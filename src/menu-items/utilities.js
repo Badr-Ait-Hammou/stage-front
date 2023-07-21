@@ -33,6 +33,14 @@ const utilities = {
       breadcrumbs: false
     },
     {
+      id: 'image',
+      title: 'Image',
+      type: 'item',
+      url: '/image/image',
+      icon: icons.IconPalette,
+      breadcrumbs: false
+    },
+    {
       id: 'util-shadow',
       title: 'Shadow',
       type: 'item',

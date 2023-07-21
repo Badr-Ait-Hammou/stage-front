@@ -16,6 +16,9 @@ const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons
 
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
+const Image = Loadable(lazy(() => import('../component/Image')));
+const Information = Loadable(lazy(() => import('../component/Information')));
+const Annotation = Loadable(lazy(() => import('../component/Annotation')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -37,6 +40,23 @@ const MainRoutes = {
       ]
     },
     {
+      path: 'annotation',
+      children: [
+        {
+          path: 'annotation',
+          element: <Annotation />
+        }
+      ]
+    }, {
+      path: 'information',
+      children: [
+        {
+          path: 'information',
+          element: <Information />
+        }
+      ]
+    },
+    {
       path: 'utils',
       children: [
         {
@@ -54,6 +74,7 @@ const MainRoutes = {
         }
       ]
     },
+
     {
       path: 'utils',
       children: [
@@ -63,6 +84,16 @@ const MainRoutes = {
         }
       ]
     },
+    {
+      path: 'image',
+      children: [
+        {
+          path: 'image',
+          element: <Image />
+        }
+      ]
+    },
+
     {
       path: 'icons',
       children: [
@@ -81,6 +112,7 @@ const MainRoutes = {
         }
       ]
     },
+
     {
       path: 'sample-page',
       element: <SamplePage />
