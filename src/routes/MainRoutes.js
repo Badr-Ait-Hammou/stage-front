@@ -1,24 +1,21 @@
-import { lazy } from 'react';
-
-// project imports
+import React from 'react';
 import MainLayout from 'layout/MainLayout';
-import Loadable from 'ui-component/Loadable';
 
 // dashboard routing
-const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
+import DashboardDefault from 'views/dashboard/Default';
 
 // utilities routing
-const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
-const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
-const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
-const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
-const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
+import UtilsTypography from 'views/utilities/Typography';
+import UtilsColor from 'views/utilities/Color';
+import UtilsShadow from 'views/utilities/Shadow';
+import UtilsMaterialIcons from 'views/utilities/MaterialIcons';
+import UtilsTablerIcons from 'views/utilities/TablerIcons';
 
 // sample page routing
-const SamplePage = Loadable(lazy(() => import('views/sample-page')));
-const Image = Loadable(lazy(() => import('../component/Image')));
-const Information = Loadable(lazy(() => import('../component/Information')));
-const Annotation = Loadable(lazy(() => import('../component/Annotation')));
+import SamplePage from 'views/sample-page';
+import Image from '../component/Image';
+import Information from '../component/Information';
+import Annotation from '../component/Annotation';
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -41,20 +38,11 @@ const MainRoutes = {
     },
     {
       path: 'annotation',
-      children: [
-        {
-          path: 'annotation',
-          element: <Annotation />
-        }
-      ]
-    }, {
+      element: <Annotation />
+    },
+    {
       path: 'information',
-      children: [
-        {
-          path: 'information',
-          element: <Information />
-        }
-      ]
+      element: <Information />
     },
     {
       path: 'utils',
@@ -86,12 +74,7 @@ const MainRoutes = {
     },
     {
       path: 'image',
-      children: [
-        {
-          path: 'image',
-          element: <Image />
-        }
-      ]
+      element: <Image />
     },
 
     {

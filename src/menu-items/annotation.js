@@ -1,8 +1,8 @@
 // assets
-import { IconDashboard } from '@tabler/icons';
+import { IconPencil } from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard };
+const icons = { IconPencil };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -14,8 +14,8 @@ const annotation = {
             id: 'annotation',
             title: 'annotation',
             type: 'item',
-            url: '/annotation/annotation',
-            icon: icons.IconDashboard,
+            url: '/annotation',
+            icon: icons.IconPencil,
             breadcrumbs: false
         }
     ]
