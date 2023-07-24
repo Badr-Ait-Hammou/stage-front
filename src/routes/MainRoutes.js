@@ -16,6 +16,9 @@ import SamplePage from 'views/sample-page';
 import Image from '../component/Image';
 import Information from '../component/Information';
 import Annotation from '../component/Annotation';
+import Projects from '../component/Projects';
+import Storage from '../component/Storage';
+
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -43,6 +46,12 @@ const MainRoutes = {
     {
       path: 'information',
       element: <Information />
+    }, {
+      path: 'projects',
+      element: <Projects />
+    }, {
+      path: 'storage',
+      element: <Storage />
     },
     {
       path: 'utils',

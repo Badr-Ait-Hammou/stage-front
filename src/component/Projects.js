@@ -22,7 +22,7 @@ import { Tag } from 'primereact/tag';
 import 'primeicons/primeicons.css';
 
 
-export default function Image() {
+export default function Projects() {
     let emptyProduct = {
         id: null,
         name: '',
@@ -358,4 +358,3 @@ export default function Image() {
         </div>
     );
 }
-        

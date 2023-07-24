@@ -1,12 +1,13 @@
 // assets
-import { IconTypography, IconPalette, IconShadow, IconWindmill } from '@tabler/icons';
-
+import { IconTypography, IconPalette, IconShadow, IconWindmill,IconBrandMiniprogram,IconDownload } from '@tabler/icons';
 // constant
 const icons = {
   IconTypography,
   IconPalette,
   IconShadow,
-  IconWindmill
+  IconWindmill,
+  IconBrandMiniprogram,
+  IconDownload
 };
 
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
@@ -17,6 +18,20 @@ const utilities = {
   type: 'group',
   children: [
     {
+      id: 'projects',
+      title: 'Projects',
+      type: 'item',
+      url: '/projects',
+      icon: icons.IconBrandMiniprogram,
+      breadcrumbs: false
+    }, {
+      id: 'storage',
+      title: 'Storage',
+      type: 'item',
+      url: '/storage',
+      icon: icons.IconDownload,
+      breadcrumbs: false
+    }, {
       id: 'util-typography',
       title: 'Typography',
       type: 'item',
