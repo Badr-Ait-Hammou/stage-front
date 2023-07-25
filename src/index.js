@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-
+import "App.css";
 // third party
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
