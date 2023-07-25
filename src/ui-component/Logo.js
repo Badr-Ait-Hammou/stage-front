@@ -1,6 +1,6 @@
 // material-ui
 //import { useTheme } from '@mui/material/styles';
-import Visumine from '../assets/images/Visu.svg';
+import Visumine from '../assets/images/visulogo1.svg';
 
 /**
  * if you want to use image instead of <svg> uncomment following.
@@ -16,7 +16,7 @@ const Logo = () => {
   //const theme = useTheme();
 
   return (
-      <img src={Visumine} alt="Berry" width="30" />
+      <img src={Visumine} alt="Berry" width="35" style={{marginLeft:"6px"}} />
     /**
      * if you want to use image instead of svg uncomment following, and comment out <svg> element.
      *
