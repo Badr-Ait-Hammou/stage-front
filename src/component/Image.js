@@ -1,25 +1,24 @@
 
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 //theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 
 //core
 
 import "primereact/resources/primereact.min.css";
-import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton } from 'primereact/radiobutton';
-import { InputNumber } from 'primereact/inputnumber';
+import { FileUpload } from 'primereact/fileupload';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { Tag } from 'primereact/tag';
 import 'primeicons/primeicons.css';
+import axios from "axios";
+import { Dropdown } from 'primereact/dropdown';
+
 
 
 export default function Image() {
@@ -46,7 +45,42 @@ export default function Image() {
     const toast = useRef(null);
     const dt = useRef(null);
 
+    const [nom, setNom] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [description, setDescription] = useState('');
+    const [format, setFormat] = useState('');
+    const [projetId, setProjetId] = useState("");
+    const [projet, setProjet] = useState([]);
 
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/projet/all').then((response) => {
+            setProjet(response.data);
+        });
+    }, []);
+
+    const handleSubmit = (event) => {
+        event?.preventDefault();
+        axios.post('http://localhost:8080/api/image/save', {
+            nom, photo, description, format, projet: {
+                id: projetId
+            }
+        }).then(() => {
+            setNom("");
+            setPhoto("");
+            setDescription("");
+            setFormat("");
+            setProjetId("");
+        });
+    };
+
+    const handlePhotoChange = (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setPhoto(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    };
 
     const formatCurrency = (value) => {
         return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -71,30 +105,30 @@ export default function Image() {
         setDeleteProductsDialog(false);
     };
 
-    const saveProduct = () => {
-        setSubmitted(true);
-
-        if (product.name.trim()) {
-            let _products = [...products];
-            let _product = { ...product };
-
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _products[index] = _product;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            } else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            setProducts(_products);
-            setProductDialog(false);
-            setProduct(emptyProduct);
-        }
-    };
+    // const saveProduct = () => {
+    //     setSubmitted(true);
+    //
+    //     if (product.name.trim()) {
+    //         let _products = [...products];
+    //         let _product = { ...product };
+    //
+    //         if (product.id) {
+    //             const index = findIndexById(product.id);
+    //
+    //             _products[index] = _product;
+    //             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+    //         } else {
+    //             _product.id = createId();
+    //             _product.image = 'product-placeholder.svg';
+    //             _products.push(_product);
+    //             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+    //         }
+    //
+    //         setProducts(_products);
+    //         setProductDialog(false);
+    //         setProduct(emptyProduct);
+    //     }
+    // };
 
     const editProduct = (product) => {
         setProduct({ ...product });
@@ -115,29 +149,29 @@ export default function Image() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     };
 
-    const findIndexById = (id) => {
-        let index = -1;
+    // const findIndexById = (id) => {
+    //     let index = -1;
+    //
+    //     for (let i = 0; i < products.length; i++) {
+    //         if (products[i].id === id) {
+    //             index = i;
+    //             break;
+    //         }
+    //     }
+    //
+    //     return index;
+    // };
 
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    };
-
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        return id;
-    };
+    // const createId = () => {
+    //     let id = '';
+    //     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    //
+    //     for (let i = 0; i < 5; i++) {
+    //         id += chars.charAt(Math.floor(Math.random() * chars.length));
+    //     }
+    //
+    //     return id;
+    // };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -156,30 +190,30 @@ export default function Image() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     };
 
-    const onCategoryChange = (e) => {
-        let _product = { ...product };
+    // const onCategoryChange = (e) => {
+    //     let _product = { ...product };
+    //
+    //     _product['category'] = e.value;
+    //     setProduct(_product);
+    // };
 
-        _product['category'] = e.value;
-        setProduct(_product);
-    };
+    // const onInputChange = (e, name) => {
+    //     const val = (e.target && e.target.value) || '';
+    //     let _product = { ...product };
+    //
+    //     _product[`${name}`] = val;
+    //
+    //     setProduct(_product);
+    // };
 
-    const onInputChange = (e, name) => {
-        const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
-
-        _product[`${name}`] = val;
-
-        setProduct(_product);
-    };
-
-    const onInputNumberChange = (e, name) => {
-        const val = e.value || 0;
-        let _product = { ...product };
-
-        _product[`${name}`] = val;
-
-        setProduct(_product);
-    };
+    // const onInputNumberChange = (e, name) => {
+    //     const val = e.value || 0;
+    //     let _product = { ...product };
+    //
+    //     _product[`${name}`] = val;
+    //
+    //     setProduct(_product);
+    // };
 
     const leftToolbarTemplate = () => {
         return (
@@ -202,13 +236,10 @@ export default function Image() {
         return formatCurrency(rowData.price);
     };
 
-    const ratingBodyTemplate = (rowData) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    };
 
-    const statusBodyTemplate = (rowData) => {
-        return <Tag value={rowData.inventoryStatus} severity={getSeverity(rowData)}></Tag>;
-    };
+    // const statusBodyTemplate = (rowData) => {
+    //     return <Tag value={rowData.inventoryStatus} severity={getSeverity(rowData)}></Tag>;
+    // };
 
     const actionBodyTemplate = (rowData) => {
         return (
@@ -218,22 +249,22 @@ export default function Image() {
             </React.Fragment>
         );
     };
-
-    const getSeverity = (product) => {
-        switch (product.inventoryStatus) {
-            case 'INSTOCK':
-                return 'success';
-
-            case 'LOWSTOCK':
-                return 'warning';
-
-            case 'OUTOFSTOCK':
-                return 'danger';
-
-            default:
-                return null;
-        }
-    };
+    //
+    // const getSeverity = (product) => {
+    //     switch (product.inventoryStatus) {
+    //         case 'INSTOCK':
+    //             return 'success';
+    //
+    //         case 'LOWSTOCK':
+    //             return 'warning';
+    //
+    //         case 'OUTOFSTOCK':
+    //             return 'danger';
+    //
+    //         default:
+    //             return null;
+    //     }
+    // };
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -247,7 +278,7 @@ export default function Image() {
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" onClick={saveProduct} />
+            <Button label="Save" icon="pi pi-check" onClick={handleSubmit} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -274,13 +305,11 @@ export default function Image() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column selectionMode="multiple" exportable={false}></Column>
-                    <Column field="code" header="Code" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Name" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="image" header="Image" body={imageBodyTemplate}></Column>
-                    <Column field="price" header="Price" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column field="category" header="Category" sortable style={{ minWidth: '10rem' }}></Column>
-                    <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="photo" header="Photo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="description" header="Description" body={imageBodyTemplate}></Column>
+                    <Column field="format" header="Format" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
+                    <Column field="projet" header="Projet" sortable style={{ minWidth: '10rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
@@ -291,49 +320,39 @@ export default function Image() {
                     <label htmlFor="name" className="font-bold">
                         Name
                     </label>
-                    <InputText id="name" value={product.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.name })} />
+                    <InputText id="name" value={nom} onChange={(event) => setNom(event.target.value)} required autoFocus  />
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="description" className="font-bold">
                         Description
                     </label>
-                    <InputTextarea id="description" value={product.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
-                </div>
-
-                <div className="field">
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
-                    </div>
+                    <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
                 </div>
 
                 <div className="formgrid grid">
                     <div className="field col">
-                        <label htmlFor="price" className="font-bold">
-                            Price
+                        <label htmlFor="format" className="font-bold">
+                            Format
                         </label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
+                        <InputText id="format" value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
                     </div>
                     <div className="field col">
                         <label htmlFor="quantity" className="font-bold">
-                            Quantity
+                            Photo
                         </label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} />
+                        <FileUpload mode="basic" name="demo[]"  accept="image/*" maxFileSize={1000000} onChange={handlePhotoChange} />
+                    </div>
+
+                    <div className="field col">
+                        <Dropdown
+                            id="projetId"
+                            value={projetId}
+                            options={projet}
+                            onChange={(event) => setProjetId(event.value)}
+                            placeholder="Select projet"
+                            optionLabel="name"
+                        />
                     </div>
                 </div>
             </Dialog>
