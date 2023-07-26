@@ -17,7 +17,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
-import { Dropdown } from 'primereact/dropdown';
+
 
 
 
@@ -51,40 +51,70 @@ export default function Image() {
     const [format, setFormat] = useState('');
     const [projetId, setProjetId] = useState("");
     const [projet, setProjet] = useState([]);
+    const [image, setImages] =  useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/projet/all').then((response) => {
-            setProjet(response.data);
-        });
+        fetchData();
     }, []);
+
+    const fetchData = async () => {
+        try {
+            const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
+            setProjet(projetResponse.data);
+
+            // const imageResponse = await axios.get('http://localhost:8080/api/image/all');
+            // setImages(imageResponse.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
     const handleSubmit = (event) => {
         event?.preventDefault();
-        axios.post('http://localhost:8080/api/image/save', {
+        axios.post("http://localhost:8080/api/image/save", {
             nom, photo, description, format, projet: {
                 id: projetId
             }
-        }).then(() => {
+        }).then((response) => {
+            console.log(response.data);
+            console.log(photo);
             setNom("");
             setPhoto("");
             setDescription("");
             setFormat("");
             setProjetId("");
+            hideDialog();
+            showusave();
+        }).catch((error) => {
+            console.error("Error while saving image:", error);
         });
     };
 
     const handlePhotoChange = (event) => {
         const file = event.target.files[0];
+
+        if (!file || !file.type.startsWith('image/')) {
+            // Handle the case where no image file is provided or the selected file is not an image
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
+            // e.target.result contains the data URL of the selected image
             setPhoto(e.target.result);
         };
         reader.readAsDataURL(file);
     };
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    };
+    // const formatCurrency = (value) => {
+    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    // };
+
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
+    }
+
+
 
     const openNew = () => {
         setProduct(emptyProduct);
@@ -228,13 +258,13 @@ export default function Image() {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
     };
 
-    const imageBodyTemplate = (rowData) => {
-        return <img src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2 border-round" style={{ width: '64px' }} />;
-    };
+    // const imageBodyTemplate = (rowData) => {
+    //     return <img src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2 border-round" style={{ width: '64px' }} />;
+    // };
 
-    const priceBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.price);
-    };
+    // const priceBodyTemplate = (rowData) => {
+    //     return formatCurrency(rowData.price);
+    // };
 
 
     // const statusBodyTemplate = (rowData) => {
@@ -300,25 +330,25 @@ export default function Image() {
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
-                <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={image} onSelectionChange={(e) => setSelectedProducts(e.value)}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column selectionMode="multiple" exportable={false}></Column>
                     <Column field="photo" header="Photo" sortable style={{ minWidth: '12rem' }}></Column>
                     <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="description" header="Description" body={imageBodyTemplate}></Column>
-                    <Column field="format" header="Format" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
+                    <Column field="description" header="Description" ></Column>
+                    <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
                     <Column field="projet" header="Projet" sortable style={{ minWidth: '10rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 {product.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
-                        Name
+                        Nom
                     </label>
                     <InputText id="name" value={nom} onChange={(event) => setNom(event.target.value)} required autoFocus  />
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
@@ -345,14 +375,28 @@ export default function Image() {
                     </div>
 
                     <div className="field col">
-                        <Dropdown
+                        <select
                             id="projetId"
+                            className="form-control"
                             value={projetId}
-                            options={projet}
-                            onChange={(event) => setProjetId(event.value)}
-                            placeholder="Select projet"
-                            optionLabel="name"
-                        />
+                            onChange={(event) => setProjetId(event.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '0.5rem 1rem',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '1rem',
+                                lineHeight: '1.5',
+                            }}
+                        >
+                            <option value="">Select Projet</option>
+                            {projet &&
+                                projet.map((projet) => (
+                                    <option key={projet.id} value={projet.id}>
+                                        {projet.name}
+                                    </option>
+                                ))}
+                        </select>
                     </div>
                 </div>
             </Dialog>
