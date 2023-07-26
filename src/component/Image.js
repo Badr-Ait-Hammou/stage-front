@@ -324,6 +324,21 @@ export default function Image() {
         </React.Fragment>
     );
 
+    const photoBodyTemplate = (rowData) => {
+        if (rowData.photo) {
+            return (
+                <img
+                    src={rowData.photo}
+                    alt={rowData.photo}
+                    style={{ width: '100px', height: 'auto' }}
+                    onError={() => console.error(`Failed to load image for row with ID: ${rowData.id}`)}
+                />
+            );
+        }
+        // If photo is missing or empty, display a placeholder image or message
+        return <img src="https://example.com/placeholder-image.jpg" alt="No" style={{ width: '100px', height: 'auto' }} />;
+    }
+
     return (
         <div>
             <Toast ref={toast} />
@@ -335,7 +350,7 @@ export default function Image() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column selectionMode="multiple" exportable={false}></Column>
-                    <Column field="photo" header="Photo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
                     <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="description" header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
@@ -371,7 +386,27 @@ export default function Image() {
                         <label htmlFor="quantity" className="font-bold">
                             Photo
                         </label>
-                        <FileUpload mode="basic" name="demo[]"  accept="image/*" maxFileSize={1000000} onChange={handlePhotoChange} />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            id="photo"
+                            onChange={handlePhotoChange}
+                            className="form-control custom-file-input"
+                            style={{
+                                width: '100%',
+                                height: '38px', // Adjust the height as needed
+                                padding: '0.375rem 0.75rem',
+                                fontSize: '1rem',
+                                lineHeight: '1.5',
+                                color: '#495057',
+                                backgroundColor: '#fff',
+                                backgroundClip: 'padding-box',
+                                border: '1px solid #ced4da',
+                                borderRadius: '0.25rem',
+                                marginBottom: '2rem',
+                                transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                            }}
+                        />
                     </div>
 
                     <div className="field col">
