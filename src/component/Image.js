@@ -62,8 +62,8 @@ export default function Image() {
             const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
             setProjet(projetResponse.data);
 
-            // const imageResponse = await axios.get('http://localhost:8080/api/image/all');
-            // setImages(imageResponse.data);
+             const imageResponse = await axios.get('http://localhost:8080/api/image/all');
+             setImages(imageResponse.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -339,7 +339,7 @@ export default function Image() {
                     <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="description" header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column field="projet" header="Projet" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column header="Projet" style={{ minWidth: '10rem' }} body={(rowData) => rowData.projet.name}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
