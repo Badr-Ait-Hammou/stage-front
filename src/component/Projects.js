@@ -94,7 +94,7 @@ export default function Projects() {
         };
 
         confirmDialog({
-            message: 'Are you sure you want to Delete this Restaurant ?',
+            message: 'Are you sure you want to Delete this Project ?',
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes',

@@ -1,10 +1,6 @@
 
 import React, {useState, useRef, useEffect} from 'react';
-//theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
-
-//core
-
 import "primereact/resources/primereact.min.css";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -24,21 +20,10 @@ import {Box} from "@mui/system";
 
 
 export default function Image() {
-    let emptyProduct = {
-        id: null,
-        name: '',
-        image: null,
-        description: '',
-        category: null,
-        price: 0,
-        quantity: 0,
-        rating: 0,
-        inventoryStatus: 'INSTOCK'
-    };
+
 
     const [productDialog, setProductDialog] = useState(false);
 
-    const [product] = useState(emptyProduct);
     const [editproductDialog, seteditProductDialog] = useState(false);
 
     const [submitted, setSubmitted] = useState(false);
@@ -117,13 +102,10 @@ export default function Image() {
     }
 
 
-    /********************************************Toasts *************************/
-
-    const showusave = () => {
-        toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
-    }
 
 
+
+    /******************************************** Delete *************************/
 
     const handleDelete = (id) => {
         const confirmDelete = () => {
@@ -139,7 +121,7 @@ export default function Image() {
         };
 
         confirmDialog({
-            message: 'Are you sure you want to Delete this Restaurant ?',
+            message: 'Are you sure you want to Delete this Image ?',
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes',
@@ -149,6 +131,7 @@ export default function Image() {
         });
     };
 
+    /******************************************** Dialogues *************************/
 
 
     const openNew = () => {
@@ -208,7 +191,11 @@ export default function Image() {
         }
     };
 
-    /***********************Toasts **************/
+    /********************************************Toasts *************************/
+
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
+    }
 
     const showupdate = () => {
         toast.current.show({severity:'info', summary: 'success', detail:'item updated successfully', life: 3000});
@@ -216,12 +203,13 @@ export default function Image() {
 
 
 
-    /***********************csv **************/
 
 
     const exportCSV = () => {
         dt.current.exportCSV();
     };
+
+    /******************************************** components *************************/
 
 
     const leftToolbarTemplate = () => {
@@ -313,7 +301,6 @@ export default function Image() {
             </div>
 
             <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-                {image.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                      <Box className="field">
