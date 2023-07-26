@@ -17,6 +17,8 @@ import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
+import {Grid} from "@mui/material";
+import {Box} from "@mui/system";
 
 
 
@@ -50,7 +52,6 @@ export default function Image() {
     const [description, setDescription] = useState('');
     const [format, setFormat] = useState('');
     const [projetId, setProjetId] = useState("");
-    const [projetimage, setProjetimage] = useState("");
     const [projet, setProjet] = useState([]);
     const [image, setImages] =  useState([]);
 
@@ -191,7 +192,7 @@ export default function Image() {
                 description:description,
                 format:format,
                 projet: {
-                    id: projetimage
+                    id: projetId
                 }
             });
 
@@ -311,30 +312,125 @@ export default function Image() {
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 {image.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
-                <div className="field">
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                     <Box className="field">
                     <label htmlFor="name" className="font-bold">
-                        Nom
+                        Name
                     </label>
-                    <InputText id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus  />
+                    <InputText id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
                     {submitted && !image.name && <small className="p-error">Name is required.</small>}
-                </div>
-                <div className="field">
+                </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Box className="field">
+                            <label htmlFor="format" className="font-bold ">
+                                Format
+                            </label>
+                            <InputText id="format"  value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
+                        </Box>
+                    </Grid>
+                </Grid>
+                <Box className="field mt-2">
                     <label htmlFor="description" className="font-bold">
                         Description
                     </label>
                     <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
-                </div>
+                </Box>
 
-                <div className="formgrid grid">
-                    <div className="field col">
-                        <label htmlFor="format" className="font-bold">
-                            Format
-                        </label>
-                        <InputText id="format" value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
-                    </div>
-                    <div className="field col">
+
+                    <Grid item xs={12} >
+                        <Box className="field mt-2">
+                            <label htmlFor="quantity" className="font-bold">
+                                Photo
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                id="photo"
+                                onChange={handlePhotoChange}
+                                className="form-control custom-file-input"
+                                style={{
+                                    width: '100%',
+                                    height: '38px', // Adjust the height as needed
+                                    padding: '0.375rem 0.75rem',
+                                    fontSize: '1rem',
+                                    lineHeight: '1.5',
+                                    color: '#495057',
+                                    backgroundColor: '#fff',
+                                    backgroundClip: 'padding-box',
+                                    border: '1px solid #ced4da',
+                                    borderRadius: '0.25rem',
+                                    marginBottom: '2rem',
+                                    transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                                }}
+                            />
+                        </Box>
+                    </Grid>
+                    <Grid item xs={12} >
+                        <Box className="field ">
+                            <label htmlFor="description" className="font-bold">
+                                Project
+                            </label>
+                            <select
+                                id="projetId"
+                                className="form-control"
+                                value={projetId}
+                                onChange={(event) => setProjetId(event.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.5rem 1rem',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    fontSize: '1rem',
+                                    lineHeight: '1.5',
+                                }}
+                            >
+                                <option value="">Select Projet</option>
+                                {projet &&
+                                    projet.map((projet) => (
+                                        <option key={projet.id} value={projet.id}>
+                                            {projet.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </Box>
+                    </Grid>
+
+            </Dialog>
+
+            <Dialog visible={editproductDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Edit Image" modal className="p-fluid" footer={editimageDialogFooter} onHide={hideDialog}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                        <Box className="field">
+                            <label htmlFor="name" className="font-bold">
+                                Name
+                            </label>
+                            <InputText  id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
+                            {submitted && !image.name && <small className="p-error">Name is required.</small>}
+                        </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Box className="field">
+                            <label htmlFor="format" className="font-bold ">
+                                Format
+                            </label>
+                            <InputText className="mt-2" id="format"  value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
+                        </Box>
+                    </Grid>
+                </Grid>
+                <Box className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Description
+                    </label>
+                    <InputTextarea className="mt-2" id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
+                </Box>
+
+
+                <Grid item xs={12} >
+                    <Box className="field mt-2">
                         <label htmlFor="quantity" className="font-bold">
                             Photo
                         </label>
@@ -343,7 +439,7 @@ export default function Image() {
                             accept="image/*"
                             id="photo"
                             onChange={handlePhotoChange}
-                            className="form-control custom-file-input"
+                            className="form-control custom-file-input mt-2"
                             style={{
                                 width: '100%',
                                 height: '38px', // Adjust the height as needed
@@ -359,9 +455,13 @@ export default function Image() {
                                 transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
                             }}
                         />
-                    </div>
-
-                    <div className="field col">
+                    </Box>
+                </Grid>
+                <Grid item xs={12} >
+                    <Box className="field ">
+                        <label htmlFor="description" className="font-bold">
+                            Project
+                        </label>
                         <select
                             id="projetId"
                             className="form-control"
@@ -384,86 +484,9 @@ export default function Image() {
                                     </option>
                                 ))}
                         </select>
-                    </div>
-                </div>
-            </Dialog>
+                    </Box>
+                </Grid>
 
-
-            <Dialog visible={editproductDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Image" modal className="p-fluid" footer={editimageDialogFooter} onHide={hideDialog}>
-                {product.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
-                <div className="field">
-                    <label htmlFor="name" className="font-bold">
-                        Nom
-                    </label>
-                    <InputText id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus  />
-                    {submitted && !image.name && <small className="p-error">Name is required.</small>}
-                </div>
-                <div className="field">
-                    <label htmlFor="description" className="font-bold">
-                        Description
-                    </label>
-                    <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
-                </div>
-
-                <div className="formgrid grid">
-                    <div className="field col">
-                        <label htmlFor="format" className="font-bold">
-                            Format
-                        </label>
-                        <InputText id="format" value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
-                    </div>
-                    <div className="field col">
-                        <label htmlFor="quantity" className="font-bold">
-                            Photo
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            id="photo"
-                            onChange={handlePhotoChange}
-                            className="form-control custom-file-input"
-                            style={{
-                                width: '100%',
-                                height: '38px', // Adjust the height as needed
-                                padding: '0.375rem 0.75rem',
-                                fontSize: '1rem',
-                                lineHeight: '1.5',
-                                color: '#495057',
-                                backgroundColor: '#fff',
-                                backgroundClip: 'padding-box',
-                                border: '1px solid #ced4da',
-                                borderRadius: '0.25rem',
-                                marginBottom: '2rem',
-                                transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-                            }}
-                        />
-                    </div>
-
-                    <div className="field col">
-                        <select
-                            id="projetId"
-                            className="form-control"
-                            value={projetimage}
-                            onChange={(e) => setProjetimage(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '0.5rem 1rem',
-                                border: '1px solid #ccc',
-                                borderRadius: '4px',
-                                fontSize: '1rem',
-                                lineHeight: '1.5',
-                            }}
-                        >
-                            <option value="">Select Projet</option>
-                            {projet &&
-                                projet.map((projet) => (
-                                    <option key={projet.id} value={projet.id}>
-                                        {projet.name}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-                </div>
             </Dialog>
 
 
