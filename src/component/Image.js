@@ -12,7 +12,6 @@ import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { FileUpload } from 'primereact/fileupload';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
@@ -62,8 +61,8 @@ export default function Image() {
             const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
             setProjet(projetResponse.data);
 
-            // const imageResponse = await axios.get('http://localhost:8080/api/image/all');
-            // setImages(imageResponse.data);
+            const imageResponse = await axios.get('http://localhost:8080/api/image/all');
+            setImages(imageResponse.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -84,6 +83,7 @@ export default function Image() {
             setFormat("");
             setProjetId("");
             hideDialog();
+            loadImage();
             showusave();
         }).catch((error) => {
             console.error("Error while saving image:", error);
@@ -94,27 +94,30 @@ export default function Image() {
         const file = event.target.files[0];
 
         if (!file || !file.type.startsWith('image/')) {
-            // Handle the case where no image file is provided or the selected file is not an image
             return;
         }
-
         const reader = new FileReader();
         reader.onload = (e) => {
-            // e.target.result contains the data URL of the selected image
             setPhoto(e.target.result);
         };
         reader.readAsDataURL(file);
     };
 
-    // const formatCurrency = (value) => {
-    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    // };
+    /********************************************Load image *************************/
+    const loadImage=async ()=>{
+        const res=await axios.get(`http://localhost:8080/api/image/all`);
+        setImages(res.data);
+    }
+
+
+    /********************************************Toasts *************************/
 
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
     }
 
 
+    /********************************************Dialogue open/close *************************/
 
     const openNew = () => {
         setProduct(emptyProduct);
@@ -135,30 +138,7 @@ export default function Image() {
         setDeleteProductsDialog(false);
     };
 
-    // const saveProduct = () => {
-    //     setSubmitted(true);
-    //
-    //     if (product.name.trim()) {
-    //         let _products = [...products];
-    //         let _product = { ...product };
-    //
-    //         if (product.id) {
-    //             const index = findIndexById(product.id);
-    //
-    //             _products[index] = _product;
-    //             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-    //         } else {
-    //             _product.id = createId();
-    //             _product.image = 'product-placeholder.svg';
-    //             _products.push(_product);
-    //             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-    //         }
-    //
-    //         setProducts(_products);
-    //         setProductDialog(false);
-    //         setProduct(emptyProduct);
-    //     }
-    // };
+
 
     const editProduct = (product) => {
         setProduct({ ...product });
@@ -179,29 +159,6 @@ export default function Image() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     };
 
-    // const findIndexById = (id) => {
-    //     let index = -1;
-    //
-    //     for (let i = 0; i < products.length; i++) {
-    //         if (products[i].id === id) {
-    //             index = i;
-    //             break;
-    //         }
-    //     }
-    //
-    //     return index;
-    // };
-
-    // const createId = () => {
-    //     let id = '';
-    //     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //
-    //     for (let i = 0; i < 5; i++) {
-    //         id += chars.charAt(Math.floor(Math.random() * chars.length));
-    //     }
-    //
-    //     return id;
-    // };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -220,30 +177,7 @@ export default function Image() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     };
 
-    // const onCategoryChange = (e) => {
-    //     let _product = { ...product };
-    //
-    //     _product['category'] = e.value;
-    //     setProduct(_product);
-    // };
 
-    // const onInputChange = (e, name) => {
-    //     const val = (e.target && e.target.value) || '';
-    //     let _product = { ...product };
-    //
-    //     _product[`${name}`] = val;
-    //
-    //     setProduct(_product);
-    // };
-
-    // const onInputNumberChange = (e, name) => {
-    //     const val = e.value || 0;
-    //     let _product = { ...product };
-    //
-    //     _product[`${name}`] = val;
-    //
-    //     setProduct(_product);
-    // };
 
     const leftToolbarTemplate = () => {
         return (
@@ -258,18 +192,6 @@ export default function Image() {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
     };
 
-    // const imageBodyTemplate = (rowData) => {
-    //     return <img src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2 border-round" style={{ width: '64px' }} />;
-    // };
-
-    // const priceBodyTemplate = (rowData) => {
-    //     return formatCurrency(rowData.price);
-    // };
-
-
-    // const statusBodyTemplate = (rowData) => {
-    //     return <Tag value={rowData.inventoryStatus} severity={getSeverity(rowData)}></Tag>;
-    // };
 
     const actionBodyTemplate = (rowData) => {
         return (
@@ -279,22 +201,7 @@ export default function Image() {
             </React.Fragment>
         );
     };
-    //
-    // const getSeverity = (product) => {
-    //     switch (product.inventoryStatus) {
-    //         case 'INSTOCK':
-    //             return 'success';
-    //
-    //         case 'LOWSTOCK':
-    //             return 'warning';
-    //
-    //         case 'OUTOFSTOCK':
-    //             return 'danger';
-    //
-    //         default:
-    //             return null;
-    //     }
-    // };
+
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -354,7 +261,7 @@ export default function Image() {
                     <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="description" header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column field="projet" header="Projet" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column header="Projet" style={{ minWidth: '10rem' }} body={(rowData) => rowData.projet.name}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
