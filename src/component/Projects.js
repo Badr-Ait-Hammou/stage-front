@@ -79,13 +79,18 @@ export default function Projects() {
 
     /***********************Delete **************/
 
-
     const handleDelete = (id) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/projet/${id}`).then(() => {
-                setProjects(project.filter((rowData) => rowData.id !== id));
-                toast.current.show({severity:'error', summary: 'Done', detail:'Project deleted successfully', life: 3000});
-            });
+            axios.delete(`http://localhost:8080/api/projet/${id}`)
+                .then(() => {
+                    setProjects(project.filter((rowData) => rowData.id !== id));
+                    toast.current.show({severity:'success', summary: 'Done', detail:'Project deleted successfully', life: 3000});
+                })
+                .catch((error) => {
+                    // Handle the error here, you can show an error toast or handle it as needed
+                    console.error('Error deleting project:', error);
+                    toast.current.show({severity:'error', summary: 'Error', detail:'project assigned to an image', life: 3000});
+                });
         };
 
         confirmDialog({
