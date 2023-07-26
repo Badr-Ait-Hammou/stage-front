@@ -1,25 +1,24 @@
 
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 //theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 
 //core
 
 import "primereact/resources/primereact.min.css";
-import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton } from 'primereact/radiobutton';
-import { InputNumber } from 'primereact/inputnumber';
+import { FileUpload } from 'primereact/fileupload';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { Tag } from 'primereact/tag';
 import 'primeicons/primeicons.css';
+import axios from "axios";
+
+
 
 
 export default function Image() {
@@ -46,11 +45,76 @@ export default function Image() {
     const toast = useRef(null);
     const dt = useRef(null);
 
+    const [nom, setNom] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [description, setDescription] = useState('');
+    const [format, setFormat] = useState('');
+    const [projetId, setProjetId] = useState("");
+    const [projet, setProjet] = useState([]);
+    const [image, setImages] =  useState([]);
 
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    const fetchData = async () => {
+        try {
+            const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
+            setProjet(projetResponse.data);
+
+            // const imageResponse = await axios.get('http://localhost:8080/api/image/all');
+            // setImages(imageResponse.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
+
+    const handleSubmit = (event) => {
+        event?.preventDefault();
+        axios.post("http://localhost:8080/api/image/save", {
+            nom, photo, description, format, projet: {
+                id: projetId
+            }
+        }).then((response) => {
+            console.log(response.data);
+            console.log(photo);
+            setNom("");
+            setPhoto("");
+            setDescription("");
+            setFormat("");
+            setProjetId("");
+            hideDialog();
+            showusave();
+        }).catch((error) => {
+            console.error("Error while saving image:", error);
+        });
+    };
+
+    const handlePhotoChange = (event) => {
+        const file = event.target.files[0];
+
+        if (!file || !file.type.startsWith('image/')) {
+            // Handle the case where no image file is provided or the selected file is not an image
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            // e.target.result contains the data URL of the selected image
+            setPhoto(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // const formatCurrency = (value) => {
+    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    // };
+
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
+    }
+
+
 
     const openNew = () => {
         setProduct(emptyProduct);
@@ -71,30 +135,30 @@ export default function Image() {
         setDeleteProductsDialog(false);
     };
 
-    const saveProduct = () => {
-        setSubmitted(true);
-
-        if (product.name.trim()) {
-            let _products = [...products];
-            let _product = { ...product };
-
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _products[index] = _product;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            } else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            setProducts(_products);
-            setProductDialog(false);
-            setProduct(emptyProduct);
-        }
-    };
+    // const saveProduct = () => {
+    //     setSubmitted(true);
+    //
+    //     if (product.name.trim()) {
+    //         let _products = [...products];
+    //         let _product = { ...product };
+    //
+    //         if (product.id) {
+    //             const index = findIndexById(product.id);
+    //
+    //             _products[index] = _product;
+    //             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+    //         } else {
+    //             _product.id = createId();
+    //             _product.image = 'product-placeholder.svg';
+    //             _products.push(_product);
+    //             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+    //         }
+    //
+    //         setProducts(_products);
+    //         setProductDialog(false);
+    //         setProduct(emptyProduct);
+    //     }
+    // };
 
     const editProduct = (product) => {
         setProduct({ ...product });
@@ -115,29 +179,29 @@ export default function Image() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     };
 
-    const findIndexById = (id) => {
-        let index = -1;
+    // const findIndexById = (id) => {
+    //     let index = -1;
+    //
+    //     for (let i = 0; i < products.length; i++) {
+    //         if (products[i].id === id) {
+    //             index = i;
+    //             break;
+    //         }
+    //     }
+    //
+    //     return index;
+    // };
 
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    };
-
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        return id;
-    };
+    // const createId = () => {
+    //     let id = '';
+    //     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    //
+    //     for (let i = 0; i < 5; i++) {
+    //         id += chars.charAt(Math.floor(Math.random() * chars.length));
+    //     }
+    //
+    //     return id;
+    // };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -156,30 +220,30 @@ export default function Image() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     };
 
-    const onCategoryChange = (e) => {
-        let _product = { ...product };
+    // const onCategoryChange = (e) => {
+    //     let _product = { ...product };
+    //
+    //     _product['category'] = e.value;
+    //     setProduct(_product);
+    // };
 
-        _product['category'] = e.value;
-        setProduct(_product);
-    };
+    // const onInputChange = (e, name) => {
+    //     const val = (e.target && e.target.value) || '';
+    //     let _product = { ...product };
+    //
+    //     _product[`${name}`] = val;
+    //
+    //     setProduct(_product);
+    // };
 
-    const onInputChange = (e, name) => {
-        const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
-
-        _product[`${name}`] = val;
-
-        setProduct(_product);
-    };
-
-    const onInputNumberChange = (e, name) => {
-        const val = e.value || 0;
-        let _product = { ...product };
-
-        _product[`${name}`] = val;
-
-        setProduct(_product);
-    };
+    // const onInputNumberChange = (e, name) => {
+    //     const val = e.value || 0;
+    //     let _product = { ...product };
+    //
+    //     _product[`${name}`] = val;
+    //
+    //     setProduct(_product);
+    // };
 
     const leftToolbarTemplate = () => {
         return (
@@ -194,21 +258,18 @@ export default function Image() {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
     };
 
-    const imageBodyTemplate = (rowData) => {
-        return <img src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2 border-round" style={{ width: '64px' }} />;
-    };
+    // const imageBodyTemplate = (rowData) => {
+    //     return <img src={`https://primefaces.org/cdn/primereact/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2 border-round" style={{ width: '64px' }} />;
+    // };
 
-    const priceBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.price);
-    };
+    // const priceBodyTemplate = (rowData) => {
+    //     return formatCurrency(rowData.price);
+    // };
 
-    const ratingBodyTemplate = (rowData) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    };
 
-    const statusBodyTemplate = (rowData) => {
-        return <Tag value={rowData.inventoryStatus} severity={getSeverity(rowData)}></Tag>;
-    };
+    // const statusBodyTemplate = (rowData) => {
+    //     return <Tag value={rowData.inventoryStatus} severity={getSeverity(rowData)}></Tag>;
+    // };
 
     const actionBodyTemplate = (rowData) => {
         return (
@@ -218,22 +279,22 @@ export default function Image() {
             </React.Fragment>
         );
     };
-
-    const getSeverity = (product) => {
-        switch (product.inventoryStatus) {
-            case 'INSTOCK':
-                return 'success';
-
-            case 'LOWSTOCK':
-                return 'warning';
-
-            case 'OUTOFSTOCK':
-                return 'danger';
-
-            default:
-                return null;
-        }
-    };
+    //
+    // const getSeverity = (product) => {
+    //     switch (product.inventoryStatus) {
+    //         case 'INSTOCK':
+    //             return 'success';
+    //
+    //         case 'LOWSTOCK':
+    //             return 'warning';
+    //
+    //         case 'OUTOFSTOCK':
+    //             return 'danger';
+    //
+    //         default:
+    //             return null;
+    //     }
+    // };
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -247,7 +308,7 @@ export default function Image() {
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" onClick={saveProduct} />
+            <Button label="Save" icon="pi pi-check" onClick={handleSubmit} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -269,71 +330,73 @@ export default function Image() {
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
-                <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={image} onSelectionChange={(e) => setSelectedProducts(e.value)}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column selectionMode="multiple" exportable={false}></Column>
-                    <Column field="code" header="Code" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Name" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="image" header="Image" body={imageBodyTemplate}></Column>
-                    <Column field="price" header="Price" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column field="category" header="Category" sortable style={{ minWidth: '10rem' }}></Column>
-                    <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="photo" header="Photo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="description" header="Description" ></Column>
+                    <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
+                    <Column field="projet" header="Projet" sortable style={{ minWidth: '10rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 {product.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
-                        Name
+                        Nom
                     </label>
-                    <InputText id="name" value={product.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.name })} />
+                    <InputText id="name" value={nom} onChange={(event) => setNom(event.target.value)} required autoFocus  />
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="description" className="font-bold">
                         Description
                     </label>
-                    <InputTextarea id="description" value={product.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
-                </div>
-
-                <div className="field">
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
-                    </div>
+                    <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
                 </div>
 
                 <div className="formgrid grid">
                     <div className="field col">
-                        <label htmlFor="price" className="font-bold">
-                            Price
+                        <label htmlFor="format" className="font-bold">
+                            Format
                         </label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
+                        <InputText id="format" value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
                     </div>
                     <div className="field col">
                         <label htmlFor="quantity" className="font-bold">
-                            Quantity
+                            Photo
                         </label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} />
+                        <FileUpload mode="basic" name="demo[]"  accept="image/*" maxFileSize={1000000} onChange={handlePhotoChange} />
+                    </div>
+
+                    <div className="field col">
+                        <select
+                            id="projetId"
+                            className="form-control"
+                            value={projetId}
+                            onChange={(event) => setProjetId(event.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '0.5rem 1rem',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '1rem',
+                                lineHeight: '1.5',
+                            }}
+                        >
+                            <option value="">Select Projet</option>
+                            {projet &&
+                                projet.map((projet) => (
+                                    <option key={projet.id} value={projet.id}>
+                                        {projet.name}
+                                    </option>
+                                ))}
+                        </select>
                     </div>
                 </div>
             </Dialog>
