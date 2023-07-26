@@ -16,6 +16,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
+import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 
 
 
@@ -33,22 +34,23 @@ export default function Image() {
         inventoryStatus: 'INSTOCK'
     };
 
-    const [products, setProducts] = useState(null);
     const [productDialog, setProductDialog] = useState(false);
-    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [product, setProduct] = useState(emptyProduct);
-    const [selectedProducts, setSelectedProducts] = useState(null);
+
+    const [product] = useState(emptyProduct);
+    const [editproductDialog, seteditProductDialog] = useState(false);
+
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
+    const [selectedProject, setSelectedProject] = useState(null);
 
-    const [nom, setNom] = useState('');
+    const [name, setName] = useState('');
     const [photo, setPhoto] = useState('');
     const [description, setDescription] = useState('');
     const [format, setFormat] = useState('');
     const [projetId, setProjetId] = useState("");
+    const [projetimage, setProjetimage] = useState("");
     const [projet, setProjet] = useState([]);
     const [image, setImages] =  useState([]);
 
@@ -71,13 +73,17 @@ export default function Image() {
     const handleSubmit = (event) => {
         event?.preventDefault();
         axios.post("http://localhost:8080/api/image/save", {
-            nom, photo, description, format, projet: {
+            name,
+            photo,
+            description,
+            format,
+            projet: {
                 id: projetId
             }
         }).then((response) => {
             console.log(response.data);
             console.log(photo);
-            setNom("");
+            setName("");
             setPhoto("");
             setDescription("");
             setFormat("");
@@ -117,11 +123,42 @@ export default function Image() {
     }
 
 
-    /********************************************Dialogue open/close *************************/
+
+    const handleDelete = (id) => {
+        const confirmDelete = () => {
+            axios.delete(`http://localhost:8080/api/image/${id}`)
+                .then(() => {
+                    setImages(image.filter((rowData) => rowData.id !== id));
+                    toast.current.show({severity:'success', summary: 'Done', detail:'Image deleted successfully', life: 3000});
+                })
+                .catch((error) => {
+                    console.error('Error deleting project:', error);
+                    toast.current.show({severity:'error', summary: 'Error', detail:'failed to delete Image', life: 3000});
+                });
+        };
+
+        confirmDialog({
+            message: 'Are you sure you want to Delete this Restaurant ?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete
+        });
+    };
+
+
 
     const openNew = () => {
-        setProduct(emptyProduct);
+        setImages(image);
         setSubmitted(false);
+        setDescription("");
+        setName("");
+        setPhoto("");
+        setDescription("");
+        setFormat("");
+        setProjetId("");
         setProductDialog(true);
     };
 
@@ -129,61 +166,67 @@ export default function Image() {
         setSubmitted(false);
         setProductDialog(false);
     };
-
-    const hideDeleteProductDialog = () => {
-        setDeleteProductDialog(false);
-    };
-
-    const hideDeleteProductsDialog = () => {
-        setDeleteProductsDialog(false);
+    const hideeditDialog = () => {
+        // setSubmitted(false);
+        seteditProductDialog(false);
     };
 
 
+    /***********************Update **************/
 
-    const editProduct = (product) => {
-        setProduct({ ...product });
-        setProductDialog(true);
+    const handleupdate = (rowData) => {
+        setSelectedProject(rowData);
+        setName(rowData.name);
+        setDescription(rowData.description);
+        setPhoto(rowData.photo);
+        setFormat(rowData.format);
+        seteditProductDialog(true);
     };
 
-    const confirmDeleteProduct = (product) => {
-        setProduct(product);
-        setDeleteProductDialog(true);
+    const handleEdit = async (projectToUpdate) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/api/image/${projectToUpdate.id}`, {
+                name:name,
+                photo:photo,
+                description:description,
+                format:format,
+                projet: {
+                    id: projetimage
+                }
+            });
+
+            const updatedProject = [...image];
+            const updatedProjectIndex = updatedProject.findIndex((image) => image.id === projectToUpdate.id);
+            updatedProject[updatedProjectIndex] = response.data;
+
+            hideeditDialog();
+            loadImage();
+            showupdate()
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const deleteProduct = () => {
-        let _products = products.filter((val) => val.id !== product.id);
+    /***********************Toasts **************/
 
-        setProducts(_products);
-        setDeleteProductDialog(false);
-        setProduct(emptyProduct);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-    };
+    const showupdate = () => {
+        toast.current.show({severity:'info', summary: 'success', detail:'item updated successfully', life: 3000});
+    }
+
+
+
+    /***********************csv **************/
 
 
     const exportCSV = () => {
         dt.current.exportCSV();
     };
 
-    const confirmDeleteSelected = () => {
-        setDeleteProductsDialog(true);
-    };
-
-    const deleteSelectedProducts = () => {
-        let _products = products.filter((val) => !selectedProducts.includes(val));
-
-        setProducts(_products);
-        setDeleteProductsDialog(false);
-        setSelectedProducts(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
-    };
-
-
 
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button  label="New" icon="pi pi-plus" severity="success" onClick={openNew} />
-                <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                <Button   label="New" icon="pi pi-plus" severity="success" onClick={openNew} />
             </div>
         );
     };
@@ -193,11 +236,14 @@ export default function Image() {
     };
 
 
+
+
+
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteProduct(rowData)} />
+                <Button icon="pi pi-pencil" rounded outlined style={{marginRight:"4px"}} onClick={() => handleupdate(rowData)} />
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => handleDelete(rowData.id)} />
             </React.Fragment>
         );
     };
@@ -205,7 +251,6 @@ export default function Image() {
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0">Manage Products</h4>
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
@@ -215,21 +260,19 @@ export default function Image() {
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" onClick={handleSubmit} />
+            <Button  label="save"
+                     severity="success"
+                     raised onClick={(e) => handleSubmit(e)}/>
         </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const editimageDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteProductDialog} />
-            <Button label="Yes" icon="pi pi-check" severity="danger" onClick={deleteProduct} />
+            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideeditDialog} />
+            <Button label="Update" severity="info"  raised onClick={() => handleEdit(selectedProject)} />
         </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
-        <React.Fragment>
-            <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteProductsDialog} />
-            <Button label="Yes" icon="pi pi-check" severity="danger" onClick={deleteSelectedProducts} />
-        </React.Fragment>
-    );
+
+
 
     const photoBodyTemplate = (rowData) => {
         if (rowData.photo) {
@@ -249,16 +292,18 @@ export default function Image() {
     return (
         <div>
             <Toast ref={toast} />
+            <ConfirmDialog />
+
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
-                <DataTable ref={dt} value={image} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={image}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column selectionMode="multiple" exportable={false}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="nom" header="Nom" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="name" header="Name" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="description" header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
                     <Column header="Projet" style={{ minWidth: '10rem' }} body={(rowData) => rowData.projet.name}></Column>
@@ -267,13 +312,13 @@ export default function Image() {
             </div>
 
             <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-                {product.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
+                {image.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
                         Nom
                     </label>
-                    <InputText id="name" value={nom} onChange={(event) => setNom(event.target.value)} required autoFocus  />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                    <InputText id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus  />
+                    {submitted && !image.name && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="description" className="font-bold">
@@ -343,23 +388,85 @@ export default function Image() {
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
-                <div className="confirmation-content">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && (
-                        <span>
-                            Are you sure you want to delete <b>{product.name}</b>?
-                        </span>
-                    )}
+
+            <Dialog visible={editproductDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Image" modal className="p-fluid" footer={editimageDialogFooter} onHide={hideDialog}>
+                {product.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.image} className="product-image block m-auto pb-3" />}
+                <div className="field">
+                    <label htmlFor="name" className="font-bold">
+                        Nom
+                    </label>
+                    <InputText id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus  />
+                    {submitted && !image.name && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field">
+                    <label htmlFor="description" className="font-bold">
+                        Description
+                    </label>
+                    <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
+                </div>
+
+                <div className="formgrid grid">
+                    <div className="field col">
+                        <label htmlFor="format" className="font-bold">
+                            Format
+                        </label>
+                        <InputText id="format" value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
+                    </div>
+                    <div className="field col">
+                        <label htmlFor="quantity" className="font-bold">
+                            Photo
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            id="photo"
+                            onChange={handlePhotoChange}
+                            className="form-control custom-file-input"
+                            style={{
+                                width: '100%',
+                                height: '38px', // Adjust the height as needed
+                                padding: '0.375rem 0.75rem',
+                                fontSize: '1rem',
+                                lineHeight: '1.5',
+                                color: '#495057',
+                                backgroundColor: '#fff',
+                                backgroundClip: 'padding-box',
+                                border: '1px solid #ced4da',
+                                borderRadius: '0.25rem',
+                                marginBottom: '2rem',
+                                transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+                            }}
+                        />
+                    </div>
+
+                    <div className="field col">
+                        <select
+                            id="projetId"
+                            className="form-control"
+                            value={projetimage}
+                            onChange={(e) => setProjetimage(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '0.5rem 1rem',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '1rem',
+                                lineHeight: '1.5',
+                            }}
+                        >
+                            <option value="">Select Projet</option>
+                            {projet &&
+                                projet.map((projet) => (
+                                    <option key={projet.id} value={projet.id}>
+                                        {projet.name}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductsDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
-                <div className="confirmation-content">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete the selected products?</span>}
-                </div>
-            </Dialog>
+
         </div>
     );
 }
