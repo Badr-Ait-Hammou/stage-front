@@ -1,17 +1,113 @@
 import React from "react"
 import MainCard from "../ui-component/cards/MainCard";
-import {Typography} from "@mui/material";
+import {Dropdown} from "primereact/dropdown";
+import { Calendar } from 'primereact/calendar';
 
 export default function Annotation(){
-    return(
 
+
+    return(
+      <>
         <MainCard title="Annotation">
-            <Typography variant="body2">
-                Lorem ipsum dolor sit amen, consenter nipissing eli, sed do elusion tempos incident ut laborers et doolie magna alissa. Ut enif ad
-                minim venice, quin nostrum exercitation illampu laborings nisi ut liquid ex ea commons construal. Duos aube grue dolor in reprehended
-                in voltage veil esse colum doolie eu fujian bulla parian. Exceptive sin ocean cuspidate non president, sunk in culpa qui officiate
-                descent molls anim id est labours.
-            </Typography>
+            <div className="font-serif mt-1 ">
+                <p style={{fontSize:"18px"}}>Appearance</p>
+            </div>
+            <div className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i className="pi pi-user"></i>
+                </span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">$</span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">www</span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />
+                </div>
+            </div>
+
+            <div className="font-serif mt-5 ">
+                <p style={{fontSize:"18px"}}>Filter</p>
+            </div>
+
+            <div className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i className="pi pi-user"></i>
+                </span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">$</span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">www</span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />                </div>
+            </div>
+            <div className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i className="pi pi-user"></i>
+                </span>
+                    <Dropdown optionLabel="name"
+                              placeholder="Select a City"
+                              className="w-full md:w-14rem"
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">From</span>
+                    <Calendar showButtonBar />
+
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">To</span>
+                    <Calendar showButtonBar />
+
+                </div>
+            </div>
+
         </MainCard>
+
+
+
+
+
+<div className="mt-5">
+    <MainCard  title="Images">
+
+
+    </MainCard>
+</div>
+</>
+
+
     );
 }
