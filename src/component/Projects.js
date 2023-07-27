@@ -55,7 +55,7 @@ export default function Projects() {
                 description,
                 gestionnaire: {
                   id: 1,
-                  role: "GESTIONNAIRE"
+                 role: "GESTIONNAIRE"
                  },
             })
             .then((response) => {
