@@ -16,6 +16,7 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Grid} from "@mui/material";
 import {Box} from "@mui/system";
 import { FileUpload } from 'primereact/fileupload';
+import EmptyImg from "../assets/images/empty.png"
 
 
 
@@ -288,8 +289,7 @@ export default function Image() {
                 />
             );
         }
-        // If photo is missing or empty, display a placeholder image or message
-        return <img src="https://example.com/placeholder-image.jpg" alt="No" style={{ width: '100px', height: 'auto' }} />;
+        return <img src={EmptyImg} alt="No" style={{ width: '50px', height: 'auto' }} />;
     }
 
     return (
@@ -339,20 +339,20 @@ export default function Image() {
 
                     <Grid item xs={12} >
                         <Box className="field mt-2">
-                            <label htmlFor="quantity" className="font-bold">
+                            <label htmlFor="image" className="font-bold">
                                 Photo
                             </label>
                             <FileUpload
                                 className="mt-2"
-                                name="photo" // Use the appropriate name for your backend
-                                url={'/api/upload'} // Replace this with the actual API endpoint for file upload
+                                name="photo"
+                                url={'/api/upload'}
                                 accept="image/*"
                                 maxFileSize={1000000}
                                 emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
                                 chooseLabel="Select Image"
                                 uploadLabel="Upload"
                                 cancelLabel="Cancel"
-                                onSelect={(e) => handlePhotoChange(e)} // Keep your existing handlePhotoChange function
+                                onSelect={(e) => handlePhotoChange(e)}
                             />
 
                         </Box>

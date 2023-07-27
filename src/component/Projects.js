@@ -12,7 +12,7 @@ import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-
+import EmptyImg from "../assets/images/empty.png"
 
 export default function Projects() {
 
@@ -246,7 +246,7 @@ export default function Projects() {
                 </div>
             );
         } else {
-            return null; // If there are no images, you can choose to return null or any default content/message
+            return <img src={EmptyImg} alt="No" style={{ width: '50px', height: 'auto' }} />;
         }
     };
 
