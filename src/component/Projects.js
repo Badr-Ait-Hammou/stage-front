@@ -16,6 +16,7 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 export default function Projects() {
 
+    const [selectedProjectForImages, setSelectedProjectForImages] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
     const [project, setProjects] =  useState([]);
     const [name, setName] =  useState('');
@@ -50,14 +51,14 @@ export default function Projects() {
         }
 
         axios.post("http://localhost:8080/api/projet/save", {
-                name,
-               // dateCreation,
-                description,
-                gestionnaire: {
-                  id: 1,
-                 role: "GESTIONNAIRE"
-                 },
-            })
+            name,
+            // dateCreation,
+            description,
+            gestionnaire: {
+                id: 1,
+                role: "GESTIONNAIRE"
+            },
+        })
             .then((response) => {
                 console.log("API Response:", response.data);
                 setName("");
@@ -106,7 +107,7 @@ export default function Projects() {
 
 
 
-        const openNew = () => {
+    const openNew = () => {
         setProjects(project);
         setSubmitted(false);
         setDescription("");
@@ -119,7 +120,7 @@ export default function Projects() {
         setProductDialog(false);
     };
     const hideeditDialog = () => {
-       // setSubmitted(false);
+        // setSubmitted(false);
         seteditProductDialog(false);
     };
 
@@ -130,6 +131,8 @@ export default function Projects() {
         setSelectedProject(rowData);
         setName(rowData.name);
         setDescription(rowData.description);
+        setSelectedProjectForImages(rowData); // Set the selected project for image display
+
         //setDateCreation(new Date(rowData.dateCreation));
         seteditProductDialog(true);
     };
@@ -220,6 +223,27 @@ export default function Projects() {
             <Button label="Update" severity="info"  raised onClick={() => handleEdit(selectedProject)} />
         </React.Fragment>
     );
+    const photoBodyTemplate = (rowData) => {
+        if (rowData.images && rowData.images.length > 0) {
+            return (
+                <div>
+                    {rowData.images.map((image) => (
+                        <img
+                            key={image.id}
+                            src={image.photo}
+                            alt={image.name}
+                            style={{ width: '100px', height: 'auto', marginRight: '8px' }}
+                            onError={() => console.error(`Failed to load image for ID: ${image.id}`)}
+                        />
+                    ))}
+                </div>
+            );
+        }
+        // If no photos are available, display a placeholder image or message
+        return <img src="https://example.com/placeholder-image.jpg" alt="No" style={{ width: '100px', height: 'auto' }} />;
+    };
+
+
 
 
     return (
@@ -237,6 +261,10 @@ export default function Projects() {
                     <Column selectionMode="multiple" exportable={false}></Column>
                     <Column field="name" header="Name" sortable style={{ minWidth: '12rem' }}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
+
+
+
                     <Column field="dateCreation" header="Creation_Date" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
