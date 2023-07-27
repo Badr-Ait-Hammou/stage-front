@@ -16,7 +16,6 @@ import {Grid} from "@mui/material";
 import {Box} from "@mui/system";
 
 
-
 export default function Image() {
 
 
@@ -162,6 +161,7 @@ export default function Image() {
         setDescription(rowData.description);
         setPhoto(rowData.photo);
         setFormat(rowData.format);
+        //setProjetId(rowData.projet.name)
         seteditProductDialog(true);
     };
 
@@ -449,7 +449,7 @@ export default function Image() {
                         </label>
                         <select
                             id="projetId"
-                            className="form-control"
+                            className="form-control mt-2"
                             value={projetId}
                             onChange={(event) => setProjetId(event.target.value)}
                             style={{
@@ -461,7 +461,7 @@ export default function Image() {
                                 lineHeight: '1.5',
                             }}
                         >
-                            <option value="">Select Projet</option>
+                            <option value="">Select Project</option>
                             {projet &&
                                 projet.map((projet) => (
                                     <option key={projet.id} value={projet.id}>

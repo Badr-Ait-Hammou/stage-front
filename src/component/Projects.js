@@ -54,8 +54,8 @@ export default function Projects() {
                // dateCreation,
                 description,
                 gestionnaire: {
-                  id: 2,
-                  role: "GESTIONNAIRE"
+                  id: 1,
+                 role: "GESTIONNAIRE"
                  },
             })
             .then((response) => {
