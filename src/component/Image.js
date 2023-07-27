@@ -15,6 +15,7 @@ import axios from "axios";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Grid} from "@mui/material";
 import {Box} from "@mui/system";
+import { FileUpload } from 'primereact/fileupload';
 
 
 
@@ -83,17 +84,23 @@ export default function Image() {
     };
 
     const handlePhotoChange = (event) => {
-        const file = event.target.files[0];
+        const files = event.files; // An array of selected files
 
-        if (!file || !file.type.startsWith('image/')) {
-            return;
+        if (files && files.length > 0) {
+            const file = files[0];
+
+            if (!file.type.startsWith('image/')) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setPhoto(e.target.result);
+            };
+            reader.readAsDataURL(file);
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            setPhoto(e.target.result);
-        };
-        reader.readAsDataURL(file);
     };
+
 
     /********************************************Load image *************************/
     const loadImage=async ()=>{
@@ -149,6 +156,7 @@ export default function Image() {
     const hideDialog = () => {
         setSubmitted(false);
         setProductDialog(false);
+        seteditProductDialog(false);
     };
     const hideeditDialog = () => {
         // setSubmitted(false);
@@ -269,7 +277,13 @@ export default function Image() {
                 <img
                     src={rowData.photo}
                     alt={rowData.photo}
-                    style={{ width: '100px', height: 'auto' }}
+                    style={{
+                        width: '50%',
+                        height: '50%',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    }}
                     onError={() => console.error(`Failed to load image for row with ID: ${rowData.id}`)}
                 />
             );
@@ -290,24 +304,24 @@ export default function Image() {
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
-                    <Column selectionMode="multiple" exportable={false}></Column>
+                    <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Name" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="name" header="Name" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="description" header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column header="Projet" style={{ minWidth: '10rem' }} body={(rowData) => rowData.projet.name}></Column>
-                    <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
+                    <Column header="Projet" style={{ minWidth: '7rem' }} body={(rowData) => rowData.projet.name}></Column>
+                    <Column header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+            <Dialog visible={productDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                      <Box className="field">
                     <label htmlFor="name" className="font-bold">
                         Name
                     </label>
-                    <InputText id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
+                    <InputText style={{marginTop:"5px"}} id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
                     {submitted && !image.name && <small className="p-error">Name is required.</small>}
                 </Box>
                     </Grid>
@@ -316,16 +330,11 @@ export default function Image() {
                             <label htmlFor="format" className="font-bold ">
                                 Format
                             </label>
-                            <InputText id="format"  value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
+                            <InputText style={{marginTop:"5px"}} id="format"  value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
                         </Box>
                     </Grid>
                 </Grid>
-                <Box className="field mt-2">
-                    <label htmlFor="description" className="font-bold">
-                        Description
-                    </label>
-                    <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
-                </Box>
+
 
 
                     <Grid item xs={12} >
@@ -333,37 +342,35 @@ export default function Image() {
                             <label htmlFor="quantity" className="font-bold">
                                 Photo
                             </label>
-                            <input
-                                type="file"
+                            <FileUpload
+                                className="mt-2"
+                                name="photo" // Use the appropriate name for your backend
+                                url={'/api/upload'} // Replace this with the actual API endpoint for file upload
                                 accept="image/*"
-                                id="photo"
-                                onChange={handlePhotoChange}
-                                className="form-control custom-file-input"
-                                style={{
-                                    width: '100%',
-                                    height: '38px', // Adjust the height as needed
-                                    padding: '0.375rem 0.75rem',
-                                    fontSize: '1rem',
-                                    lineHeight: '1.5',
-                                    color: '#495057',
-                                    backgroundColor: '#fff',
-                                    backgroundClip: 'padding-box',
-                                    border: '1px solid #ced4da',
-                                    borderRadius: '0.25rem',
-                                    marginBottom: '2rem',
-                                    transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-                                }}
+                                maxFileSize={1000000}
+                                emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
+                                chooseLabel="Select Image"
+                                uploadLabel="Upload"
+                                cancelLabel="Cancel"
+                                onSelect={(e) => handlePhotoChange(e)} // Keep your existing handlePhotoChange function
                             />
+
                         </Box>
                     </Grid>
+                <Box className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Description
+                    </label>
+                    <InputTextarea style={{marginTop:"5px"}} id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
+                </Box>
                     <Grid item xs={12} >
-                        <Box className="field ">
+                        <Box className="field mt-1">
                             <label htmlFor="description" className="font-bold">
                                 Project
                             </label>
                             <select
                                 id="projetId"
-                                className="form-control"
+                                className="form-control mt-2"
                                 value={projetId}
                                 onChange={(event) => setProjetId(event.target.value)}
                                 style={{
@@ -388,14 +395,14 @@ export default function Image() {
 
             </Dialog>
 
-            <Dialog visible={editproductDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Edit Image" modal className="p-fluid" footer={editimageDialogFooter} onHide={hideDialog}>
+            <Dialog visible={editproductDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Edit Image" modal className="p-fluid" footer={editimageDialogFooter} onHide={hideDialog}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <Box className="field">
                             <label htmlFor="name" className="font-bold">
                                 Name
                             </label>
-                            <InputText  id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
+                            <InputText style={{marginTop:"5px"}} id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
                             {submitted && !image.name && <small className="p-error">Name is required.</small>}
                         </Box>
                     </Grid>
@@ -404,16 +411,11 @@ export default function Image() {
                             <label htmlFor="format" className="font-bold ">
                                 Format
                             </label>
-                            <InputText className="mt-2" id="format"  value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
+                            <InputText style={{marginTop:"5px"}} id="format"  value={format} onChange={(event) => setFormat(event.target.value)} mode="currency" currency="USD" locale="en-US" />
                         </Box>
                     </Grid>
                 </Grid>
-                <Box className="field mt-2">
-                    <label htmlFor="description" className="font-bold">
-                        Description
-                    </label>
-                    <InputTextarea className="mt-2" id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
-                </Box>
+
 
 
                 <Grid item xs={12} >
@@ -421,37 +423,34 @@ export default function Image() {
                         <label htmlFor="quantity" className="font-bold">
                             Photo
                         </label>
-                        <input
-                            type="file"
+                        <FileUpload
+                            className="mt-2"
+                            name="photo"
+                            url={'/api/upload'}
                             accept="image/*"
-                            id="photo"
-                            onChange={handlePhotoChange}
-                            className="form-control custom-file-input mt-2"
-                            style={{
-                                width: '100%',
-                                height: '38px', // Adjust the height as needed
-                                padding: '0.375rem 0.75rem',
-                                fontSize: '1rem',
-                                lineHeight: '1.5',
-                                color: '#495057',
-                                backgroundColor: '#fff',
-                                backgroundClip: 'padding-box',
-                                border: '1px solid #ced4da',
-                                borderRadius: '0.25rem',
-                                marginBottom: '2rem',
-                                transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-                            }}
+                            maxFileSize={1000000}
+                            emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
+                            chooseLabel="Select Image"
+                            uploadLabel="Upload"
+                            cancelLabel="Cancel"
+                            onSelect={(e) => handlePhotoChange(e)}
                         />
                     </Box>
                 </Grid>
+                <Box className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Description
+                    </label>
+                    <InputTextarea style={{marginTop:"5px"}} id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
+                </Box>
                 <Grid item xs={12} >
-                    <Box className="field ">
+                    <Box className="field mt-1">
                         <label htmlFor="description" className="font-bold">
                             Project
                         </label>
                         <select
                             id="projetId"
-                            className="form-control"
+                            className="form-control mt-2"
                             value={projetId}
                             onChange={(event) => setProjetId(event.target.value)}
                             style={{

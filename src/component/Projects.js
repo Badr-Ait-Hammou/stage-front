@@ -120,7 +120,6 @@ export default function Projects() {
         setProductDialog(false);
     };
     const hideeditDialog = () => {
-        // setSubmitted(false);
         seteditProductDialog(false);
     };
 
@@ -223,25 +222,35 @@ export default function Projects() {
             <Button label="Update" severity="info"  raised onClick={() => handleEdit(selectedProject)} />
         </React.Fragment>
     );
+
+
     const photoBodyTemplate = (rowData) => {
         if (rowData.images && rowData.images.length > 0) {
             return (
-                <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', justifyContent: 'center' }}>
                     {rowData.images.map((image) => (
                         <img
                             key={image.id}
                             src={image.photo}
                             alt={image.name}
-                            style={{ width: '100px', height: 'auto', marginRight: '8px' }}
+                            style={{
+                                width: '100%',
+                                height: 'auto',
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                            }}
                             onError={() => console.error(`Failed to load image for ID: ${image.id}`)}
                         />
                     ))}
                 </div>
             );
+        } else {
+            return null; // If there are no images, you can choose to return null or any default content/message
         }
-        // If no photos are available, display a placeholder image or message
-        return <img src="https://example.com/placeholder-image.jpg" alt="No" style={{ width: '100px', height: 'auto' }} />;
     };
+
+
 
 
 
@@ -258,37 +267,37 @@ export default function Projects() {
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
-                    <Column selectionMode="multiple" exportable={false}></Column>
-                    <Column field="name" header="Name" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="description" header="Description" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
+                    <Column field="name" header="Name" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
 
 
 
                     <Column field="dateCreation" header="Creation_Date" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
+                    <Column  header="Action"body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Project" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+            <Dialog visible={productDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Project" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <div className="field">
-                    <label htmlFor="name" className="font-bold mb-4">
+                    <label htmlFor="name" className="font-bold ">
                         Name
                     </label>
-                    <InputText id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+                    <InputText style={{marginTop:"5px"}} id="name" value={name} onChange={(e) => setName(e.target.value)} required />
                     {submitted && !name && <small className="p-error">Name is required.</small>}
                 </div>
-                <div className="field">
+                <div className="field mt-2">
                     <label htmlFor="description" className="font-bold">
                         Description
                     </label>
-                    <InputTextarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                    <InputTextarea  style={{marginTop:"5px"}} id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
                 </div>
             </Dialog>
 
 
             <Dialog  visible={editproductDialog}
-                     style={{ width: '32rem' }}
+                     style={{ width: '40rem' }}
                      breakpoints={{ '960px': '75vw', '641px': '90vw' }}
                      header="Edit Project"
                      modal
@@ -300,14 +309,14 @@ export default function Projects() {
                     <label htmlFor="newname" className="font-bold mb-4">
                         Name
                     </label>
-                    <InputText id="newname" value={name} onChange={(e) => setName(e.target.value)} required />
+                    <InputText style={{marginTop:"5px"}} id="newname" value={name} onChange={(e) => setName(e.target.value)} required />
                     {submitted && !name && <small className="p-error">Name is required.</small>}
                 </div>
-                <div className="field">
+                <div className="field mt-2">
                     <label htmlFor="newdescription" className="font-bold">
                         Description
                     </label>
-                    <InputTextarea id="newdescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                    <InputTextarea style={{marginTop:"5px"}} id="newdescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
                 </div>
 
 
