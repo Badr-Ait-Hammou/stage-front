@@ -16,7 +16,6 @@ import EmptyImg from "../assets/images/empty.png"
 
 export default function Projects() {
 
-    const [selectedProjectForImages, setSelectedProjectForImages] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
     const [project, setProjects] =  useState([]);
     const [name, setName] =  useState('');
@@ -130,8 +129,6 @@ export default function Projects() {
         setSelectedProject(rowData);
         setName(rowData.name);
         setDescription(rowData.description);
-        setSelectedProjectForImages(rowData); // Set the selected project for image display
-
         //setDateCreation(new Date(rowData.dateCreation));
         seteditProductDialog(true);
     };
