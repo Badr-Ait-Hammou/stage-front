@@ -84,7 +84,6 @@ export default function Annotation() {
             </MainCard>
             <div className="mt-5">
                 <MainCard title="Images">
-                    {/* Pass the filtered images data to the ImagesGrid component */}
                     <ImagesGrid images={filteredImages} />
                 </MainCard>
             </div>
