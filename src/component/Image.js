@@ -521,45 +521,56 @@ export default function Image() {
 
             </Dialog>
 
-            <Dialog visible={showImageDialog} onHide={() => setShowImageDialog(false)}>
-                <div ref={dialogContentRef} style={{ position: 'relative' }}>
+            <Dialog visible={showImageDialog} style={{ width: '40rem',height:'40rem' }} onHide={() => setShowImageDialog(false)}>
+                <div
+                    ref={dialogContentRef}
+                    style={{
+                        position: 'relative',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+                    }}
+                >
                     <img
-                      src={selectedImage?.photo}
-                      alt={selectedImage?.photo}
-                      style={{
-                          width: `${zoom}%`,
-                          height: 'auto',
-                          objectFit: 'contain',
-                      }}
+                        src={selectedImage?.photo}
+                        alt={selectedImage?.photo}
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: `${zoom}%`,
+                            height: 'auto',
+                            objectFit: 'contain',
+                        }}
                     />
                     <div
-                      style={{
-                          position: 'absolute',
-                          bottom: '10px',
-                          right: '10px',
-                          display: 'flex',
-                          gap: '5px',
-                      }}
+                        style={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            right: '10px',
+                            display: 'flex',
+                            gap: '5px',
+                        }}
                     >
                         <Button
-                          className="p-button-outlined p-button-secondary p-button-icon-only"
-                          icon={<IoAddOutline />}
-                          onClick={handleZoomIn}
+                            className="p-button-outlined p-button-secondary p-button-icon-only"
+                            icon={<IoAddOutline />}
+                            onClick={handleZoomIn}
                         />
                         <Button
-                          className="p-button-outlined p-button-secondary p-button-icon-only"
-                          icon={<IoRemoveOutline />}
-                          onClick={handleZoomOut}
+                            className="p-button-outlined p-button-secondary p-button-icon-only"
+                            icon={<IoRemoveOutline />}
+                            onClick={handleZoomOut}
                         />
                         <Button
-                          className="p-button-outlined p-button-secondary p-button-icon-only"
-                          icon={<IoCameraOutline />}
-                          onClick={handleScreenshot}
+                            className="p-button-outlined p-button-secondary p-button-icon-only"
+                            icon={<IoCameraOutline />}
+                            onClick={handleScreenshot}
                         />
-
                     </div>
                 </div>
             </Dialog>
+
         </div>
     );
 }
