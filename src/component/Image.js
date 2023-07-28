@@ -18,7 +18,7 @@ import {Box} from "@mui/system";
 import { FileUpload } from 'primereact/fileupload';
 import EmptyImg from "../assets/images/empty.png";
 import html2canvas from 'html2canvas';
-import { IoCameraOutline, IoOpenOutline, IoAddOutline, IoRemoveOutline } from 'react-icons/io5';
+import { IoCameraOutline, IoAddOutline, IoRemoveOutline } from 'react-icons/io5';
 
 
 
@@ -46,7 +46,6 @@ export default function Image() {
     const [showImageDialog, setShowImageDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [zoom, setZoom] = useState(100);
-    const [screenshotUrl, setScreenshotUrl] = useState(null);
 
 
     useEffect(() => {
@@ -260,7 +259,7 @@ export default function Image() {
                     const screenshotUrl = canvas.toDataURL('image/png');
 
                     const newTab = window.open('');
-                    newTab.document.write('<img src="' + screenshotUrl + '" style="width: 100%; height: auto;" />');
+                    newTab.document.write('<img alt="img" src="' + screenshotUrl + '" style="width: 100%; height: auto;" />');
                 });
             }
         } catch (error) {
@@ -355,7 +354,7 @@ export default function Image() {
                     <Column field="name" filter filterPlaceholder="Search Name ..." header="Name" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="description"  sortable header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column header="Projet" field="projet.name" filter filterPlaceholder="Search Project ..."sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.projet.name}></Column>
+                    <Column header="Projet" field="projet.name" filter filterPlaceholder="Search Project ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.projet.name}></Column>
                     <Column header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
@@ -521,7 +520,7 @@ export default function Image() {
 
             </Dialog>
 
-            <Dialog visible={showImageDialog} style={{ width: '40rem',height:'40rem' }} onHide={() => setShowImageDialog(false)}>
+            <Dialog visible={showImageDialog} style={{ width: '35rem',height:'35rem' }} onHide={() => setShowImageDialog(false)}>
                 <div
                     ref={dialogContentRef}
                     style={{

@@ -8,13 +8,26 @@
 .image-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
 .image-item-small {
+    cursor: pointer;
     width: 80px;
     height: 80px;
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.image-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tag {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    color: white;
+    border-radius: 5px;
 }
