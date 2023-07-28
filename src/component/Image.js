@@ -245,16 +245,20 @@ export default function Image() {
             </React.Fragment>
         );
     };
-
-
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <span className="p-input-icon-left">
-                <i className="pi pi-search" />
-                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
-            </span>
+    <span className="p-input-icon-left">
+      <i className="pi pi-search" />
+      <InputText
+          type="search"
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search..."
+      />
+    </span>
         </div>
     );
+
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
@@ -304,12 +308,12 @@ export default function Image() {
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
-                    <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
+                    <Column field="id"  header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Name" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="description" header="Description" ></Column>
+                    <Column field="name" filter filterPlaceholder="Search Name ..." header="Name" sortable style={{ minWidth: '7rem' }}></Column>
+                    <Column field="description"  sortable header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column header="Projet" style={{ minWidth: '7rem' }} body={(rowData) => rowData.projet.name}></Column>
+                    <Column header="Projet" field="projet.name" filter filterPlaceholder="Search Project ..."sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.projet.name}></Column>
                     <Column header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>

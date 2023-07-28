@@ -268,13 +268,10 @@ export default function Projects() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="name" header="Name" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
-
-
-
-                    <Column field="dateCreation" header="Creation_Date" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                     <Column  header="Action"body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
