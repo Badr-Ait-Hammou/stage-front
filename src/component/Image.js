@@ -16,7 +16,9 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Grid} from "@mui/material";
 import {Box} from "@mui/system";
 import { FileUpload } from 'primereact/fileupload';
-import EmptyImg from "../assets/images/empty.png"
+import EmptyImg from "../assets/images/empty.png";
+import html2canvas from 'html2canvas';
+import { IoCameraOutline, IoOpenOutline, IoAddOutline, IoRemoveOutline } from 'react-icons/io5';
 
 
 
@@ -41,6 +43,11 @@ export default function Image() {
     const [projetId, setProjetId] = useState("");
     const [projet, setProjet] = useState([]);
     const [image, setImages] =  useState([]);
+    const [showImageDialog, setShowImageDialog] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [zoom, setZoom] = useState(100);
+    const [screenshotUrl, setScreenshotUrl] = useState(null);
+
 
     useEffect(() => {
         fetchData();
@@ -139,6 +146,15 @@ export default function Image() {
         });
     };
 
+
+    const handleZoomIn = () => {
+        setZoom((prevZoom) => prevZoom + 10);
+    };
+
+    const handleZoomOut = () => {
+        setZoom((prevZoom) => Math.max(10, prevZoom - 10));
+    };
+
     /******************************************** Dialogues *************************/
 
 
@@ -234,6 +250,24 @@ export default function Image() {
     };
 
 
+    const dialogContentRef = useRef();
+
+    const handleScreenshot = () => {
+        try {
+            const dialogContentElement = dialogContentRef.current;
+            if (dialogContentElement) {
+                html2canvas(dialogContentElement).then((canvas) => {
+                    const screenshotUrl = canvas.toDataURL('image/png');
+
+                    const newTab = window.open('');
+                    newTab.document.write('<img src="' + screenshotUrl + '" style="width: 100%; height: auto;" />');
+                });
+            }
+        } catch (error) {
+            console.error('Error capturing screenshot:', error);
+        }
+    };
+
 
 
 
@@ -273,24 +307,32 @@ export default function Image() {
 
 
     const photoBodyTemplate = (rowData) => {
+        const showImage = (rowData) => {
+            setSelectedImage(rowData);
+            setShowImageDialog(true);
+        };
+
         if (rowData.photo) {
             return (
-                <img
-                    src={rowData.photo}
-                    alt={rowData.photo}
-                    style={{
-                        width: '50%',
-                        height: '50%',
-                        objectFit: 'cover',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    }}
-                    onError={() => console.error(`Failed to load image for row with ID: ${rowData.id}`)}
-                />
+              <img
+                src={rowData.photo}
+                alt={rowData.photo}
+                style={{
+                    width: '50%',
+                    height: '50%',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    cursor: 'pointer',
+                }}
+                onError={() => console.error(`Failed to load image for row with ID: ${rowData.id}`)}
+                onClick={() => showImage(rowData)}
+              />
             );
         }
         return <img src={EmptyImg} alt="No" style={{ width: '50px', height: 'auto' }} />;
-    }
+    };
+
 
     return (
         <div>
@@ -475,7 +517,45 @@ export default function Image() {
 
             </Dialog>
 
+            <Dialog visible={showImageDialog} onHide={() => setShowImageDialog(false)}>
+                <div ref={dialogContentRef} style={{ position: 'relative' }}>
+                    <img
+                      src={selectedImage?.photo}
+                      alt={selectedImage?.photo}
+                      style={{
+                          width: `${zoom}%`,
+                          height: 'auto',
+                          objectFit: 'contain',
+                      }}
+                    />
+                    <div
+                      style={{
+                          position: 'absolute',
+                          bottom: '10px',
+                          right: '10px',
+                          display: 'flex',
+                          gap: '5px',
+                      }}
+                    >
+                        <Button
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoAddOutline />}
+                          onClick={handleZoomIn}
+                        />
+                        <Button
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoRemoveOutline />}
+                          onClick={handleZoomOut}
+                        />
+                        <Button
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoCameraOutline />}
+                          onClick={handleScreenshot}
+                        />
 
+                    </div>
+                </div>
+            </Dialog>
         </div>
     );
 }
