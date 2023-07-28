@@ -34,7 +34,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import UpgradePlanCard from './UpgradePlanCard';
-import User1 from 'assets/images/users/user-round.svg';
+//import User1 from 'assets/images/users/user-round.svg';
 
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
@@ -111,7 +111,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src={User1}
+
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',
