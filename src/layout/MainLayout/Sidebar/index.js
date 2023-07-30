@@ -32,13 +32,16 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
           style={{
             height: !matchUpMd ? 'calc(100vh - 56px)' : 'calc(100vh - 88px)',
             paddingLeft: '16px',
-            paddingRight: '16px'
+            paddingRight: '16px',
+
           }}
         >
           <MenuList />
-          <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
+            {/*
+            <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
             <Chip label={process.env.REACT_APP_VERSION} disabled chipcolor="secondary" size="small" sx={{ cursor: 'pointer' }} />
           </Stack>
+          */}
         </PerfectScrollbar>
       </BrowserView>
       <MobileView>
@@ -55,7 +58,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
   const container = window !== undefined ? () => window.document.body : undefined;
 
   return (
-    <Box component="nav" sx={{ flexShrink: { md: 0 }, width: matchUpMd ? drawerWidth : 'auto' }} aria-label="mailbox folders">
+    <Box component="nav"  sx={{ flexShrink: { md: 0 }, width: matchUpMd ? drawerWidth : 'auto',  zIndex: 0  }} aria-label="mailbox folders">
       <Drawer
         container={container}
         variant={matchUpMd ? 'persistent' : 'temporary'}

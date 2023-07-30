@@ -5,10 +5,10 @@ import axios from "axios";
 import "../style/annotation_img.css"
 import {Calendar} from "primereact/calendar";
 import {format} from "date-fns";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { IoAddOutline, IoRemoveOutline } from "react-icons/io5";
-import { Tag } from 'primereact/tag';
+import {Dialog} from "primereact/dialog";
+import {Button} from "primereact/button";
+import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
+import {Tag} from 'primereact/tag';
 
 
 export default function Annotation() {
@@ -21,8 +21,10 @@ export default function Annotation() {
     const [showImageDialog, setShowImageDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [zoom, setZoom] = useState(20);
-
     const dialogContentRef = useRef();
+
+
+    /***************************************** Dialog open/close ************************************************************/
 
     const openDialog = (image) => {
         setSelectedImage(image);
@@ -34,10 +36,14 @@ export default function Annotation() {
         setZoom(100);
     };
 
+    /***************************************** Project title ************************************************************/
+
 
     const dynamicTitle = selectedProject
         ? ` ${selectedProject.name}- Images  `
         : "Project Images";
+
+    /***************************************** Api Get all ************************************************************/
 
 
     useEffect(() => {
@@ -57,6 +63,10 @@ export default function Annotation() {
                 .catch((error) => console.error("Error fetching images:", error));
         }
     }, [selectedProject]);
+
+
+    /***************************************** Api Date filter ************************************************************/
+
 
     useEffect(() => {
         if (startDate && endDate) {
@@ -112,7 +122,7 @@ export default function Annotation() {
         );
     }
 
-        /**********************************  ImageGrid all projects >> date filter  ******************************/
+    /**********************************  ImageGrid all projects >> date filter  ******************************/
 
     const FilteredImagesGrid = ({projects}) => {
         const images = projects.flatMap((project) => project.images);
@@ -136,13 +146,13 @@ export default function Annotation() {
                     <div key={rowIndex} className="image-row">
                         {imageRow.map((image) => (
                             <div key={image.name} className="image-wrapper">
-                            <img
-                                key={image.id}
-                                src={image.photo}
-                                alt={image.name}
-                                className="image-item-small"
-                                onClick={() => openDialog(image)} // Add the click event here
-                            />
+                                <img
+                                    key={image.id}
+                                    src={image.photo}
+                                    alt={image.name}
+                                    className="image-item-small"
+                                    onClick={() => openDialog(image)} // Add the click event here
+                                />
                                 <div className="tag">
                                     <Tag className="pi pi-plus"></Tag>
                                 </div>
@@ -161,37 +171,36 @@ export default function Annotation() {
                 <div className="font-serif mt-1">
                     <p style={{fontSize: "18px"}}>Appearance</p>
                 </div>
-                <div className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="card flex  flex-wrap gap-3 mt-2" >
                     <div className="p-inputgroup flex-1">
-            <span className="p-inputgroup-addon">
-              <i className="pi pi-user"></i>
-            </span>
+                        <span className="p-inputgroup-addon">
+                            <i className="pi pi-user"></i>
+                        </span>
                         <Dropdown
                             value={selectedProject}
                             options={projects}
                             optionLabel="name"
                             placeholder="Select a Project"
-                            className="w-full md:w-14rem"
                             onChange={(e) => setSelectedProject(e.value)}
                         />
                     </div>
-
                     <div className="p-inputgroup flex-1">
-                 <span className="p-inputgroup-addon">
-                   <i className="pi pi-calendar"></i>
-                   </span>
+                        <span className="p-inputgroup-addon">
+                            <i className="pi pi-calendar"></i>
+                        </span>
                         <Calendar
                             value={startDate}
                             dateFormat="yy-mm-dd"
                             placeholder="From"
+
                             showButtonBar
                             onChange={(e) => setStartDate(e.value)}
                         />
                     </div>
                     <div className="p-inputgroup flex-1">
-                      <span className="p-inputgroup-addon">
-                       <i className="pi pi-calendar"></i>
-                      </span>
+                        <span className="p-inputgroup-addon">
+                            <i className="pi pi-calendar"></i>
+                        </span>
                         <Calendar
                             value={endDate}
                             dateFormat="yy-mm-dd"
@@ -215,7 +224,7 @@ export default function Annotation() {
             </div>
             <Dialog
                 visible={showImageDialog}
-                style={{ width: "35rem", height: "35rem" }}
+                style={{width: "35rem", height: "35rem"}}
                 onHide={closeDialog}
             >
                 <div
@@ -250,12 +259,12 @@ export default function Annotation() {
                     >
                         <Button
                             className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoAddOutline />}
+                            icon={<IoAddOutline/>}
                             onClick={() => setZoom((prevZoom) => prevZoom + 10)}
                         />
                         <Button
                             className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoRemoveOutline />}
+                            icon={<IoRemoveOutline/>}
                             onClick={() => setZoom((prevZoom) => Math.max(10, prevZoom - 10))}
                         />
                     </div>
@@ -264,21 +273,6 @@ export default function Annotation() {
         </>
     );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*

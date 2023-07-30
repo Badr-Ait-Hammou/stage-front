@@ -18,13 +18,6 @@ const utilities = {
   type: 'group',
   children: [
     {
-      id: 'projects',
-      title: 'Projects',
-      type: 'item',
-      url: '/projects',
-      icon: icons.IconBrandMiniprogram,
-      breadcrumbs: false
-    }, {
       id: 'storage',
       title: 'Storage',
       type: 'item',

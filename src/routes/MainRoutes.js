@@ -44,6 +44,10 @@ const MainRoutes = {
       element: <Annotation />
     },
     {
+      path: 'projects',
+      element: <Projects />
+    },
+    {
       path: 'information',
       element: <Information />
     }, {
