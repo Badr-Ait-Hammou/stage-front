@@ -247,6 +247,11 @@ export default function Image() {
     const rightToolbarTemplate = () => {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
     };
+    const centerToolbarTemplate = () => {
+        return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h4 className="m-0 font-bold">Manage Images</h4>
+        </div>;
+    };
 
 
     const dialogContentRef = useRef();
@@ -343,7 +348,7 @@ export default function Image() {
             <ConfirmDialog />
 
             <div className="card">
-                <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+                <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={dt} value={image}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}

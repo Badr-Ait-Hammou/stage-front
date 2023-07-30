@@ -183,7 +183,11 @@ export default function Projects() {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
     };
 
-
+    const centerToolbarTemplate = () => {
+        return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h4 className="m-0 font-bold">Manage Projects</h4>
+        </div>;
+    };
 
 
 
@@ -258,7 +262,7 @@ export default function Projects() {
             <ConfirmDialog />
 
             <div className="card">
-                <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+                <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={dt} value={project}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
@@ -269,7 +273,7 @@ export default function Projects() {
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
-                    <Column  header="Action"body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
+                    <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
 
