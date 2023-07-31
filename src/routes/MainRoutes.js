@@ -47,6 +47,9 @@ const MainRoutes = {
     {
       path: 'annotation/Imagedetail/:id',
       element: <ImageDetail />
+    }, {
+      path: 'projects/Imagedetail/:id',
+      element: <ImageDetail />
     },
     {
       path: 'projects',

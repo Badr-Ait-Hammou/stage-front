@@ -8,10 +8,9 @@ import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
 export default function ImageDetail() {
     const {id} = useParams();
     const [image, setImage] = useState(null);
-    const [zoom, setZoom] = useState(100);
+    const [zoom, setZoom] = useState(20);
 
     useEffect(() => {
-        // Make an API call to get the image details based on the 'id' parameter
         axios
             .get(`http://localhost:8080/api/image/${id}`)
             .then((response) => {
@@ -19,7 +18,6 @@ export default function ImageDetail() {
             })
             .catch((error) => {
                 console.error("Error fetching image details:", error);
-                // Handle error, e.g., show an error message
             });
     }, [id]);
 

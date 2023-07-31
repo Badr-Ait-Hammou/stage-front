@@ -13,6 +13,7 @@ import 'primeicons/primeicons.css';
 import axios from "axios";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import EmptyImg from "../assets/images/empty.png"
+import {Link} from "react-router-dom";
 
 export default function Projects() {
 
@@ -230,6 +231,7 @@ export default function Projects() {
             return (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', justifyContent: 'center' }}>
                     {rowData.images.map((image) => (
+                        <Link to={`imagedetail/${image.id}`}>
                         <img
                             key={image.id}
                             src={image.photo}
@@ -243,6 +245,7 @@ export default function Projects() {
                             }}
                             onError={() => console.error(`Failed to load image for ID: ${image.id}`)}
                         />
+                        </Link>
                     ))}
                 </div>
             );

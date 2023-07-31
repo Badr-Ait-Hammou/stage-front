@@ -8,7 +8,6 @@ import {format} from "date-fns";
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
 import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
-import {Tag} from 'primereact/tag';
 import {Link} from "react-router-dom";
 
 
@@ -169,7 +168,9 @@ export default function Annotation() {
                                     onClick={() => openDialog(image)}
                                 />
                                 <div className="tag">
-                                    <Tag className="pi pi-plus"></Tag>
+                                    <Link to={`imagedetail/${image.id}`}>
+                                        <i className="pi pi-spin pi-cog" style={{ fontSize: '1rem' }}></i>
+                                    </Link>
                                 </div>
                             </div>
                         ))}
