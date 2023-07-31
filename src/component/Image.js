@@ -28,15 +28,12 @@ export default function Image() {
 
 
     const [productDialog, setProductDialog] = useState(false);
-
     const [editproductDialog, seteditProductDialog] = useState(false);
-
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
     const [selectedProject, setSelectedProject] = useState(null);
-
     const [name, setName] = useState('');
     const [photo, setPhoto] = useState('');
     const [description, setDescription] = useState('');
@@ -47,6 +44,7 @@ export default function Image() {
     const [showImageDialog, setShowImageDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [zoom, setZoom] = useState(100);
+
 
 
     useEffect(() => {
@@ -92,7 +90,7 @@ export default function Image() {
     };
 
     const handlePhotoChange = (event) => {
-        const files = event.files; // An array of selected files
+        const files = event.files;
 
         if (files && files.length > 0) {
             const file = files[0];
@@ -109,17 +107,11 @@ export default function Image() {
         }
     };
 
-
     /********************************************Load image *************************/
     const loadImage=async ()=>{
         const res=await axios.get(`http://localhost:8080/api/image/all`);
         setImages(res.data);
     }
-
-
-
-
-
     /******************************************** Delete *************************/
 
     const handleDelete = (id) => {
@@ -225,10 +217,6 @@ export default function Image() {
     const showupdate = () => {
         toast.current.show({severity:'info', summary: 'success', detail:'item updated successfully', life: 3000});
     }
-
-
-
-
 
     const exportCSV = () => {
         dt.current.exportCSV();

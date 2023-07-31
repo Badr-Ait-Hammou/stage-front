@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import {Dropdown} from "primereact/dropdown";
 import axios from "axios";
@@ -6,6 +6,7 @@ import "../style/annotation_img.css"
 import {Calendar} from "primereact/calendar";
 import {format} from "date-fns";
 import {Link} from "react-router-dom";
+import { Toast } from 'primereact/toast';
 
 
 export default function Annotation() {
@@ -15,7 +16,7 @@ export default function Annotation() {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [allImages, setAllImages] = useState([]);
-
+    const toast = useRef(null);
     const [filteredProjects, setFilteredProjects] = useState([]);
 
 
@@ -65,20 +66,38 @@ export default function Annotation() {
 
     useEffect(() => {
         if (startDate && endDate) {
-            const formattedStartDate = format(startDate, 'yyyy-MM-dd');
-            const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-            axios
-                .get(`http://localhost:8080/api/projet/between/${formattedStartDate}/${formattedEndDate}`)
-                .then((response) => {
-                    console.log("API response:", response.data);
-                    setFilteredProjects(response.data);
-                })
-                .catch((error) => console.error('Error fetching projects:', error));
+            if (endDate <= startDate) {
+                console.error("End date must be greater than the start date.");
+
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'End date must be greater than the start date.',
+                        life: 3000,
+                    });
+
+                setFilteredProjects([]);
+            } else {
+                const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+                const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+                axios
+                    .get(`http://localhost:8080/api/projet/between/${formattedStartDate}/${formattedEndDate}`)
+                    .then((response) => {
+                        console.log("API response:", response.data);
+                        setFilteredProjects(response.data);
+                    })
+                    .catch((error) => console.error('Error fetching projects:', error));
+            }
         }
     }, [startDate, endDate]);
+
+    /**********************************  Toast  ******************************/
+
+
+
     /**********************************  ImageGrid  ******************************/
 
-    const ImagesGrid = ({images}) => {
+    const ImagesGrid = ({ images }) => {
         images = selectedProject ? images : allImages;
 
         if (!images || images.length === 0) {
@@ -99,25 +118,24 @@ export default function Annotation() {
                 {chunkedImages.map((imageRow, rowIndex) => (
                     <div key={rowIndex} className="image-row">
                         {imageRow.map((image) => (
-                            <div key={image.name} className="image-wrapper">
+                            <div key={image.id} className="image-wrapper">
                                 <Link to={`imagedetail/${image.id}`}>
-                                <img
-                                    src={image.photo}
-                                    alt={image.name}
-                                    className="image-item-small"
-                                />
-                                <div className="tag">
+                                    <img
+                                        src={image.photo}
+                                        alt={image.name}
+                                        className="image-item-small"
+                                    />
+                                    <div className="tag">
                                         <i className="pi pi-spin pi-cog" style={{ fontSize: '1rem' }}></i>
-                                </div>
+                                    </div>
                                 </Link>
-
                             </div>
                         ))}
                     </div>
                 ))}
             </div>
         );
-    }
+    };
 
     /**********************************  ImageGrid all projects >> date filter  ******************************/
 
@@ -141,11 +159,10 @@ export default function Annotation() {
                 {chunkedImages.map((imageRow, rowIndex) => (
                     <div key={rowIndex} className="image-row">
                         {imageRow.map((image) => (
-                            <div key={image.name} className="image-wrapper">
+                            <div key={image.id} className="image-wrapper">
                                 <Link to={`imagedetail/${image.id}`}>
 
                                 <img
-                                    key={image.id}
                                     src={image.photo}
                                     alt={image.name}
                                     className="image-item-small"
@@ -165,7 +182,10 @@ export default function Annotation() {
 
     return (
         <>
+            <Toast ref={toast} />
+
             <MainCard title="Annotation">
+                <Toast ref={toast} />
                 <div className="font-serif mt-1">
                     <p style={{fontSize: "18px"}}>Appearance</p>
                 </div>
@@ -227,4 +247,3 @@ export default function Annotation() {
         </>
     );
 }
-
