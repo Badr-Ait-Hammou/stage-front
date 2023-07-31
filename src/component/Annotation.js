@@ -9,6 +9,7 @@ import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
 import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
 import {Tag} from 'primereact/tag';
+import {Link} from "react-router-dom";
 
 
 export default function Annotation() {
@@ -17,11 +18,14 @@ export default function Annotation() {
     const [filteredImages, setFilteredImages] = useState([]);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [allImages, setAllImages] = useState([]);
+
     const [filteredProjects, setFilteredProjects] = useState([]);
     const [showImageDialog, setShowImageDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [zoom, setZoom] = useState(20);
     const dialogContentRef = useRef();
+
 
 
     /***************************************** Dialog open/close ************************************************************/
@@ -51,9 +55,16 @@ export default function Annotation() {
             .get("http://localhost:8080/api/projet/all")
             .then((response) => {
                 setProjects(response.data);
+                // Store all images in the state
+                const allImages = response.data.reduce((images, project) => {
+                    images.push(...project.images);
+                    return images;
+                }, []);
+                setAllImages(allImages);
             })
             .catch((error) => console.error("Error fetching projects:", error));
     }, []);
+
 
     useEffect(() => {
         if (selectedProject) {
@@ -86,6 +97,8 @@ export default function Annotation() {
     /**********************************  ImageGrid  ******************************/
 
     const ImagesGrid = ({images}) => {
+        images = selectedProject ? images : allImages;
+
         if (!images || images.length === 0) {
             return <p>No images found for the selected project.</p>;
         }
@@ -112,7 +125,9 @@ export default function Annotation() {
                                     onClick={() => openDialog(image)}
                                 />
                                 <div className="tag">
-                                    <Tag className="pi pi-plus"></Tag>
+                                    <Link to={`imagedetail/${image.id}`}>
+                                        <i className="pi pi-spin pi-cog" style={{ fontSize: '1rem' }}></i>
+                                    </Link>
                                 </div>
                             </div>
                         ))}
@@ -151,7 +166,7 @@ export default function Annotation() {
                                     src={image.photo}
                                     alt={image.name}
                                     className="image-item-small"
-                                    onClick={() => openDialog(image)} // Add the click event here
+                                    onClick={() => openDialog(image)}
                                 />
                                 <div className="tag">
                                     <Tag className="pi pi-plus"></Tag>
@@ -274,111 +289,3 @@ export default function Annotation() {
     );
 }
 
-
-/*
- <>
-        <MainCard title="Annotation">
-            <div className="font-serif mt-1 ">
-                <p style={{fontSize:"18px"}}>Appearance</p>
-            </div>
-            <div className="card flex flex-column md:flex-row gap-3 mt-2">
-                <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i className="pi pi-user"></i>
-                </span>
-                    <Dropdown
-                        value={selectedProjectId}
-                        options={projects}
-                        optionLabel="name"
-                        placeholder="Select a Project"
-                        className="w-full md:w-14rem"
-                        onChange={(e) => setSelectedProjectId(e.value.id)}
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">$</span>
-                    <Dropdown optionLabel="name"
-                              placeholder="Select a City"
-                              className="w-full md:w-14rem"
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">www</span>
-                    <Dropdown optionLabel="name"
-                              placeholder="Select a City"
-                              className="w-full md:w-14rem"
-                    />
-                </div>
-            </div>
-
-            <div className="font-serif mt-5 ">
-                <p style={{fontSize:"18px"}}>Filter</p>
-            </div>
-
-            <div className="card flex flex-column md:flex-row gap-3 mt-2">
-                <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i className="pi pi-user"></i>
-                </span>
-                    <Dropdown optionLabel="name"
-                              placeholder="Select a City"
-                              className="w-full md:w-14rem"
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">$</span>
-                    <Dropdown optionLabel="name"
-                              placeholder="Select a City"
-                              className="w-full md:w-14rem"
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">www</span>
-                    <Dropdown optionLabel="name"
-                              placeholder="Select a City"
-                              className="w-full md:w-14rem"
-                    />                </div>
-            </div>
-            <div className="card flex flex-column md:flex-row gap-3 mt-2">
-                <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i className="pi pi-user"></i>
-                </span>
-                    <Dropdown optionLabel="name"
-                              placeholder="Select a City"
-                              className="w-full md:w-14rem"
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">From</span>
-                    <Calendar showButtonBar />
-
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">To</span>
-                    <Calendar showButtonBar />
-
-                </div>
-            </div>
-
-        </MainCard>
-
-
-
-
-*/
-/*       <div className="mt-5">
-           <MainCard title="Images">
-
-<ImagesGrid images={filteredImages} />
-</MainCard>
-</div>
-</>
-
-*/

@@ -18,6 +18,7 @@ import Information from '../component/Information';
 import Annotation from '../component/Annotation';
 import Projects from '../component/Projects';
 import Storage from '../component/Storage';
+import ImageDetail from '../component/ImageDetail';
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -42,6 +43,10 @@ const MainRoutes = {
     {
       path: 'annotation',
       element: <Annotation />
+    },
+    {
+      path: 'annotation/Imagedetail/:id',
+      element: <ImageDetail />
     },
     {
       path: 'projects',
