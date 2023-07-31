@@ -1,13 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import {Dropdown} from "primereact/dropdown";
 import axios from "axios";
 import "../style/annotation_img.css"
 import {Calendar} from "primereact/calendar";
 import {format} from "date-fns";
-import {Dialog} from "primereact/dialog";
-import {Button} from "primereact/button";
-import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
 import {Link} from "react-router-dom";
 
 
@@ -20,24 +17,13 @@ export default function Annotation() {
     const [allImages, setAllImages] = useState([]);
 
     const [filteredProjects, setFilteredProjects] = useState([]);
-    const [showImageDialog, setShowImageDialog] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [zoom, setZoom] = useState(20);
-    const dialogContentRef = useRef();
+
 
 
 
     /***************************************** Dialog open/close ************************************************************/
 
-    const openDialog = (image) => {
-        setSelectedImage(image);
-        setShowImageDialog(true);
-    };
 
-    const closeDialog = () => {
-        setShowImageDialog(false);
-        setZoom(100);
-    };
 
     /***************************************** Project title ************************************************************/
 
@@ -117,17 +103,17 @@ export default function Annotation() {
                     <div key={rowIndex} className="image-row">
                         {imageRow.map((image) => (
                             <div key={image.name} className="image-wrapper">
+                                <Link to={`imagedetail/${image.id}`}>
                                 <img
                                     src={image.photo}
                                     alt={image.name}
                                     className="image-item-small"
-                                    onClick={() => openDialog(image)}
                                 />
                                 <div className="tag">
-                                    <Link to={`imagedetail/${image.id}`}>
                                         <i className="pi pi-spin pi-cog" style={{ fontSize: '1rem' }}></i>
-                                    </Link>
                                 </div>
+                                </Link>
+
                             </div>
                         ))}
                     </div>
@@ -160,18 +146,18 @@ export default function Annotation() {
                     <div key={rowIndex} className="image-row">
                         {imageRow.map((image) => (
                             <div key={image.name} className="image-wrapper">
+                                <Link to={`imagedetail/${image.id}`}>
+
                                 <img
                                     key={image.id}
                                     src={image.photo}
                                     alt={image.name}
                                     className="image-item-small"
-                                    onClick={() => openDialog(image)}
                                 />
                                 <div className="tag">
-                                    <Link to={`imagedetail/${image.id}`}>
                                         <i className="pi pi-spin pi-cog" style={{ fontSize: '1rem' }}></i>
-                                    </Link>
                                 </div>
+                                </Link>
                             </div>
                         ))}
 
@@ -238,54 +224,6 @@ export default function Annotation() {
                     <FilteredImagesGrid projects={filteredProjects}/>
                 </MainCard>
             </div>
-            <Dialog
-                visible={showImageDialog}
-                style={{width: "35rem", height: "35rem"}}
-                onHide={closeDialog}
-            >
-                <div
-                    ref={dialogContentRef}
-                    style={{
-                        position: "relative",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100%",
-                    }}
-                >
-                    <img
-                        src={selectedImage?.photo}
-                        alt={selectedImage?.name}
-                        style={{
-                            maxWidth: "100%",
-                            maxHeight: "100%",
-                            width: `${zoom}%`,
-                            height: "auto",
-                            objectFit: "contain",
-                        }}
-                    />
-                    <div
-                        style={{
-                            position: "absolute",
-                            bottom: "10px",
-                            right: "10px",
-                            display: "flex",
-                            gap: "5px",
-                        }}
-                    >
-                        <Button
-                            className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoAddOutline/>}
-                            onClick={() => setZoom((prevZoom) => prevZoom + 10)}
-                        />
-                        <Button
-                            className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoRemoveOutline/>}
-                            onClick={() => setZoom((prevZoom) => Math.max(10, prevZoom - 10))}
-                        />
-                    </div>
-                </div>
-            </Dialog>
         </>
     );
 }

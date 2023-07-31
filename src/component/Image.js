@@ -17,6 +17,7 @@ import {Grid} from "@mui/material";
 import {Box} from "@mui/system";
 import { FileUpload } from 'primereact/fileupload';
 import EmptyImg from "../assets/images/empty.png";
+import "../style/Image.css"
 import html2canvas from 'html2canvas';
 import { IoCameraOutline, IoAddOutline, IoRemoveOutline } from 'react-icons/io5';
 
@@ -325,6 +326,7 @@ export default function Image() {
               <img
                 src={rowData.photo}
                 alt={rowData.photo}
+                className="enlarge-on-hover"
                 style={{
                     width: '50%',
                     height: '50%',
