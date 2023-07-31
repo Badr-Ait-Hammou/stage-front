@@ -24,7 +24,9 @@ const utilities = {
       url: '/storage',
       icon: icons.IconDownload,
       breadcrumbs: false
-    }, {
+    },
+
+    /*{
       id: 'util-typography',
       title: 'Typography',
       type: 'item',
@@ -71,7 +73,7 @@ const utilities = {
           breadcrumbs: false
         }
       ]
-    }
+    }*/
   ]
 };
 
