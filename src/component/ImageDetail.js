@@ -4,6 +4,7 @@ import axios from "axios";
 import {Button} from "primereact/button";
 import MainCard from "../ui-component/cards/MainCard";
 import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
+import {Grid} from "@mui/material";
 
 export default function ImageDetail() {
     const {id} = useParams();
@@ -36,10 +37,15 @@ export default function ImageDetail() {
 
             <div style={{ position: "relative" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-                    <div>
-                        <p>ID: {image.id}</p>
-                        <p>Name: {image.name}</p>
-                    </div>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <strong>ID: {image.id}</strong>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <strong>Project: {image.projet.name}</strong>
+                        </Grid>
+                    </Grid>
+
                     <div style={{ display: "flex", gap: "5px" }}>
                         <Button
                             className="p-button-outlined p-button-secondary"

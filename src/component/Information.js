@@ -8,38 +8,38 @@ export default function Information(){
     return(
 
         <MainCard title="Information">
-            <Panel header="Header" toggleable>
+            <Panel header="Information" toggleable>
                 <Grid>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <strong>Header:</strong>
+                            <strong>Name:</strong>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            "Header"
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} className="mt-0.5">
-                        <Grid item xs={12} sm={6}>
-                            <strong>Header:</strong>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            "Header"
+                            ""
                         </Grid>
                     </Grid>
                     <Grid container spacing={2} className="mt-0.5">
                         <Grid item xs={12} sm={6}>
-                            <strong>Header:</strong>
+                            <strong>Images:</strong>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            "Header"
+                            ""
                         </Grid>
                     </Grid>
                     <Grid container spacing={2} className="mt-0.5">
                         <Grid item xs={12} sm={6}>
-                            <strong>Header:</strong>
+                            <strong>Created at:</strong>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            "Header"
+                            ""
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} className="mt-0.5">
+                        <Grid item xs={12} sm={6}>
+                            <strong>Description:</strong>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            ""
                         </Grid>
                     </Grid>
                     <Grid container spacing={2} className="mt-0.5">

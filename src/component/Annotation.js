@@ -40,7 +40,6 @@ export default function Annotation() {
             .get("http://localhost:8080/api/projet/all")
             .then((response) => {
                 setProjects(response.data);
-                // Store all images in the state
                 const allImages = response.data.reduce((images, project) => {
                     images.push(...project.images);
                     return images;
@@ -77,8 +76,6 @@ export default function Annotation() {
                 .catch((error) => console.error('Error fetching projects:', error));
         }
     }, [startDate, endDate]);
-
-
     /**********************************  ImageGrid  ******************************/
 
     const ImagesGrid = ({images}) => {
@@ -139,7 +136,6 @@ export default function Annotation() {
             resultArray[chunkIndex].push(item);
             return resultArray;
         }, []);
-
         return (
             <div className="images-grid">
                 {chunkedImages.map((imageRow, rowIndex) => (
@@ -222,6 +218,10 @@ export default function Annotation() {
             <div className="mt-5">
                 <MainCard title="All Project Images">
                     <FilteredImagesGrid projects={filteredProjects}/>
+                </MainCard>
+            </div>
+            <div className="mt-5">
+                <MainCard title="Download ">
                 </MainCard>
             </div>
         </>
