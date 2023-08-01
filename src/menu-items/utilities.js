@@ -24,6 +24,13 @@ const utilities = {
       url: '/storage',
       icon: icons.IconDownload,
       breadcrumbs: false
+    },{
+      id: 'chart',
+      title: 'chart',
+      type: 'item',
+      url: '/chart',
+      icon: icons.IconTypography,
+      breadcrumbs: false
     },
 
     /*{
