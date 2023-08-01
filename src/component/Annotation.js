@@ -22,7 +22,6 @@ export default function Annotation() {
 
 
 
-    /***************************************** Dialog open/close ************************************************************/
 
 
 
@@ -204,25 +203,24 @@ export default function Annotation() {
                     </div>
                     <div className="p-inputgroup flex-1">
                         <span className="p-inputgroup-addon">
-                            <i className="pi pi-calendar"></i>
+                            <p>From</p>
                         </span>
                         <Calendar
                             value={startDate}
                             dateFormat="yy-mm-dd"
-                            placeholder="From"
-
+                            touchUI
                             showButtonBar
                             onChange={(e) => setStartDate(e.value)}
                         />
                     </div>
                     <div className="p-inputgroup flex-1">
                         <span className="p-inputgroup-addon">
-                            <i className="pi pi-calendar"></i>
+                            <p>To</p>
                         </span>
                         <Calendar
                             value={endDate}
                             dateFormat="yy-mm-dd"
-                            placeholder="To"
+                            touchUI
                             showButtonBar
                             onChange={(e) => setEndDate(e.value)}
                         />
