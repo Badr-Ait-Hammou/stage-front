@@ -26,7 +26,7 @@ const utilities = {
       breadcrumbs: false
     },{
       id: 'chart',
-      title: 'chart',
+      title: 'Chart',
       type: 'item',
       url: '/chart',
       icon: icons.IconTypography,
