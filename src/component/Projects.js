@@ -1,6 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
+import 'primeicons/primeicons.css';
+import "../style/Image.css"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
@@ -9,7 +11,6 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import 'primeicons/primeicons.css';
 import axios from "axios";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import EmptyImg from "../assets/images/empty.png"
@@ -52,7 +53,6 @@ export default function Projects() {
 
         axios.post("http://localhost:8080/api/projet/save", {
             name,
-            // dateCreation,
             description,
             gestionnaire: {
                 id: 1,
@@ -67,10 +67,7 @@ export default function Projects() {
                 hideDialog();
                 loadProjects();
                 showusave();
-                //  setDateCreation(new Date());
                 //  setGestionnaireid("");
-                //setProductDialog(false);
-                // setProjects([...updatedProjects, response.data]);
             })
             .catch((error) => {
                 console.error("Error while saving project:", error);
@@ -130,7 +127,6 @@ export default function Projects() {
         setSelectedProject(rowData);
         setName(rowData.name);
         setDescription(rowData.description);
-        //setDateCreation(new Date(rowData.dateCreation));
         seteditProductDialog(true);
     };
 
@@ -139,7 +135,6 @@ export default function Projects() {
             const response = await axios.put(`http://localhost:8080/api/projet/${projectToUpdate.id}`, {
                 name: name,
                 description: description,
-                //dateCreation: dateCreation,
             });
 
             const updatedProject = [...project];
@@ -236,13 +231,8 @@ export default function Projects() {
                             key={image.id}
                             src={image.photo}
                             alt={image.name}
-                            style={{
-                                width: '100%',
-                                height: 'auto',
-                                objectFit: 'cover',
-                                borderRadius: '8px',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            }}
+                            className="image-item-small"
+
                             onError={() => console.error(`Failed to load image for ID: ${image.id}`)}
                         />
                         </Link>
@@ -272,9 +262,11 @@ export default function Projects() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
+                        <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                    )}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
-                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
+                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '18rem' }} ></Column>
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                     <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
@@ -319,9 +311,6 @@ export default function Projects() {
                     </label>
                     <InputTextarea style={{marginTop:"5px"}} id="newdescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
                 </div>
-
-
-
             </Dialog>
 
 

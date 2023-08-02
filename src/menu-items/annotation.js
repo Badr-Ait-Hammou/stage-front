@@ -12,7 +12,7 @@ const annotation = {
     children: [
         {
             id: 'annotation',
-            title: 'annotation',
+            title: 'Annotation',
             type: 'item',
             url: '/annotation',
             icon: icons.IconPencil,

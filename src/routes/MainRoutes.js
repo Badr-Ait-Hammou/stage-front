@@ -19,8 +19,8 @@ import Annotation from '../component/Annotation';
 import Projects from '../component/Projects';
 import Storage from '../component/Storage';
 import ImageDetail from '../component/ImageDetail';
-
-
+import Chart from "../component/Chart"
+import ProjectDetails from "../component/ProjectDetails"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -29,7 +29,8 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
+      element: <Projects />
+      // element: <DashboardDefault />
     },
     {
       path: 'dashboard',
@@ -47,9 +48,18 @@ const MainRoutes = {
     {
       path: 'annotation/Imagedetail/:id',
       element: <ImageDetail />
-    }, {
+    },
+    {
       path: 'projects/Imagedetail/:id',
       element: <ImageDetail />
+    },
+    {
+      path: 'chart',
+      element: <Chart />
+    },
+    {
+      path: 'projects/project_details/:id',
+      element: <ProjectDetails />
     },
     {
       path: 'projects',
