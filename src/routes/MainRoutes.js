@@ -20,7 +20,7 @@ import Projects from '../component/Projects';
 import Storage from '../component/Storage';
 import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
-
+import ProjectDetails from "../component/ProjectDetails"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -29,7 +29,8 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
+      element: <Projects />
+      // element: <DashboardDefault />
     },
     {
       path: 'dashboard',
@@ -55,6 +56,10 @@ const MainRoutes = {
     {
       path: 'chart',
       element: <Chart />
+    },
+    {
+      path: 'project_details',
+      element: <ProjectDetails />
     },
     {
       path: 'projects',
