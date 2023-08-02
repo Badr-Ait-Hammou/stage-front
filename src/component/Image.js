@@ -19,7 +19,8 @@ import { FileUpload } from 'primereact/fileupload';
 import EmptyImg from "../assets/images/empty.png";
 import "../style/Image.css"
 import html2canvas from 'html2canvas';
-import { IoCameraOutline, IoAddOutline, IoRemoveOutline } from 'react-icons/io5';
+import { IoCameraOutline, IoAddOutline, IoRemoveOutline,IoSquareOutline } from 'react-icons/io5';
+import 'leaflet-draw/dist/leaflet.draw.css'
 
 
 
@@ -47,6 +48,14 @@ export default function Image() {
     const [showImageDialog, setShowImageDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [zoom, setZoom] = useState(100);
+    const [showPolygonDrawing, setShowPolygonDrawing] = useState(false);
+    const [drawnItems, setDrawnItems] = useState(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [drawingStartX, setDrawingStartX] = useState(0);
+    const [drawingStartY, setDrawingStartY] = useState(0);
+    const [drawingWidth, setDrawingWidth] = useState(0);
+    const [drawingHeight, setDrawingHeight] = useState(0);
+
 
 
     useEffect(() => {
@@ -108,6 +117,8 @@ export default function Image() {
             reader.readAsDataURL(file);
         }
     };
+
+
 
 
     /********************************************Load image *************************/
@@ -273,7 +284,34 @@ export default function Image() {
         }
     };
 
+    const togglePolygonDrawing = () => {
+        setIsDrawing((prevState) => !prevState);
+    };
 
+    const handleImageMouseDown = (event) => {
+        if (isDrawing) {
+            setDrawingStartX(event.nativeEvent.offsetX);
+            setDrawingStartY(event.nativeEvent.offsetY);
+        }
+    };
+
+    const handleImageMouseUp = () => {
+        if (isDrawing) {
+            setIsDrawing(false);
+        }
+    };
+
+    const handleImageMouseMove = (event) => {
+        if (isDrawing) {
+            const currentX = event.nativeEvent.offsetX;
+            const currentY = event.nativeEvent.offsetY;
+            const width = currentX - drawingStartX;
+            const height = currentY - drawingStartY;
+
+            setDrawingWidth(width);
+            setDrawingHeight(height);
+        }
+    };
 
 
     const actionBodyTemplate = (rowData) => {
@@ -527,55 +565,78 @@ export default function Image() {
 
             </Dialog>
 
-            <Dialog visible={showImageDialog} style={{ width: '35rem',height:'35rem' }} onHide={() => setShowImageDialog(false)}>
+            <Dialog visible={showImageDialog} style={{ width: '35rem', height: '35rem' }} onHide={() => setShowImageDialog(false)}>
                 <div
-                    ref={dialogContentRef}
-                    style={{
-                        position: 'relative',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100%',
-                    }}
+                  ref={dialogContentRef}
+                  style={{
+                      position: 'relative',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '100%',
+                  }}
                 >
                     <img
-                        src={selectedImage?.photo}
-                        alt={selectedImage?.photo}
-                        style={{
-                            maxWidth: '100%',
-                            maxHeight: '100%',
-                            width: `${zoom}%`,
-                            height: 'auto',
-                            objectFit: 'contain',
-                        }}
+                      src={selectedImage?.photo}
+                      alt={selectedImage?.photo}
+                      style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          width: `${zoom}%`,
+                          height: 'auto',
+                          objectFit: 'contain',
+                      }}
+                      onMouseDown={handleImageMouseDown} // Enable drawing when clicking on the image
+                      onMouseUp={handleImageMouseUp} // Finish drawing when releasing the mouse button
+                      onMouseMove={handleImageMouseMove} // Update drawing coordinates as the mouse moves
                     />
                     <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '10px',
-                            right: '10px',
-                            display: 'flex',
-                            gap: '5px',
-                        }}
+                      style={{
+                          position: 'absolute',
+                          bottom: '10px',
+                          right: '10px',
+                          display: 'flex',
+                          gap: '5px',
+                      }}
                     >
                         <Button
-                            className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoAddOutline />}
-                            onClick={handleZoomIn}
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoAddOutline />}
+                          onClick={handleZoomIn}
                         />
                         <Button
-                            className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoRemoveOutline />}
-                            onClick={handleZoomOut}
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoRemoveOutline />}
+                          onClick={handleZoomOut}
                         />
                         <Button
-                            className="p-button-outlined p-button-secondary p-button-icon-only"
-                            icon={<IoCameraOutline />}
-                            onClick={handleScreenshot}
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoCameraOutline />}
+                          onClick={handleScreenshot}
+                        />
+
+                        <Button
+                          className="p-button-outlined p-button-secondary p-button-icon-only"
+                          icon={<IoSquareOutline/>}
+                          onClick={togglePolygonDrawing}
                         />
                     </div>
+                    {isDrawing && (
+                      <div
+                        style={{
+                            position: 'absolute',
+                            border: '2px dashed red',
+                            pointerEvents: 'none',
+                            left: `${drawingStartX}px`,
+                            top: `${drawingStartY}px`,
+                            width: `${drawingWidth}px`,
+                            height: `${drawingHeight}px`,
+                        }}
+                      />
+                    )}
                 </div>
             </Dialog>
+
 
         </div>
     );
