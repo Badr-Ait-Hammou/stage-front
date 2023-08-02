@@ -67,10 +67,7 @@ export default function Projects() {
                 hideDialog();
                 loadProjects();
                 showusave();
-                //  setDateCreation(new Date());
                 //  setGestionnaireid("");
-                //setProductDialog(false);
-                // setProjects([...updatedProjects, response.data]);
             })
             .catch((error) => {
                 console.error("Error while saving project:", error);
@@ -130,7 +127,6 @@ export default function Projects() {
         setSelectedProject(rowData);
         setName(rowData.name);
         setDescription(rowData.description);
-        //setDateCreation(new Date(rowData.dateCreation));
         seteditProductDialog(true);
     };
 
@@ -139,7 +135,6 @@ export default function Projects() {
             const response = await axios.put(`http://localhost:8080/api/projet/${projectToUpdate.id}`, {
                 name: name,
                 description: description,
-                //dateCreation: dateCreation,
             });
 
             const updatedProject = [...project];
@@ -272,7 +267,9 @@ export default function Projects() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
+                        <Link to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                    )}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>

@@ -58,7 +58,7 @@ const MainRoutes = {
       element: <Chart />
     },
     {
-      path: 'project_details',
+      path: 'projects/project_details/:id',
       element: <ProjectDetails />
     },
     {
