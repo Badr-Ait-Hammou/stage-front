@@ -1,52 +1,51 @@
-import React from "react"
-import MainCard from "../ui-component/cards/MainCard";
-import { useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import "../style/project_details.css"
+import React, { useState, useEffect } from 'react';
+import { Toolbar } from 'primereact/toolbar';
 import axios from "axios";
+import MainCard from "../ui-component/cards/MainCard";
+import {useParams} from "react-router-dom";
+import {Column} from "primereact/column";
+import {DataTable} from "primereact/datatable";
 
 export default function ProjectDetails() {
+    const [project, setProject] = useState([]);
     const {id} = useParams();
-    const [project, setProjects] = useState([]);
+
+
+    const imageBodyTemplate = (photo) => {
+        return <img className=" image-item-small w-20 sm:w-16rem xl:w-10rem h-20 sm:h-16rem xl:h-10rem shadow-2 block xl:block mx-auto border-round" src={photo.photo} alt={photo.name}/>
+    };
+
+    const header = (
+        <div className="mt-2 mb-2">
+            <span className="text-xl text-900 font-bold">{project.name} Images</span>
+        </div>
+    );
+    const footer = `In total there are ${project.images ? project.images.length : 0} images on the ${project.name} project.`;
+
+
+
 
 
     useEffect(() => {
         axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
-            setProjects(response.data);
+            setProject(response.data);
         });
-    }, [id]);
+    }, []);
+
 
 
     return (
-        <>
-            <MainCard title="project_details">
-                <div>{project.id}</div>
-                <div>{project.name}</div>
-            </MainCard>
-            <MainCard title="project_details">
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '10px',
-                    justifyContent: 'center'
-                }}>
-                    {project && project.images && project.images.map((photo) => (
-                        <img
-                            key={photo.id}
-                            src={photo.photo}
-                            alt={photo.name}
-                            style={{
-                                width: '100%',
-                                height: 'auto',
-                                objectFit: 'cover',
-                                borderRadius: '8px',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            }}
-                            onError={() => console.error(`Failed to load image for ID: ${photo.id}`)}
-                        />
-                    ))}
-                </div>
-            </MainCard>
-        </>
-
+        <MainCard>
+            <div className="card">
+                <Toolbar className="mb-2"  center={header}/>
+                <DataTable value={project.images}  footer={footer} tableStyle={{ minWidth: '30rem' }}>
+                    <Column field="id" sortable  header="ID"></Column>
+                    <Column header="Images" body={imageBodyTemplate}></Column>
+                    <Column field="name" filter header="Name" ></Column>
+                    <Column field="comment" header="Comment"></Column>
+                </DataTable>
+            </div>
+        </MainCard>
     );
 }

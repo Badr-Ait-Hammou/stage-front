@@ -1,6 +1,8 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
+import 'primeicons/primeicons.css';
+
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
@@ -9,7 +11,6 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import 'primeicons/primeicons.css';
 import axios from "axios";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import EmptyImg from "../assets/images/empty.png"
@@ -52,7 +53,6 @@ export default function Projects() {
 
         axios.post("http://localhost:8080/api/projet/save", {
             name,
-            // dateCreation,
             description,
             gestionnaire: {
                 id: 1,
