@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import 'primeicons/primeicons.css';
-
+import "../style/Image.css"
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
@@ -231,13 +231,8 @@ export default function Projects() {
                             key={image.id}
                             src={image.photo}
                             alt={image.name}
-                            style={{
-                                width: '100%',
-                                height: 'auto',
-                                objectFit: 'cover',
-                                borderRadius: '8px',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            }}
+                            className="image-item-small"
+
                             onError={() => console.error(`Failed to load image for ID: ${image.id}`)}
                         />
                         </Link>
@@ -268,10 +263,10 @@ export default function Projects() {
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                        <Link to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                        <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
                     )}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
-                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }} ></Column>
+                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '18rem' }} ></Column>
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                     <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
@@ -316,9 +311,6 @@ export default function Projects() {
                     </label>
                     <InputTextarea style={{marginTop:"5px"}} id="newdescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
                 </div>
-
-
-
             </Dialog>
 
 

@@ -314,15 +314,7 @@ export default function Image() {
               <img
                 src={rowData.photo}
                 alt={rowData.photo}
-                className="enlarge-on-hover"
-                style={{
-                    width: '50%',
-                    height: '50%',
-                    objectFit: 'cover',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    cursor: 'pointer',
-                }}
+                className="image-item-small"
                 onError={() => console.error(`Failed to load image for row with ID: ${rowData.id}`)}
                 onClick={() => showImage(rowData)}
               />
@@ -345,7 +337,7 @@ export default function Image() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
                     <Column field="id"  header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable ></Column>
                     <Column field="name" filter filterPlaceholder="Search Name ..." header="Name" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="description"  sortable header="Description" ></Column>
                     <Column field="format" header="Format"  sortable style={{ minWidth: '8rem' }}></Column>
