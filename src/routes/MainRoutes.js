@@ -21,7 +21,7 @@ import Storage from '../component/Storage';
 import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
-import Excel from '../menu-items/excel';
+import Template from "../component/Template"
 import ExcelFile from '../component/ExcelFile';
 import PdfFile from '../component/PdfFile';
 // ==============================|| MAIN ROUTING ||============================== //
@@ -55,6 +55,10 @@ const MainRoutes = {
     {
       path: 'pdf',
       element: <PdfFile />
+    },
+    {
+      path: 'template',
+      element: <Template />
     },
     {
       path: 'annotation/Imagedetail/:id',

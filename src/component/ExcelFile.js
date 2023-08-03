@@ -3,8 +3,6 @@ import MainCard from "../ui-component/cards/MainCard";
 import { Panel } from 'primereact/panel';
 import {Grid} from "@mui/material";
 export default function ExcelFile(){
-
-
   return(
 
     <MainCard title="Information">
