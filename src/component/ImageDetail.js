@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import {Button} from "primereact/button";
+import { Button } from "primereact/button";
 import MainCard from "../ui-component/cards/MainCard";
-import {IoAddOutline, IoRemoveOutline} from "react-icons/io5";
-import {Grid} from "@mui/material";
+import {IoAddOutline, IoRefreshOutline, IoRemoveOutline} from "react-icons/io5";
+import { Grid } from "@mui/material";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export default function ImageDetail() {
-    const {id} = useParams();
+    const { id } = useParams();
     const [image, setImage] = useState(null);
-    const [zoom, setZoom] = useState(20);
 
     useEffect(() => {
         axios
@@ -25,18 +25,14 @@ export default function ImageDetail() {
     if (!image) {
         return <p>Loading...</p>;
     }
-    const handleZoomIn = () => {
-        setZoom((prevZoom) => prevZoom + 10);
-    };
 
-    const handleZoomOut = () => {
-        setZoom((prevZoom) => Math.max(10, prevZoom - 10));
-    };
+
     return (
         <MainCard title="Detail">
-
             <div style={{ position: "relative" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
+                <div
+                    style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}
+                >
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <strong>ID: {image.id}</strong>
@@ -49,29 +45,59 @@ export default function ImageDetail() {
                     <div style={{ display: "flex", gap: "5px" }}>
                         <Button
                             className="p-button-outlined p-button-secondary"
-                            onClick={handleZoomIn}
+                            onClick={() => zoomIn(0.1)} // Zoom in by 0.1 increment
                             icon={<IoAddOutline />}
-                        />
-                        <Button
-                            className="p-button-outlined p-button-secondary"
-                            onClick={handleZoomOut}
-                            icon={<IoRemoveOutline />}
                         />
                     </div>
                 </div>
             </div>
-            <div style={{
 
-                position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-            }}>
-                <img
-                    src={image.photo}
-                    alt={image.name}
-                    style={{width: `${zoom}%`, height: "auto", objectFit: "contain"}}
-                />
+            <div
+                style={{
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <TransformWrapper
+                    options={{
+                        limitToBounds: false,
+                        minScale: 0.1,
+                        maxScale: 1,
+                    }}
+                >
+                    {({ zoomIn, zoomOut, resetTransform }) => (
+                        <>
+                            <TransformComponent >
+                                <img
+                                    src={image.photo}
+                                    alt={image.name}
+                                    style={{ width: "500px", height: "500px", border: "1px solid #ccc", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}                                />
+                            </TransformComponent>
+
+
+                            {/* Update the styles for the buttons container */}
+                            <div style={{ position: "absolute", top: 0, right: 0, display: "flex", flexDirection: "column" }}>
+                                <Button
+                                    className="p-button-outlined p-button-secondary"
+                                    onClick={() => zoomIn(0.1)}
+                                    icon={<IoAddOutline />}
+                                />
+                                <Button
+                                    className="p-button-outlined p-button-secondary"
+                                    onClick={() => zoomOut(0.1)}
+                                    icon={<IoRemoveOutline />}
+                                />
+                                <Button
+                                    className="p-button-outlined p-button-secondary"
+                                    onClick={() => resetTransform(true)}
+                                    icon={<IoRefreshOutline />}
+                                />
+                            </div>
+                        </>
+                    )}
+                </TransformWrapper>
             </div>
 
         </MainCard>
