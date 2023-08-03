@@ -24,6 +24,7 @@ import ProjectDetails from "../component/ProjectDetails"
 import Template from "../component/Template"
 import ExcelFile from '../component/ExcelFile';
 import PdfFile from '../component/PdfFile';
+import Profile from '../component/Profile'
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -41,7 +42,7 @@ const MainRoutes = {
         {
           path: 'default',
           element: <DashboardDefault />
-        }
+        },
       ]
     },
     {
@@ -59,6 +60,9 @@ const MainRoutes = {
     {
       path: 'template',
       element: <Template />
+    },{
+      path: 'profile',
+      element: <Profile />
     },
     {
       path: 'annotation/Imagedetail/:id',
