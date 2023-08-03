@@ -45,8 +45,7 @@ export default function ImageDetail() {
                     <div style={{ display: "flex", gap: "5px" }}>
                         <Button
                             className="p-button-outlined p-button-secondary"
-                            onClick={() => zoomIn(0.1)} // Zoom in by 0.1 increment
-                            icon={<IoAddOutline />}
+
                         />
                     </div>
                 </div>
@@ -73,24 +72,26 @@ export default function ImageDetail() {
                                 <img
                                     src={image.photo}
                                     alt={image.name}
-                                    style={{ width: "500px", height: "500px", border: "1px solid #ccc", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}                                />
+                                    style={{ width: "700px", height: "500px", border: "0.5px solid #ccc",borderRadius:"20px", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}                                />
                             </TransformComponent>
 
 
-                            {/* Update the styles for the buttons container */}
-                            <div style={{ position: "absolute", top: 0, right: 0, display: "flex", flexDirection: "column" }}>
+                            <div style={{ position: "absolute", top:5, right:0, display: "flex", flexDirection: "column" }}>
                                 <Button
                                     className="p-button-outlined p-button-secondary"
+
                                     onClick={() => zoomIn(0.1)}
                                     icon={<IoAddOutline />}
                                 />
                                 <Button
-                                    className="p-button-outlined p-button-secondary"
+                                    className="p-button-outlined p-button-secondary mt-5"
+                                    style={{marginTop:"5px"}}
                                     onClick={() => zoomOut(0.1)}
                                     icon={<IoRemoveOutline />}
                                 />
                                 <Button
                                     className="p-button-outlined p-button-secondary"
+                                    style={{marginTop:"5px"}}
                                     onClick={() => resetTransform(true)}
                                     icon={<IoRefreshOutline />}
                                 />
