@@ -21,6 +21,9 @@ import Storage from '../component/Storage';
 import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
+import Excel from '../menu-items/excel';
+import ExcelFile from '../component/ExcelFile';
+import PdfFile from '../component/PdfFile';
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -44,6 +47,14 @@ const MainRoutes = {
     {
       path: 'annotation',
       element: <Annotation />
+    },
+    {
+      path: 'excel',
+      element: <ExcelFile />
+    },
+    {
+      path: 'pdf',
+      element: <PdfFile />
     },
     {
       path: 'annotation/Imagedetail/:id',
