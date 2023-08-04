@@ -21,6 +21,9 @@ import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import axios from "axios";
 import {Toast} from "primereact/toast";
 import { Toolbar } from 'primereact/toolbar';
+import {DataTable} from "primereact/datatable";
+import {Column} from "primereact/column";
+import {InputText} from "primereact/inputtext";
 
 
 export default function AddUser(){
@@ -32,15 +35,30 @@ export default function AddUser(){
     const[tel,settel]=useState('');
     const[password,setpassword]=useState('');
     const[role,setRole]=useState('');
+    const[users,setUsers]=useState([]);
     const [userDialog, setUserDialog] = useState(false);
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const [showPassword, setShowPassword] = useState(false);
     const [strength, setStrength] = useState(0);
+    const [globalFilter, setGlobalFilter] = useState(null);
     const [level, setLevel] = useState();
     const toast = useRef(null);
+    const dt = useRef(null);
 
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/api/users/").then((response) => {
+            setUsers(response.data);
+            console.log(response.data);
+        });
+    }, []);
+
+    const loadUsers=async ()=>{
+        const res=await axios.get(`http://localhost:8080/api/users/`);
+        setUsers(res.data);
+    }
 
 
     const handleSubmit = (event) => {
@@ -70,6 +88,8 @@ export default function AddUser(){
                 settel("");
                 setpassword("");
                 setRole("");
+                setUserDialog(false);
+                loadUsers();
 
             })
             .catch((error) => {
@@ -82,7 +102,7 @@ export default function AddUser(){
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button   label="New" icon="pi pi-plus" severity="success" onClick={openDialog} />
+                <Button   label="Add" icon="pi pi-plus" severity="success" onClick={openDialog} />
             </div>
         );
     };
@@ -117,15 +137,38 @@ export default function AddUser(){
         setLevel(strengthColor(temp));
     };
 
+    const header = (
+        <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
+            </span>
+        </div>
+    );
     useEffect(() => {
         changePassword('123456');
     }, []);
 
+
     return (
         <>
                <Toast ref={toast} />
+            <div>
                <Toolbar className="mb-4" start={leftToolbarTemplate}  ></Toolbar>
 
+                <DataTable ref={dt} value={users}
+                           dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                    <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
+                    <Column field="firstName" header="FirstName" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="lastName" header="LastName" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="username" header="username" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="email" header="Email" sortable style={{ minWidth: '10em' }}></Column>
+                    <Column field="tel" header="Phone" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
+                    <Column  header="Action"  exportable={false} style={{ minWidth: '12rem' }}></Column>
+                </DataTable>
+            </div>
 
 
 
