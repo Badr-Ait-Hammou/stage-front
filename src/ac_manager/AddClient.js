@@ -47,7 +47,7 @@ export default function AddClient() {
         });
     }, []);
 
-    const loadUsers = async () => {
+    const loadClients = async () => {
         const res = await axios.get(`http://localhost:8080/api/users/role/CLIENT`);
         setUsers(res.data);
     }
@@ -63,8 +63,24 @@ export default function AddClient() {
                 detail: 'one of the fields is empty',
                 life: 3000
             })
+        } else if (!isValidPhoneNumber(tel)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Invalid Phone Number',
+                detail: 'Please enter a valid phone number (8 to 15 digits)',
+                life: 3000
+            });
+            return;
+        } else if (!isValidEmail(email)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Invalid Email',
+                detail: 'Please enter a valid email address',
+                life: 3000
+            });
             return;
         }
+
 
         axios.post("http://localhost:8080/api/auth/register", {
             username,
@@ -85,7 +101,7 @@ export default function AddClient() {
                 settel("");
                 setpassword("");
                 setUserDialog(false);
-                loadUsers();
+                loadClients();
 
             })
             .catch((error) => {
@@ -102,17 +118,29 @@ export default function AddClient() {
         );
     };
 
-    const exportCSV = () => {
-        dt.current.exportCSV();
+    /************************************ Dialog open/close *****************************/
+
+    const openDialog = () => {
+        setEmail("");
+        settel("");
+        setUserName("");
+        setFirstName("");
+        setLastName("");
+        setUserDialog(true);
     };
-    const rightToolbarTemplate = () => {
-        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV}/>;
+    const hideDialog = () => {
+        setUserDialog(false);
     };
-    const centerToolbarTemplate = () => {
-        return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0 font-bold">Manage Users</h4>
-        </div>;
+
+    /************************************ password check  *****************************/
+
+
+    const changePassword = (value) => {
+        const temp = strengthIndicator(value);
+        setStrength(temp);
+        setLevel(strengthColor(temp));
     };
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -120,9 +148,27 @@ export default function AddClient() {
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
     };
-    const hideDialog = () => {
-        setUserDialog(false);
+    useEffect(() => {
+        changePassword('123456');
+    }, []);
+
+    /************************************ Toolbar table component *****************************/
+
+
+    const exportCSV = () => {
+        dt.current.exportCSV();
     };
+
+    const rightToolbarTemplate = () => {
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV}/>;
+    };
+    const centerToolbarTemplate = () => {
+        return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h4 className="m-0 font-bold">Manage Clients</h4>
+        </div>;
+    };
+
+
     const userDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
@@ -140,22 +186,6 @@ export default function AddClient() {
         );
     };
 
-    const openDialog = () => {
-        setEmail("");
-        settel("");
-        setUserName("");
-        setFirstName("");
-        setLastName("");
-        setUserDialog(true);
-
-    };
-
-    const changePassword = (value) => {
-        const temp = strengthIndicator(value);
-        setStrength(temp);
-        setLevel(strengthColor(temp));
-    };
-
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <span className="p-input-icon-left">
@@ -164,10 +194,19 @@ export default function AddClient() {
             </span>
         </div>
     );
-    useEffect(() => {
-        changePassword('123456');
-    }, []);
 
+
+    /********************************************** Regex ***********************************************/
+
+    const isValidEmail = (email) => {
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailPattern.test(email);
+    };
+
+    const isValidPhoneNumber = (phoneNumber) => {
+        const phoneNumberPattern = /^\d{8,15}$/;
+        return phoneNumberPattern.test(phoneNumber);
+    };
 
     return (
         <>
@@ -268,7 +307,6 @@ export default function AddClient() {
                             type="email"
                             value={email} onChange={(e) => {
                             setEmail(e.target.value);
-                            handleChange(e.target.value);
                         }}
                             name="email"
 

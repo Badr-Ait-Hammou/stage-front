@@ -65,7 +65,23 @@ export default function AddUser() {
                 detail: 'one of the fields is empty',
                 life: 3000
             })
-        }else if(role.trim()==='') {
+        } else if (!isValidPhoneNumber(tel)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Invalid Phone Number',
+                detail: 'Please enter a valid phone number (8 to 15 digits)',
+                life: 3000
+            });
+            return;
+        } else if (!isValidEmail(email)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Invalid Email',
+                detail: 'Please enter a valid email address',
+                life: 3000
+            });
+            return;
+        } else if (role.trim() === '') {
             toast.current.show({
                 severity: 'error',
                 summary: 'Warning',
@@ -103,7 +119,6 @@ export default function AddUser() {
             });
     };
 
-
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
@@ -112,9 +127,48 @@ export default function AddUser() {
         );
     };
 
+    /************************************ Dialog open/close *****************************/
+
+    const openDialog = () => {
+        setEmail("");
+        settel("");
+        setUserName("");
+        setRole("");
+        setFirstName("");
+        setLastName("");
+        setUserDialog(true);
+    };
+    const hideDialog = () => {
+        setUserDialog(false);
+    };
+
+    /************************************ password check  *****************************/
+
+
+    const changePassword = (value) => {
+        const temp = strengthIndicator(value);
+        setStrength(temp);
+        setLevel(strengthColor(temp));
+    };
+
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+    useEffect(() => {
+        changePassword('123456');
+    }, []);
+
+    /************************************ Toolbar table component *****************************/
+
+
     const exportCSV = () => {
         dt.current.exportCSV();
     };
+
     const rightToolbarTemplate = () => {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV}/>;
     };
@@ -123,16 +177,8 @@ export default function AddUser() {
             <h4 className="m-0 font-bold">Manage Users</h4>
         </div>;
     };
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
 
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-    const hideDialog = () => {
-        setUserDialog(false);
-    };
+
     const userDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
@@ -150,23 +196,6 @@ export default function AddUser() {
         );
     };
 
-    const openDialog = () => {
-        setEmail("");
-        settel("");
-        setUserName("");
-        setRole("");
-        setFirstName("");
-        setLastName("");
-        setUserDialog(true);
-
-    };
-
-    const changePassword = (value) => {
-        const temp = strengthIndicator(value);
-        setStrength(temp);
-        setLevel(strengthColor(temp));
-    };
-
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <span className="p-input-icon-left">
@@ -175,10 +204,19 @@ export default function AddUser() {
             </span>
         </div>
     );
-    useEffect(() => {
-        changePassword('123456');
-    }, []);
 
+
+    /********************************************** Regex ***********************************************/
+
+    const isValidEmail = (email) => {
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailPattern.test(email);
+    };
+
+    const isValidPhoneNumber = (phoneNumber) => {
+        const phoneNumberPattern = /^\d{8,15}$/;
+        return phoneNumberPattern.test(phoneNumber);
+    };
 
     return (
         <>
@@ -210,170 +248,168 @@ export default function AddUser() {
 
             <Dialog visible={userDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
                     header="Add User" modal className="p-fluid" footer={userDialogFooter} onHide={hideDialog}>
-                        <form noValidate>
-                            <Grid container  spacing={matchDownSM ? 0 : 1}>
-                                <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth sx={{...theme.typography.customInput,mt:1}}>
-                                        <InputLabel >
-                                            FirstName
-                                        </InputLabel>
-                                    <OutlinedInput
-                                        style={{padding:"5px"}}
-                                        type="text"
-                                        defaultValue=""
-                                        value={firstname} onChange={(e) => setFirstName(e.target.value)}
-                                        sx={{...theme.typography.customInput}}
-                                    />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth sx={{...theme.typography.customInput,mt:1}}>
-                                        <InputLabel htmlFor="outlined-adornment-email-register" >LastName
-                                        </InputLabel>
-                                    <OutlinedInput
-                                        style={{padding:"5px"}}
-                                        margin="normal"
-                                        type="text"
-                                        defaultValue=""
-                                        value={lastname} onChange={(e) => setLastName(e.target.value)}
-                                        sx={{...theme.typography.customInput}}
-                                    />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth sx={{...theme.typography.customInput,mt:-1}}>
-                                        <InputLabel htmlFor="outlined-adornment-email-register" >Username
-                                        </InputLabel>
-                                    <OutlinedInput
-                                        style={{padding:"5px"}}
-                                        margin="normal"
-                                        type="text"
-                                        defaultValue=""
-                                        value={username} onChange={(e) => setUserName(e.target.value)}
-                                        sx={{...theme.typography.customInput}}
-                                    />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth sx={{...theme.typography.customInput,mt:-1}}>
-                                        <InputLabel htmlFor="outlined-adornment-email-register" >Phone
-                                        </InputLabel>
-                                    <OutlinedInput
-                                        style={{padding:"5px"}}
-                                        margin="normal"
-                                        type="text"
-                                        defaultValue=""
-                                        value={tel} onChange={(e) => settel(e.target.value)}
-                                        sx={{...theme.typography.customInput}}
-                                    />
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-
-                            <FormControl fullWidth sx={{...theme.typography.customInput,mt:1}}>
-                                <InputLabel htmlFor="outlined-adornment-email-register" >Email Address
-                                    </InputLabel>
+                <form noValidate>
+                    <Grid container spacing={matchDownSM ? 0 : 1}>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: 1}}>
+                                <InputLabel>
+                                    FirstName
+                                </InputLabel>
                                 <OutlinedInput
-                                    style={{padding:"10px"}}
-                                    id="outlined-adornment-email-register"
-                                    type="email"
-                                    value={email} onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    handleChange(e.target.value);
-                                }}
-                                    name="email"
-
+                                    style={{padding: "5px"}}
+                                    type="text"
+                                    defaultValue=""
+                                    value={firstname} onChange={(e) => setFirstName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
                                 />
-
                             </FormControl>
-
-
-                            <FormControl fullWidth sx={{...theme.typography.customInput}}>
-                                <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: 1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register">LastName
+                                </InputLabel>
                                 <OutlinedInput
-                                    id="outlined-adornment-password-register"
-                                    type={showPassword ? 'text' : 'password'}
-                                    style={{padding:"10px"}}
-                                    value={password} onChange={(e) => {
-                                    setpassword(e.target.value);
-                                    changePassword(e.target.value);
-                                }}
-                                    name="password"
-                                    label="Password"
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                edge="end"
-                                                size="large"
-                                            >
-                                                {showPassword ? <Visibility/> : <VisibilityOff/>}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
+                                    style={{padding: "5px"}}
+                                    margin="normal"
+                                    type="text"
+                                    defaultValue=""
+                                    value={lastname} onChange={(e) => setLastName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
                                 />
-
                             </FormControl>
-
-
-                            {strength !== 0 && (
-                                <FormControl fullWidth>
-                                    <Box sx={{mb: 2}}>
-                                        <Grid container spacing={2} alignItems="center">
-                                            <Grid item>
-                                                <Box style={{backgroundColor: level?.color}}
-                                                     sx={{width: 85, height: 8, borderRadius: '7px'}}/>
-                                            </Grid>
-                                            <Grid item>
-                                                <Typography variant="subtitle1" fontSize="0.75rem">
-                                                    {level?.label}
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-                                </FormControl>
-                            )}
-
-
-
-                            <FormControl component="fieldset">
-                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={role === 'ADMIN'}
-                                                onChange={() => setRole('ADMIN')}
-                                                value="ADMIN"
-                                            />
-                                        }
-                                        label="Admin"
-                                    />
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={role === 'GESTIONNAIRE'}
-                                                onChange={() => setRole('GESTIONNAIRE')}
-                                                value="GESTIONNAIRE"
-                                            />
-                                        }
-                                        label="Gestionnaire"
-                                    /> <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={role === 'CLIENT'}
-                                                onChange={() => setRole('CLIENT')}
-                                                value="CLIENT"
-                                            />
-                                        }
-                                        label="Client"
-                                    />
-                                </div>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: -1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register">Username
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding: "5px"}}
+                                    margin="normal"
+                                    type="text"
+                                    defaultValue=""
+                                    value={username} onChange={(e) => setUserName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
                             </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: -1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register">Phone
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding: "5px"}}
+                                    margin="normal"
+                                    type="text"
+                                    defaultValue=""
+                                    value={tel} onChange={(e) => settel(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+
+                    <FormControl fullWidth sx={{...theme.typography.customInput, mt: 1}}>
+                        <InputLabel htmlFor="outlined-adornment-email-register">Email Address
+                        </InputLabel>
+                        <OutlinedInput
+                            style={{padding: "10px"}}
+                            id="outlined-adornment-email-register"
+                            type="email"
+                            value={email} onChange={(e) => {
+                            setEmail(e.target.value);
+                        }}
+                            name="email"
+
+                        />
+
+                    </FormControl>
 
 
-                        </form>
+                    <FormControl fullWidth sx={{...theme.typography.customInput}}>
+                        <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+                        <OutlinedInput
+                            id="outlined-adornment-password-register"
+                            type={showPassword ? 'text' : 'password'}
+                            style={{padding: "10px"}}
+                            value={password} onChange={(e) => {
+                            setpassword(e.target.value);
+                            changePassword(e.target.value);
+                        }}
+                            name="password"
+                            label="Password"
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                        size="large"
+                                    >
+                                        {showPassword ? <Visibility/> : <VisibilityOff/>}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                        />
+
+                    </FormControl>
+
+
+                    {strength !== 0 && (
+                        <FormControl fullWidth>
+                            <Box sx={{mb: 2}}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item>
+                                        <Box style={{backgroundColor: level?.color}}
+                                             sx={{width: 85, height: 8, borderRadius: '7px'}}/>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" fontSize="0.75rem">
+                                            {level?.label}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </FormControl>
+                    )}
+
+
+                    <FormControl component="fieldset">
+                        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={role === 'ADMIN'}
+                                        onChange={() => setRole('ADMIN')}
+                                        value="ADMIN"
+                                    />
+                                }
+                                label="Admin"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={role === 'GESTIONNAIRE'}
+                                        onChange={() => setRole('GESTIONNAIRE')}
+                                        value="GESTIONNAIRE"
+                                    />
+                                }
+                                label="Gestionnaire"
+                            /> <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={role === 'CLIENT'}
+                                    onChange={() => setRole('CLIENT')}
+                                    value="CLIENT"
+                                />
+                            }
+                            label="Client"
+                        />
+                        </div>
+                    </FormControl>
+
+
+                </form>
 
             </Dialog>
 
