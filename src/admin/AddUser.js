@@ -2,7 +2,7 @@ import React, {useState,useEffect,useRef} from "react"
 import {useTheme} from "@mui/material/styles";
 import {
     Box,Switch,
-    Button,FormControlLabel,
+    FormControlLabel,
     FormControl, FormHelperText,
     Grid, IconButton, InputAdornment,
     InputLabel, OutlinedInput,
@@ -10,17 +10,17 @@ import {
     Typography,
     useMediaQuery
 } from "@mui/material";
-
-import AnimateButton from "../ui-component/extended/AnimateButton";
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
 import {Formik} from "formik";
 import * as Yup from "yup";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useScriptRef from "../hooks/useScriptRef";
-import MainCard from "../ui-component/cards/MainCard";
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import axios from "axios";
 import {Toast} from "primereact/toast";
+import { Toolbar } from 'primereact/toolbar';
 
 
 export default function AddUser(){
@@ -32,6 +32,7 @@ export default function AddUser(){
     const[tel,settel]=useState('');
     const[password,setpassword]=useState('');
     const[role,setRole]=useState('');
+    const [userDialog, setUserDialog] = useState(false);
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -78,6 +79,13 @@ export default function AddUser(){
 
 
 
+    const leftToolbarTemplate = () => {
+        return (
+            <div className="flex flex-wrap gap-2">
+                <Button   label="New" icon="pi pi-plus" severity="success" onClick={openDialog} />
+            </div>
+        );
+    };
 
 
     const handleClickShowPassword = () => {
@@ -86,6 +94,21 @@ export default function AddUser(){
 
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
+    };
+    const hideDialog = () => {
+       // setSubmitted(false);
+        setUserDialog(false);
+    };
+    const userDialogFooter = (
+        <React.Fragment>
+            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
+            <Button  label="save"
+                     severity="success"
+                     raised onClick={(e) => handleSubmit(e)}/>
+        </React.Fragment>
+    );
+    const openDialog = () => {
+        setUserDialog(true);
     };
 
     const changePassword = (value) => {
@@ -100,9 +123,28 @@ export default function AddUser(){
 
     return (
         <>
-           <MainCard>
                <Toast ref={toast} />
+               <Toolbar className="mb-4" start={leftToolbarTemplate}  ></Toolbar>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+               <Dialog visible={userDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add User" modal className="p-fluid" footer={userDialogFooter}  onHide={hideDialog}>
                <Formik
                 initialValues={{
                     email: '',
@@ -273,21 +315,13 @@ export default function AddUser(){
                             />
                         </FormControl>
 
-                        <Box sx={{ mt: 2 }}>
-                            <AnimateButton>
-                                <Button   fullWidth size="large"  color="secondary" onClick={(e) => handleSubmit(e)}>
-                                    Sign up
-                                </Button>
-                            </AnimateButton>
-                        </Box>
+
                     </form>
                 )}
 
             </Formik>
-           </MainCard>
-            <MainCard>
+               </Dialog>
 
-            </MainCard>
         </>
 
     );
