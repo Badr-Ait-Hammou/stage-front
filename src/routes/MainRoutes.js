@@ -24,7 +24,8 @@ import ProjectDetails from "../component/ProjectDetails"
 import Template from "../component/Template"
 import ExcelFile from '../component/ExcelFile';
 import PdfFile from '../component/PdfFile';
-import Profile from '../component/Profile'
+import Profile from '../component/Profile';
+import Adduser from "../admin/AddUser"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -60,7 +61,12 @@ const MainRoutes = {
     {
       path: 'template',
       element: <Template />
-    },{
+    },
+    {
+      path: 'addUser',
+      element: <Adduser />
+    },
+    {
       path: 'profile',
       element: <Profile />
     },

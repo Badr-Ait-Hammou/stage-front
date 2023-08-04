@@ -1,5 +1,5 @@
 // assets
-import { IconTypography, IconPalette, IconShadow, IconWindmill,IconBrandMiniprogram,IconDownload } from '@tabler/icons';
+import { IconTypography, IconPalette, IconShadow, IconWindmill,IconBrandMiniprogram,IconDownload,IconUserPlus } from '@tabler/icons';
 // constant
 const icons = {
   IconTypography,
@@ -7,7 +7,8 @@ const icons = {
   IconShadow,
   IconWindmill,
   IconBrandMiniprogram,
-  IconDownload
+  IconDownload,
+  IconUserPlus
 };
 
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
@@ -30,6 +31,14 @@ const utilities = {
       type: 'item',
       url: '/chart',
       icon: icons.IconTypography,
+      breadcrumbs: false
+    },
+    {
+      id: 'addUser',
+      title: 'Add_User',
+      type: 'item',
+      url: '/addUser',
+      icon: icons.IconUserPlus,
       breadcrumbs: false
     },
 

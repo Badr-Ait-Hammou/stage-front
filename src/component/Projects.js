@@ -54,7 +54,7 @@ export default function Projects() {
         axios.post("http://localhost:8080/api/projet/save", {
             name,
             description,
-            gestionnaire: {
+            user: {
                 id: 1,
                 role: "GESTIONNAIRE"
             },
