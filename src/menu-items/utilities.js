@@ -41,6 +41,14 @@ const utilities = {
       icon: icons.IconUserPlus,
       breadcrumbs: false
     },
+    {
+      id: 'addClient',
+      title: 'Add_Client',
+      type: 'item',
+      url: '/addClient',
+      icon: icons.IconUserPlus,
+      breadcrumbs: false
+    },
 
     /*{
       id: 'util-typography',

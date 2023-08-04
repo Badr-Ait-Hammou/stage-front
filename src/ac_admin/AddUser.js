@@ -359,6 +359,15 @@ export default function AddUser() {
                                             />
                                         }
                                         label="Gestionnaire"
+                                    /> <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={role === 'CLIENT'}
+                                                onChange={() => setRole('CLIENT')}
+                                                value="CLIENT"
+                                            />
+                                        }
+                                        label="Client"
                                     />
                                 </div>
                             </FormControl>

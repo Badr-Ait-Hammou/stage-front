@@ -25,7 +25,8 @@ import Template from "../component/Template"
 import ExcelFile from '../component/ExcelFile';
 import PdfFile from '../component/PdfFile';
 import Profile from '../component/Profile';
-import Adduser from "../admin/AddUser"
+import Adduser from "../ac_admin/AddUser"
+import AddClient from "../ac_manager/AddClient"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -65,6 +66,10 @@ const MainRoutes = {
     {
       path: 'addUser',
       element: <Adduser />
+    },
+    {
+      path: 'addClient',
+      element: <AddClient />
     },
     {
       path: 'profile',
