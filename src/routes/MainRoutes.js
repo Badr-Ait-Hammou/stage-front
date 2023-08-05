@@ -27,6 +27,7 @@ import PdfFile from '../component/PdfFile';
 import Profile from '../component/Profile';
 import Adduser from "../ac_admin/AddUser"
 import AddClient from "../ac_manager/AddClient"
+import ProjectClient from "../ac_client/ProjectsPage"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -62,6 +63,10 @@ const MainRoutes = {
     {
       path: 'template',
       element: <Template />
+    },
+    {
+      path: 'client_projects',
+      element: <ProjectClient />
     },
     {
       path: 'addUser',
