@@ -19,25 +19,20 @@ export default function ProjectPage() {
     const imageTemplate = (rowData) => {
         return (
             <>
-                {rowData.projetList && rowData.projetList.length > 0 ? (
-                    rowData.projetList.map((project) => (
-                        <div key={project.id}>
-                            <h3>{project.name}</h3>
-                            {project.images.map((image) => (
-                                <div key={image.id}>
-                                    <img
-                                        src={image.photo} // Assuming image.photo contains direct image URLs
-                                        alt={image.name}
-                                        width="100"
-                                        height="100"
-                                    />
-                                    <p>{image.name}</p>
-                                </div>
-                            ))}
+                {rowData.images && rowData.images.length > 0 ? (
+                    rowData.images.map((image) => (
+                        <div key={image.id}>
+                            <img
+                                src={image.photo}
+                                alt={image.name}
+                                width="100"
+                                height="100"
+                            />
+                            <p>{image.name}</p>
                         </div>
                     ))
                 ) : (
-                    <span>No projects or images found</span>
+                    <span>No images found</span>
                 )}
             </>
         );
@@ -48,10 +43,14 @@ export default function ProjectPage() {
             <div className="card">
                 <Toolbar className="mb-2" />
                 <div style={{ borderRadius: "10px", overflow: "hidden" }}>
-                    <DataTable value={client.projetList}>
-                        <Column field="name" header="Project Name" />
-                        <Column header="Images" body={imageTemplate} />
-                    </DataTable>
+                    {client.projetList && client.projetList.length > 0 ? (
+                        <DataTable value={client.projetList}>
+                            <Column field="name" header="Project Name" />
+                            <Column header="Images" body={imageTemplate} />
+                        </DataTable>
+                    ) : (
+                        <span>Loading...</span>
+                    )}
                 </div>
             </div>
         </MainCard>
