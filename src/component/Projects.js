@@ -15,6 +15,7 @@ import axios from "axios";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import EmptyImg from "../assets/images/empty.png"
 import {Link} from "react-router-dom";
+import {Dropdown} from "primereact/dropdown";
 
 export default function Projects() {
 
@@ -28,12 +29,23 @@ export default function Projects() {
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
+    const [clientId, setClientId] = useState("");
+    const [clients, setClient] = useState([]);
 
     useEffect(() => {
         axios.get("http://localhost:8080/api/projet/all").then((response) => {
             setProjects(response.data);
         });
     }, []);
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/api/users/role/CLIENT").then((response) => {
+            setClient(response.data);
+        });
+    }, []);
+
+   
+
 
     const loadProjects=async ()=>{
         const res=await axios.get(`http://localhost:8080/api/projet/all`);
@@ -55,8 +67,8 @@ export default function Projects() {
             name,
             description,
             user: {
-                id: 1,
-                role: "GESTIONNAIRE"
+                id: clientId,
+                role:"CLIENT"
             },
         })
             .then((response) => {
@@ -67,7 +79,6 @@ export default function Projects() {
                 hideDialog();
                 loadProjects();
                 showusave();
-                //  setGestionnaireid("");
             })
             .catch((error) => {
                 console.error("Error while saving project:", error);
@@ -267,6 +278,7 @@ export default function Projects() {
                     )}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '18rem' }} ></Column>
+                    <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user.firstName}></Column>
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                     <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
@@ -286,6 +298,17 @@ export default function Projects() {
                     </label>
                     <InputTextarea  style={{marginTop:"5px"}} id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
                 </div>
+                <div className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Client
+                    </label>
+                    <Dropdown
+                        style={{marginTop:"5px"}}
+                        value={clientId}
+                        options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
+                        onChange={(e) => setClientId(e.value)}
+                        placeholder="Select a client"
+                    />  </div>
             </Dialog>
 
 
@@ -311,6 +334,17 @@ export default function Projects() {
                     </label>
                     <InputTextarea style={{marginTop:"5px"}} id="newdescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
                 </div>
+                <div className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Client
+                    </label>
+                    <Dropdown
+                        style={{marginTop:"5px"}}
+                        value={clientId}
+                        options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
+                        onChange={(e) => setClientId(e.value)}
+                        placeholder="Select a client"
+                    />  </div>
             </Dialog>
 
 
