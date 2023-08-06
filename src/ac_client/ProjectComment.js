@@ -12,6 +12,7 @@ import {InputTextarea} from "primereact/inputtextarea";
 import { Rating } from "primereact/rating";
 import {Button} from "primereact/button";
 import Card from '@mui/material/Card';
+import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 
 export default function ProjectComment() {
     const [project, setProject] = useState([]);
@@ -35,7 +36,16 @@ export default function ProjectComment() {
         setProject(res.data);
     }
 
+    /******************************************************* Date format **************************************/
 
+    function formatDateTime(dateTime) {
+        const dateObj = new Date(dateTime);
+        const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')}`;
+        const formattedTime = `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+        return `${formattedDate} - ${formattedTime}`;
+    }
+
+    /******************************************************* Save comment **************************************/
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -69,17 +79,56 @@ export default function ProjectComment() {
             });
     };
 
+    /******************************************************* Delete comment **************************************/
+
+
     const handleDeleteComment = (commentId) => {
-        axios.delete(`http://localhost:8080/api/comment/${commentId}`)
-            .then((response) => {
-                console.log("Comment deleted:", response.data);
-                loadComments();
-            })
-            .catch((error) => {
-                console.error("Error while deleting comment:", error);
-            });
+        const confirmDelete = () => {
+            axios.delete(`http://localhost:8080/api/comment/${commentId}`)
+                .then((response) => {
+                    console.log("Comment deleted:", response.data);
+                    toast.current.show({
+                        severity: 'success',
+                        summary: 'Done',
+                        detail: 'Comment deleted successfully',
+                        life: 3000
+                    });
+                    loadComments();
+                })
+                .catch((error) => {
+                    console.error("Error while deleting comment:", error);
+                });
+        }
+        confirmDialog({
+            message: 'Are you sure you want to Delete this Comment ?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete
+        });
     };
 
+    /******************************************************* dialog open/close **************************************/
+
+    const openNew = () => {
+        setNote("");
+        setRating("");
+        setCommentDialog(true);
+    };
+
+    const hideDialog = () => {
+        setCommentDialog(false);
+    };
+    const hideeditDialog = () => {
+        seteditCommentDialog(false);
+    };
+
+
+
+
+    /******************************************************* Update comment **************************************/
 
     useEffect(() => {
         if (selectedComment !== null) {
@@ -95,13 +144,14 @@ export default function ProjectComment() {
     }, [selectedComment, project.commentList]);
 
 
-
     const handleupdate = (commentId) => {
         setSelectedComment(commentId);
         setNote("");
         setRating(null);
         seteditCommentDialog(true);
     };
+
+
 
     const handleEdit = async () => {
         if (note.trim() === '' || rate === null) {
@@ -119,7 +169,12 @@ export default function ProjectComment() {
                 comment.id === selectedComment ? response.data : comment
             );
             setProject({ ...project, commentList: updatedComments });
-
+            toast.current.show({
+                severity: 'info',
+                summary: 'Done',
+                detail: 'Comment updated successfully',
+                life: 3000
+            });
             hideeditDialog();
             loadComments();
         } catch (error) {
@@ -128,6 +183,7 @@ export default function ProjectComment() {
     };
 
 
+    /******************************************************* DataTable components **************************************/
 
 
 
@@ -158,22 +214,6 @@ export default function ProjectComment() {
             </div>
         );
     };
-
-    const openNew = () => {
-        setNote("");
-        setRating("");
-        setCommentDialog(true);
-    };
-
-    const hideDialog = () => {
-        setCommentDialog(false);
-    };
-    const hideeditDialog = () => {
-        seteditCommentDialog(false);
-    };
-
-
-
     const commentDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
@@ -192,12 +232,18 @@ export default function ProjectComment() {
         </React.Fragment>
     );
 
+
+
+
+
     return (
         <>
             <Toast ref={toast} />
+            <ConfirmDialog />
+
             <MainCard>
                 <div className="card">
-                    <Toolbar className="mb-2" start={leftToolbarTemplate} center={header}/>
+                    <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
                     <div style={{borderRadius: '10px', overflow: 'hidden'}}>
                         <DataTable value={project.images} footer={footer} tableStyle={{minWidth: '30rem'}}>
                             <Column field="id" sortable header="ID"></Column>
@@ -208,22 +254,25 @@ export default function ProjectComment() {
                 </div>
             </MainCard>
 
-            <MainCard className="mt-5" >
+            <MainCard className="mt-5" title="Comments" >
                 <div>
                     {project.commentList &&
                         project.commentList.map((comment) => (
                             <Card
                                 className="mt-5"
                                 style={{
-                                    backgroundColor: 'rgba(142,154,246,0.53)',
+                                    backgroundColor: 'rgb(236,230,245)',
                                     padding: '20px',
                                     borderRadius: '10px',
                                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                                    position: 'relative', // Add position relative to the card container
+                                    position: 'relative',
                                 }}
                             >
-                                <Rating value={comment.rate} readOnly cancel={false} />
-                                <p style={{ fontSize: '18px', marginBottom: '10px' }}>{comment.note}</p>
+                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginBottom: '10px' }} />
+                                <p style={{ fontSize: '25px', marginBottom: '10px' }}>{comment.note}</p>
+                                <p style={{ fontSize: '15px', marginBottom: '10px' }}>
+                                    {formatDateTime(comment.commentDate)}
+                                </p>
                                 <div
                                     style={{
                                         position: 'absolute',

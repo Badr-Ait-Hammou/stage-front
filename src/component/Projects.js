@@ -86,7 +86,7 @@ export default function Projects() {
     };
 
 
-    /***********************Delete **************/
+    /********************************************* Delete ***************************************/
 
     const handleDelete = (id) => {
         const confirmDelete = () => {
@@ -96,7 +96,6 @@ export default function Projects() {
                     toast.current.show({severity:'success', summary: 'Done', detail:'Project deleted successfully', life: 3000});
                 })
                 .catch((error) => {
-                    // Handle the error here, you can show an error toast or handle it as needed
                     console.error('Error deleting project:', error);
                     toast.current.show({severity:'error', summary: 'Error', detail:'project assigned to an image', life: 3000});
                 });
