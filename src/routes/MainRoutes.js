@@ -85,6 +85,10 @@ const MainRoutes = {
       element: <ImageDetail />
     },
     {
+      path: 'client_projects/Imagedetail/:id',
+      element: <ImageDetail />
+    },
+    {
       path: 'projects/Imagedetail/:id',
       element: <ImageDetail />
     },
