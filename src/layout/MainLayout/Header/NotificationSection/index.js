@@ -202,9 +202,11 @@ const NotificationSection = () => {
                   </Grid>
                   <Divider />
                   <CardActions sx={{ p: 1.25, justifyContent: 'center' }}>
-                    <Button size="small" disableElevation>
+                    <Link to={`/all_comments`}>
+                    <Button size="small" onClick={handleClose} disableElevation>
                       View All
                     </Button>
+                    </Link>
                   </CardActions>
                 </MainCard>
               </ClickAwayListener>

@@ -94,6 +94,7 @@ export default function ProjectComment() {
                         life: 3000
                     });
                     loadComments();
+
                 })
                 .catch((error) => {
                     console.error("Error while deleting comment:", error);
@@ -238,6 +239,7 @@ export default function ProjectComment() {
 
     return (
         <>
+
             <Toast ref={toast} />
             <ConfirmDialog />
 

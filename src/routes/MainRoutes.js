@@ -29,6 +29,7 @@ import Adduser from "../ac_admin/AddUser"
 import AddClient from "../ac_manager/AddClient"
 import ProjectClient from "../ac_client/ProjectsPage"
 import ProjectComment from "../ac_client/ProjectComment"
+import AllComments from "../component/AllComments"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -80,6 +81,10 @@ const MainRoutes = {
     {
       path: 'profile',
       element: <Profile />
+    },
+    {
+      path: 'all_comments',
+      element: <AllComments />
     },
     {
       path: 'annotation/Imagedetail/:id',

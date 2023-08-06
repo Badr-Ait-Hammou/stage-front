@@ -1,14 +1,20 @@
 import "../style/project_details.css"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import axios from "axios";
 import MainCard from "../ui-component/cards/MainCard";
 import {useParams} from "react-router-dom";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
+import Card from "@mui/material/Card";
+import {Rating} from "primereact/rating";
+import {Button} from "primereact/button";
+import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
+import {Toast} from "primereact/toast";
 
 export default function ProjectDetails() {
     const [project, setProject] = useState([]);
+    const toast = useRef(null);
     const {id} = useParams();
 
     useEffect(() => {
@@ -16,6 +22,11 @@ export default function ProjectDetails() {
             setProject(response.data);
         });
     }, []);
+
+    const loadComments=async ()=>{
+        const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
+        setProject(res.data);
+    }
 
 
     const imageBodyTemplate = (photo) => {
@@ -38,8 +49,50 @@ export default function ProjectDetails() {
         </div>
     );
 
+    /************************************* Date format **************************************/
+
+    function formatDateTime(dateTime) {
+        const dateObj = new Date(dateTime);
+        const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')}`;
+        const formattedTime = `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+        return `${formattedDate} - ${formattedTime}`;
+    }
+    /******************************************************* Delete comment **************************************/
+
+
+    const handleDeleteComment = (commentId) => {
+        const confirmDelete = () => {
+            axios.delete(`http://localhost:8080/api/comment/${commentId}`)
+                .then((response) => {
+                    console.log("Comment deleted:", response.data);
+                    toast.current.show({
+                        severity: 'success',
+                        summary: 'Done',
+                        detail: 'Comment deleted successfully',
+                        life: 3000
+                    });
+                    loadComments();
+                })
+                .catch((error) => {
+                    console.error("Error while deleting comment:", error);
+                });
+        }
+        confirmDialog({
+            message: 'Are you sure you want to Delete this Comment ?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete
+        });
+    };
+
 
     return (
+        <>
+            <Toast ref={toast} />
+            <ConfirmDialog />
         <MainCard>
             <div className="card">
                 <Toolbar className="mb-2"  center={header}/>
@@ -52,5 +105,51 @@ export default function ProjectDetails() {
                 </div>
                 </div>
         </MainCard>
+
+            <MainCard className="mt-5" title="Comments" >
+                <div>
+                    {project.commentList &&
+                        project.commentList.map((comment) => (
+                            <Card
+                                className="mt-5"
+                                style={{
+                                    backgroundColor: 'rgb(236,230,245)',
+                                    padding: '20px',
+                                    borderRadius: '10px',
+                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                    position: 'relative',
+                                }}
+                            >
+                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginBottom: '10px' }} />
+                                <p style={{ fontSize: '25px', marginBottom: '10px' }}>{comment.note}</p>
+                                <p style={{ fontSize: '15px', marginBottom: '10px' }}>
+                                    {formatDateTime(comment.commentDate)}
+                                </p>
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: '10px',
+                                        right: '10px',
+                                        display: 'flex',
+                                    }}
+                                >
+
+                                    <Button
+                                        icon="pi pi-trash"
+                                        rounded
+                                        outlined
+                                        severity="danger"
+                                        style={{ padding: '8px', fontSize: '12px' }}
+                                        onClick={() => handleDeleteComment(comment.id)}
+                                    />
+                                </div>
+                            </Card>
+                        ))}
+                </div>
+
+
+
+            </MainCard>
+        </>
     );
 }
