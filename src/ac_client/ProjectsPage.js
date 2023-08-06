@@ -82,7 +82,9 @@ export default function ProjectPage() {
                                    dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
-                            <Column field="name" header="Project Name" sortable filter style={{ minWidth: '10rem' }} />
+                            <Column field="name" header="Project Name" sortable filter filterPlaceholder="Search Name ..."  style={{ minWidth: '10rem' }}  body={(rowData) => (
+                                <Link className="font-bold" to={`project_comment/${rowData.id}`}>{rowData.name}</Link>
+                            )}></Column>
                             <Column field="description" header="Description " sortable filter style={{ minWidth: '11rem' }} />
                             <Column header="Images" body={imageTemplate} style={{ minWidth: '18rem' }}/>
                         </DataTable>

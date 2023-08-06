@@ -28,6 +28,7 @@ import Profile from '../component/Profile';
 import Adduser from "../ac_admin/AddUser"
 import AddClient from "../ac_manager/AddClient"
 import ProjectClient from "../ac_client/ProjectsPage"
+import ProjectComment from "../ac_client/ProjectComment"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -87,6 +88,10 @@ const MainRoutes = {
     {
       path: 'client_projects/Imagedetail/:id',
       element: <ImageDetail />
+    },
+    {
+      path: 'client_projects/project_comment/:id',
+      element: <ProjectComment />
     },
     {
       path: 'projects/Imagedetail/:id',

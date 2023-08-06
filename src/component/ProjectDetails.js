@@ -48,7 +48,6 @@ export default function ProjectDetails() {
                         <Column field="id" sortable  header="ID"></Column>
                         <Column header="Images" body={imageBodyTemplate}></Column>
                         <Column field="name" sortable filter header="Name" ></Column>
-                        <Column field="comment" sortable header="Comment"></Column>
                     </DataTable>
                 </div>
                 </div>
