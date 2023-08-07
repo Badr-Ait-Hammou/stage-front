@@ -15,13 +15,14 @@ import {
   Grid, ListItem, ListItemAvatar, ListItemText,
   Paper,
   Popper,
-  Stack,
+  Stack,Badge,
   TextField,
   Typography,
   useMediaQuery,
 
   List, ListItemSecondaryAction,
 } from '@mui/material';
+
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -49,11 +50,11 @@ const ListItemWrapper = styled('div')(({ theme }) => ({
 const status = [
   {
     value: 'read',
-    label: 'read'
+    label: 'Read'
   },
   {
     value: 'unread',
-    label: 'unread'
+    label: 'Unread'
   },
 
 ];
@@ -105,8 +106,9 @@ const NotificationSection = () => {
       anchorRef.current.focus();
 
     }
-    fetchReadNotifications();
-    fetchUnreadNotifications();
+      countUnreadNotifications();
+      fetchReadNotifications();
+      fetchUnreadNotifications();
     prevOpen.current = open;
   }, [open]);
 
@@ -115,12 +117,25 @@ const NotificationSection = () => {
   const [selectedStatus, setSelectedStatus] = useState('unread');
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [readNotifications, setReadNotifications] = useState([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+
 
   const fetchUnreadNotifications = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/comment/status/unread');
       const data = await response.json();
       setUnreadNotifications(data);
+
+    } catch (error) {
+      console.error('Error fetching unread notifications:', error);
+    }
+  };
+ const countUnreadNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/comment/status/unread');
+      const data = await response.json();
+      setUnreadNotificationCount(data.length);
+
     } catch (error) {
       console.error('Error fetching unread notifications:', error);
     }
@@ -140,6 +155,8 @@ const NotificationSection = () => {
   };
 
 
+
+
   return (
     <>
       <Box
@@ -152,27 +169,29 @@ const NotificationSection = () => {
         }}
       >
         <ButtonBase sx={{ borderRadius: '12px' }}>
-          <Avatar
-            variant="rounded"
-            sx={{
-              ...theme.typography.commonAvatar,
-              ...theme.typography.mediumAvatar,
-              transition: 'all .2s ease-in-out',
-              background: theme.palette.secondary.light,
-              color: theme.palette.secondary.dark,
-              '&[aria-controls="menu-list-grow"],&:hover': {
-                background: theme.palette.secondary.dark,
-                color: theme.palette.secondary.light
-              }
-            }}
-            ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            onClick={handleToggle}
-            color="inherit"
-          >
-            <IconBell stroke={1.5} size="1.3rem" />
-          </Avatar>
+          <Badge badgeContent={unreadNotificationCount} color="error">
+            <Avatar
+                variant="rounded"
+                sx={{
+                  ...theme.typography.commonAvatar,
+                  ...theme.typography.mediumAvatar,
+                  transition: 'all .2s ease-in-out',
+                  background: theme.palette.secondary.light,
+                  color: theme.palette.secondary.dark,
+                  '&[aria-controls="menu-list-grow"],&:hover': {
+                    background: theme.palette.secondary.dark,
+                    color: theme.palette.secondary.light
+                  }
+                }}
+                ref={anchorRef}
+                aria-controls={open ? 'menu-list-grow' : undefined}
+                aria-haspopup="true"
+                onClick={handleToggle}
+                color="inherit"
+            >
+              <IconBell stroke={1.5} size="1.3rem" />
+            </Avatar>
+          </Badge>
         </ButtonBase>
       </Box>
       <Popper
@@ -200,25 +219,14 @@ const NotificationSection = () => {
                 <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
                   <Grid container direction="column" spacing={2}>
                     <Grid item xs={12}>
-                      <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 2 }}>
+                      <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 10 }}>
                         <Grid item>
                           <Stack direction="row" spacing={2}>
                             <Typography variant="subtitle1">All Notification</Typography>
-                            <Chip
-                              size="small"
-                              label="01"
-                              sx={{
-                                color: theme.palette.background.default,
-                                bgcolor: theme.palette.warning.dark
-                              }}
-                            />
+
                           </Stack>
                         </Grid>
-                        <Grid item>
-                          <Typography component={Link} to="#" variant="subtitle2" color="primary">
-                            Mark as all read
-                          </Typography>
-                        </Grid>
+
                       </Grid>
                     </Grid>
                     <Grid item xs={12}>
@@ -273,6 +281,7 @@ const NotificationSection = () => {
                                     }}
                                 >
                                 <ListItemWrapper key={notification.id}>
+
                                   <ListItem alignItems="center">
                                     <ListItemAvatar>
                                       <Avatar alt={notification.author} src={User1} />
@@ -303,9 +312,8 @@ const NotificationSection = () => {
                                       </Grid>
                                     </Grid>
                                   </Grid>
-
-
                                 </ListItemWrapper>
+                                    <Divider />
                                 </List>
                             ))
                         ) : (
