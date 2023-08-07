@@ -11,6 +11,7 @@ import {Rating} from "primereact/rating";
 import {Button} from "primereact/button";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
+import {Tag} from "primereact/tag";
 
 export default function ProjectDetails() {
     const [project, setProject] = useState([]);
@@ -87,6 +88,29 @@ export default function ProjectDetails() {
             accept: confirmDelete
         });
     };
+    /******************************************************* Mark as Read  **************************************/
+
+
+    const handleMarkAsRead = (commentId) => {
+        axios.put(`http://localhost:8080/api/comment/read/${commentId}`, {
+            status: "read",
+        })
+            .then(() => {
+                const updatedComments = project.commentList.map((comment) =>
+                    comment.id === commentId ? { ...comment, status: "read" } : comment
+                );
+                setProject({ ...project, commentList: updatedComments });
+                toast.current.show({
+                    severity: 'info',
+                    summary: 'Done',
+                    detail: 'Comment marked as read',
+                    life: 3000
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
 
 
     return (
@@ -120,9 +144,15 @@ export default function ProjectDetails() {
                                     position: 'relative',
                                 }}
                             >
-                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginBottom: '10px' }} />
-                                <p style={{ fontSize: '25px', marginBottom: '10px' }}>{comment.note}</p>
-                                <p style={{ fontSize: '15px', marginBottom: '10px' }}>
+                                {comment.status === 'read' && (
+                                    <Tag value="You Read This" severity="success"></Tag>
+                                )}
+                                {comment.status === 'unread' && (
+                                    <Tag value="confirm reading comment" severity="warning"></Tag>
+                                )}
+                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
+                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                                <p style={{ fontSize: '15px', marginTop: '10px' }}>
                                     {formatDateTime(comment.commentDate)}
                                 </p>
                                 <div
@@ -139,9 +169,18 @@ export default function ProjectDetails() {
                                         rounded
                                         outlined
                                         severity="danger"
-                                        style={{ padding: '8px', fontSize: '12px' }}
+                                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
                                         onClick={() => handleDeleteComment(comment.id)}
+                                    /> {!comment.status || comment.status === 'unread' ? (
+                                    <Button
+                                        icon="pi pi-eye"
+                                        rounded
+                                        outlined
+                                        severity="success"
+                                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                                        onClick={() => handleMarkAsRead(comment.id)}
                                     />
+                                ) : null}
                                 </div>
                             </Card>
                         ))}

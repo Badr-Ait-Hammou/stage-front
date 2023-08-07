@@ -13,6 +13,7 @@ import { Rating } from "primereact/rating";
 import {Button} from "primereact/button";
 import Card from '@mui/material/Card';
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
+import { Tag } from 'primereact/tag';
 
 export default function ProjectComment() {
     const [project, setProject] = useState([]);
@@ -21,6 +22,7 @@ export default function ProjectComment() {
     const [editCommentDialog, seteditCommentDialog] = useState(false);
     const [rate, setRating] = useState(null);
     const [note,setNote]=useState();
+    const [setStatus]=useState();
     const toast = useRef(null);
     const {id} = useParams();
 
@@ -59,6 +61,7 @@ export default function ProjectComment() {
         axios.post("http://localhost:8080/api/comment/save", {
             note,
             rate,
+            status:"unread",
             projet:{
                 id: project.id
             },
@@ -71,6 +74,7 @@ export default function ProjectComment() {
                 console.log("API Response:", response.data);
                 setNote("");
                 setRating("");
+                toast.current.show({ severity: 'success', summary: 'Done', detail: 'your comment has been submitted successfully.', life: 3000 });
                 loadComments();
                 hideDialog();
             })
@@ -137,6 +141,7 @@ export default function ProjectComment() {
             if (selectedCommentData) {
                 setNote(selectedCommentData.note);
                 setRating(selectedCommentData.rate);
+                setStatus(selectedCommentData.status)
             }
         } else {
             setNote("");
@@ -149,6 +154,7 @@ export default function ProjectComment() {
         setSelectedComment(commentId);
         setNote("");
         setRating(null);
+        setStatus("unread");
         seteditCommentDialog(true);
     };
 
@@ -164,6 +170,7 @@ export default function ProjectComment() {
             const response = await axios.put(`http://localhost:8080/api/comment/${selectedComment}`, {
                 note: note,
                 rate: rate,
+                status:"unread",
             });
 
             const updatedComments = project.commentList.map((comment) =>
@@ -256,10 +263,11 @@ export default function ProjectComment() {
                 </div>
             </MainCard>
 
-            <MainCard className="mt-5" title="Comments" >
+            <MainCard className="mt-5" title="Comments">
                 <div>
                     {project.commentList &&
                         project.commentList.map((comment) => (
+
                             <Card
                                 className="mt-5"
                                 style={{
@@ -270,11 +278,23 @@ export default function ProjectComment() {
                                     position: 'relative',
                                 }}
                             >
-                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginBottom: '10px' }} />
-                                <p style={{ fontSize: '25px', marginBottom: '10px' }}>{comment.note}</p>
-                                <p style={{ fontSize: '15px', marginBottom: '10px' }}>
+                                {comment.status === 'read' && (
+                                    <Tag value="Read" severity="success"></Tag>
+                                )}
+                                {comment.status === 'unread' && (
+                                    <Tag value="Unread" severity="warning"></Tag>
+                                )}
+                                <Rating
+                                    value={comment.rate}
+                                    readOnly
+                                    cancel={false}
+                                    style={{ fontSize: '18px', marginTop: '10px' }}
+                                />
+                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                                <p style={{ fontSize: '15px', marginTop: '10px' }}>
                                     {formatDateTime(comment.commentDate)}
                                 </p>
+
                                 <div
                                     style={{
                                         position: 'absolute',
@@ -290,7 +310,6 @@ export default function ProjectComment() {
                                         style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
                                         onClick={() => handleupdate(comment.id)}
                                     />
-
                                     <Button
                                         icon="pi pi-trash"
                                         rounded
@@ -299,13 +318,11 @@ export default function ProjectComment() {
                                         style={{ padding: '8px', fontSize: '12px' }}
                                         onClick={() => handleDeleteComment(comment.id)}
                                     />
+
                                 </div>
                             </Card>
                         ))}
                 </div>
-
-
-
             </MainCard>
 
             <Dialog  visible={commentDialog}

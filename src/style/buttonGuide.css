@@ -1,0 +1,36 @@
+.button-container {
+    position: relative;
+}
+
+.show-comments-button {
+    font-size: 12px;
+    padding: 5px 10px;
+    position: relative;
+}
+
+.show-comments-button.active + .guidance-circle {
+    display: none;
+}
+
+.guidance-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(13, 124, 236, 0.59);
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    transform: translateY(-50%);
+    animation: pulse 4s infinite;
+    animation-delay: 3s;
+    display: block;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
