@@ -106,9 +106,9 @@ const NotificationSection = () => {
       anchorRef.current.focus();
 
     }
-      countUnreadNotifications();
       fetchReadNotifications();
       fetchUnreadNotifications();
+
     prevOpen.current = open;
   }, [open]);
 
@@ -130,18 +130,18 @@ const NotificationSection = () => {
       console.error('Error fetching unread notifications:', error);
     }
   };
- const countUnreadNotifications = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/comment/status/unread');
-      const data = await response.json();
-      setUnreadNotificationCount(data.length);
-
-    } catch (error) {
-      console.error('Error fetching unread notifications:', error);
-    }
-  };
 
 
+
+    const fetchUnreadNotificationCount = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/api/comment/status/unread');
+            const data = await response.json();
+            setUnreadNotificationCount(data.length);
+        } catch (error) {
+            console.error('Error fetching unread notification count:', error);
+        }
+    };
 
 
   const fetchReadNotifications = async () => {
@@ -154,7 +154,13 @@ const NotificationSection = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUnreadNotificationCount();
 
+    const intervalId = setInterval(fetchUnreadNotificationCount, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
 
   return (
