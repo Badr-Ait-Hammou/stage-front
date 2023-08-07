@@ -105,11 +105,15 @@ const NotificationSection = () => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
 
+
     }
       fetchReadNotifications();
       fetchUnreadNotifications();
+    fetchUnreadNotificationCount();
+    const pollingInterval = 60000;
+    const intervalId = setInterval(fetchUnreadNotificationCount, pollingInterval);
+    return () => clearInterval(intervalId);
 
-    prevOpen.current = open;
   }, [open]);
 
 
@@ -154,13 +158,6 @@ const NotificationSection = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUnreadNotificationCount();
-
-    const intervalId = setInterval(fetchUnreadNotificationCount, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
 
 
   return (
@@ -378,6 +375,8 @@ const NotificationSection = () => {
 
 
                                   </ListItemWrapper>
+                                  <Divider />
+
                                 </List>
                             ))
                         )}

@@ -2,8 +2,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
@@ -12,16 +11,15 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
-import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
-import { Grid,} from '@mui/material';
+import {ConfirmDialog} from "primereact/confirmdialog";
+import {Card, CardContent, Chip, Grid,} from '@mui/material';
 import {Box} from "@mui/system";
 import { FileUpload } from 'primereact/fileupload';
-import EmptyImg from "../assets/images/empty.png";
 import "../style/Image.css"
-import html2canvas from 'html2canvas';
-import { IoCameraOutline, IoAddOutline, IoRemoveOutline,IoSquareOutline } from 'react-icons/io5';
 import 'leaflet-draw/dist/leaflet.draw.css'
 import { Dropdown } from 'primereact/dropdown';
+import { Chips } from "primereact/chips";
+
 
 
 
@@ -34,9 +32,7 @@ export default function Template() {
   const [editproductDialog, seteditProductDialog] = useState(false);
 
   const [submitted, setSubmitted] = useState(false);
-  const [globalFilter, setGlobalFilter] = useState(null);
   const toast = useRef(null);
-  const dt = useRef(null);
   const [selectedProject, setSelectedProject] = useState(null);
 
   const [name, setName] = useState('');
@@ -45,12 +41,14 @@ export default function Template() {
   const [type, setType] = useState('');
   const [projetId, setProjetId] = useState("");
   const [projet, setProjet] = useState([]);
+  const [fields, setFields] = useState([]);
   const [image, setImages] =  useState([]);
-  const [result, setResult] =  useState("");
+  const [result, setResult] =  useState([]);
   const [resultId, setResultId] =  useState("");
-  const [showImageDialog, setShowImageDialog] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [zoom, setZoom] = useState(100);
+
+
+  const [chipsValue, setChipsValue] = useState([]);
+
 
 
   useEffect(() => {
@@ -68,6 +66,20 @@ export default function Template() {
       console.error('Error fetching data:', error);
     }
   };
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/field/all").then((response) => {
+      setFields(response.data);
+    });
+  }, []);
+  const handleDeleteField = (fieldId) => {
+    axios.delete(`http://localhost:8080/api/field/${fieldId}`).then(() => {
+      fetchFields(); // Fetch the updated fields after deleting.
+    }).catch((error) => {
+      console.error("Error while deleting :", error);
+    });
+  };
+
 
   const handleSubmit = (event) => {
     event?.preventDefault();
@@ -96,19 +108,31 @@ export default function Template() {
   };
 
   const handleSave = (event) => {
-    event?.preventDefault();
-    axios.post("http://localhost:8080/api/field/save", {
-      name,
-      result: {
-        id: resultId
-      }
-    }).then((response) => {
-      console.log(response.data);
-      setName("");
-      setResultId("");
-      showusave();
-    }).catch((error) => {
-      console.error("Error while saving :", error);
+    event.preventDefault();
+
+    const savePromises = chipsValue.map(chip => {
+      return axios.post("http://localhost:8080/api/field/save", {
+        name: chip,
+        result: {
+          id: resultId
+        }
+      });
+    });
+
+    Promise.all(savePromises)
+        .then((responses) => {
+          console.log("Saved all chips:", responses);
+          setChipsValue([]); // Clear the chips after saving
+          fetchFields(); // Fetch the updated fields
+        })
+        .catch((error) => {
+          console.error("Error while saving chips:", error);
+        });
+  };
+
+  const fetchFields = () => {
+    axios.get("http://localhost:8080/api/field/all").then((response) => {
+      setFields(response.data);
     });
   };
 
@@ -141,38 +165,8 @@ export default function Template() {
 
   /******************************************** Delete *************************/
 
-  const handleDelete = (id) => {
-    const confirmDelete = () => {
-      axios.delete(`http://localhost:8080/api/result/${id}`)
-        .then(() => {
-          setImages(image.filter((rowData) => rowData.id !== id));
-          toast.current.show({severity:'success', summary: 'Done', detail:'Image deleted successfully', life: 3000});
-        })
-        .catch((error) => {
-          console.error('Error deleting project:', error);
-          toast.current.show({severity:'error', summary: 'Error', detail:'failed to delete Image', life: 3000});
-        });
-    };
-
-    confirmDialog({
-      message: 'Are you sure you want to Delete this Image ?',
-      header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Yes',
-      rejectLabel: 'No',
-      acceptClassName: 'p-button-danger',
-      accept: confirmDelete
-    });
-  };
 
 
-  const handleZoomIn = () => {
-    setZoom((prevZoom) => prevZoom + 10);
-  };
-
-  const handleZoomOut = () => {
-    setZoom((prevZoom) => Math.max(10, prevZoom - 10));
-  };
 
   /******************************************** Dialogues *************************/
 
@@ -201,14 +195,7 @@ export default function Template() {
 
   /***********************Update **************/
 
-  const handleupdate = (rowData) => {
-    setSelectedProject(rowData);
-    setName(rowData.name);
-    setDescription(rowData.description);
-    setfile(rowData.file);
-    setType(rowData.type);
-    seteditProductDialog(true);
-  };
+
 
   const handleEdit = async (projectToUpdate) => {
     try {
@@ -248,10 +235,6 @@ export default function Template() {
 
 
 
-  const exportCSV = () => {
-    dt.current.exportCSV();
-  };
-
   /******************************************** components *************************/
 
 
@@ -263,11 +246,7 @@ export default function Template() {
     );
   };
 
-  const centerToolbarTemplate = () => {
-    return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-      <h4 className="m-0 font-bold">Manage Templates</h4>
-    </div>;
-  };
+
 
   const SecondcenterToolbarTemplate = () => {
     return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -276,29 +255,11 @@ export default function Template() {
   };
 
 
-  const dialogContentRef = useRef();
 
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <React.Fragment>
-        <Button icon="pi pi-pencil" rounded outlined style={{marginRight:"4px"}} onClick={() => handleupdate(rowData)} />
-        <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => handleDelete(rowData.id)} />
-      </React.Fragment>
-    );
-  };
-  const header = (
-    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-    <span className="p-input-icon-left">
-      <i className="pi pi-search" />
-      <InputText
-        type="search"
-        value={globalFilter}
-        onChange={(e) => setGlobalFilter(e.target.value)}
-        placeholder="Search..."
-      />
-    </span>
-    </div>
-  );
+
+
+
+
 
   const productDialogFooter = (
     <React.Fragment>
@@ -317,33 +278,7 @@ export default function Template() {
 
 
 
-  const fileBodyTemplate = (rowData) => {
-    const showImage = (rowData) => {
-      setSelectedImage(rowData);
-      setShowImageDialog(true);
-    };
 
-    if (rowData.file) {
-      return (
-        <img
-          src={rowData.file}
-          alt={rowData.file}
-          className="enlarge-on-hover"
-          style={{
-            width: '50%',
-            height: '50%',
-            objectFit: 'cover',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            cursor: 'pointer',
-          }}
-          onError={() => console.error(`Failed to load image for row with ID: ${rowData.id}`)}
-          onClick={() => showImage(rowData)}
-        />
-      );
-    }
-    return <img src={EmptyImg} alt="No" style={{ width: '50px', height: 'auto' }} />;
-  };
 
 
   return (
@@ -354,47 +289,67 @@ export default function Template() {
       <div className="card">
         <Toolbar className="mb-4" start={leftToolbarTemplate}  ></Toolbar>
         <Toolbar className="mb-4"  center={SecondcenterToolbarTemplate} ></Toolbar>
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={6}>
-            <Box className="field">
-              <label htmlFor="name" className="font-bold">
-                Name
-              </label>
-              <InputText style={{marginLeft:"5px"}} id="name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
-              {submitted && !image.name && <small className="p-error">Name is required.</small>}
-            </Box>
-          </Grid>
+        <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Box className="field mt-1">
 
               <select
-                id="resultId"
-                className="form-control mt-0"
-                value={resultId}
-                onChange={(event) => setResultId(event.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem 1rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  fontSize: '1rem',
-                  lineHeight: '1.5',
-                }}
+                  id="resultId"
+                  className="form-control mt-0"
+                  value={resultId}
+                  onChange={(event) => setResultId(event.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem 1rem',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    fontSize: '1rem',
+                    lineHeight: '1.5',
+                  }}
               >
                 <option value="">Select Template</option>
-                {result &&
-                  result.map((result) => (
-                    <option key={result.id} value={result.id}>
-                      {result.name}
+                {result.map((template) => (
+                    <option key={template.id} value={template.id}>
+                      {template.name}
                     </option>
-                  ))}
+                ))}
               </select>
             </Box>
           </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box className="field">
+              <div className="card p-fluid">
+            <span className="p-float-label">
+                <Chips value={chipsValue} onChange={(e) => setChipsValue(e.value)} />
+                <label htmlFor="chips">Chips</label>
+            </span>
+              </div>
+            </Box>
+          </Grid>
           <Grid item xs={12} className="mt-3">
-          <Button  label="save"
-                   severity="success"
-                   raised onClick={(e) => handleSave(e)}/>
+            <Button
+                label="save"
+                severity="success"
+                raised
+                onClick={handleSave}
+            />
+          </Grid>
+          <Grid item xs={12} className="mt-3">
+          <Card>
+            <CardContent>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '16px' }}>
+                {fields.map((field) => (
+                    <Chip
+                        key={field.id}
+                        label={field.name}
+                        onDelete={() => handleDeleteField(field.id)}
+                        color="primary"
+                        style={{ marginBottom: '8px' }}
+                    />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
           </Grid>
         </Grid>
         {/*<DataTable ref={dt} value={image}*/}
