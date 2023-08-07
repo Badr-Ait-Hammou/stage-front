@@ -70,7 +70,7 @@ export default function Template() {
 
   const handleDeleteField = (fieldId) => {
     axios.delete(`http://localhost:8080/api/field/${fieldId}`).then(() => {
-      fetchFields(); // Fetch the updated fields after deleting.
+      fetchFields();
     }).catch((error) => {
       console.error("Error while deleting :", error);
     });
@@ -97,6 +97,7 @@ export default function Template() {
       setProjetId("");
       hideDialog();
       loadResult();
+      fetchData();
       showusave();
     }).catch((error) => {
       console.error("Error while saving file:", error);
@@ -199,10 +200,7 @@ export default function Template() {
   const showusave = () => {
     toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
   }
-
-  const showupdate = () => {
-    toast.current.show({severity:'info', summary: 'success', detail:'item updated successfully', life: 3000});
-  }
+  
   const showMissing = () => {
     toast.current.show({severity:'error', summary: 'Error', detail:'one of the fields is empty', life: 3000});
   }
@@ -281,7 +279,7 @@ export default function Template() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} className="mt-3" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Grid item xs={12} className="mt-1" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Button
                 label="Save"
                 severity="success"
@@ -289,7 +287,9 @@ export default function Template() {
                 onClick={handleSave}
             />
           </Grid>
-
+            <Grid item xs={12} className="mt-3"  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <strong>Fields</strong>
+            </Grid>
           <Grid item xs={12} className="mt-3" >
           <Card style={{backgroundColor:'rgb(236, 230, 245)'}}>
             <CardContent>
