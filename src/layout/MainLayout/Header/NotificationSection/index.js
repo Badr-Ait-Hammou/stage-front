@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
+import { formatDistanceToNow } from 'date-fns';
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import {styled, useTheme} from '@mui/material/styles';
 import {
   Avatar,
   Box,
@@ -12,13 +12,15 @@ import {
   Chip,
   ClickAwayListener,
   Divider,
-  Grid,
+  Grid, ListItem, ListItemAvatar, ListItemText,
   Paper,
   Popper,
   Stack,
   TextField,
   Typography,
-  useMediaQuery
+  useMediaQuery,
+
+  List, ListItemSecondaryAction,
 } from '@mui/material';
 
 // third-party
@@ -27,39 +29,60 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import NotificationList from './NotificationList';
 
 // assets
 import { IconBell } from '@tabler/icons';
+import User1 from "../../../../assets/images/users/user-round.svg";
 
+// styles
+const ListItemWrapper = styled('div')(({ theme }) => ({
+  cursor: 'pointer',
+  padding: 16,
+  '&:hover': {
+    background: theme.palette.primary.light
+  },
+  '& .MuiListItem-root': {
+    padding: 0
+  }
+}));
 // notification status options
 const status = [
   {
-    value: 'all',
-    label: 'All Notification'
-  },
-  {
-    value: 'new',
-    label: 'New'
+    value: 'read',
+    label: 'read'
   },
   {
     value: 'unread',
-    label: 'Unread'
+    label: 'unread'
   },
-  {
-    value: 'other',
-    label: 'Other'
-  }
+
 ];
 
 // ==============================|| NOTIFICATION ||============================== //
 
 const NotificationSection = () => {
   const theme = useTheme();
+
+  const chipSX = {
+    height: 24,
+    padding: '0 6px'
+  };
+
+
+  const chipWarningSX = {
+    ...chipSX,
+    color: theme.palette.warning.dark,
+    backgroundColor: theme.palette.warning.light
+  };
+  const chipSuccessSX = {
+    ...chipSX,
+    color: theme.palette.success.dark,
+    backgroundColor: theme.palette.success.light,
+    height: 20
+  };
   const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
   /**
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
@@ -80,13 +103,42 @@ const NotificationSection = () => {
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
+
     }
+    fetchReadNotifications();
+    fetchUnreadNotifications();
     prevOpen.current = open;
   }, [open]);
 
-  const handleChange = (event) => {
-    if (event?.target.value) setValue(event?.target.value);
+
+
+  const [selectedStatus, setSelectedStatus] = useState('unread');
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [readNotifications, setReadNotifications] = useState([]);
+
+  const fetchUnreadNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/comment/status/unread');
+      const data = await response.json();
+      setUnreadNotifications(data);
+    } catch (error) {
+      console.error('Error fetching unread notifications:', error);
+    }
   };
+
+
+
+
+  const fetchReadNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/comment/status/read');
+      const data = await response.json();
+      setReadNotifications(data);
+    } catch (error) {
+      console.error('Error fetching read notifications:', error);
+    }
+  };
+
 
   return (
     <>
@@ -178,8 +230,8 @@ const NotificationSection = () => {
                                 id="outlined-select-currency-native"
                                 select
                                 fullWidth
-                                value={value}
-                                onChange={handleChange}
+                                value={selectedStatus}
+                                onChange={(e) => setSelectedStatus(e.target.value)}
                                 SelectProps={{
                                   native: true
                                 }}
@@ -190,13 +242,135 @@ const NotificationSection = () => {
                                   </option>
                                 ))}
                               </TextField>
-                            </Box>
+                             </Box>
                           </Grid>
                           <Grid item xs={12} p={0}>
                             <Divider sx={{ my: 0 }} />
                           </Grid>
                         </Grid>
-                        <NotificationList />
+
+
+                        {selectedStatus === 'read' ? (
+                            readNotifications.map(notification => (
+                                <List
+                                    sx={{
+                                      width: '100%',
+                                      maxWidth: 330,
+                                      py: 0,
+                                      borderRadius: '10px',
+                                      [theme.breakpoints.down('md')]: {
+                                        maxWidth: 300
+                                      },
+                                      '& .MuiListItemSecondaryAction-root': {
+                                        top: 22
+                                      },
+                                      '& .MuiDivider-root': {
+                                        my: 0
+                                      },
+                                      '& .list-container': {
+                                        pl: 7
+                                      }
+                                    }}
+                                >
+                                <ListItemWrapper key={notification.id}>
+                                  <ListItem alignItems="center">
+                                    <ListItemAvatar>
+                                      <Avatar alt={notification.author} src={User1} />
+                                    </ListItemAvatar>
+
+                                    <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
+                                    <ListItemSecondaryAction>
+                                      <Grid container justifyContent="flex-end">
+                                        <Grid item xs={12}>
+                                          <Typography variant="caption" display="block">
+                                            {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
+                                          </Typography>
+                                        </Grid>
+                                      </Grid>
+                                    </ListItemSecondaryAction>
+                                  </ListItem>
+
+                                  <Grid container direction="column" className="list-container">
+                                    <Grid item xs={12} sx={{ pb: 2 }}>
+                                      <Typography variant="subtitle2" className="font-bold">{notification.note}</Typography>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Grid container>
+
+                                        <Grid item>
+                                          <Chip label={notification.status} sx={chipSuccessSX} />
+                                        </Grid>
+                                      </Grid>
+                                    </Grid>
+                                  </Grid>
+
+
+                                </ListItemWrapper>
+                                </List>
+                            ))
+                        ) : (
+                            unreadNotifications.map(notification => (
+                                <List
+                                    sx={{
+                                      width: '100%',
+                                      maxWidth: 330,
+                                      py: 0,
+                                      borderRadius: '10px',
+                                      [theme.breakpoints.down('md')]: {
+                                        maxWidth: 300
+                                      },
+                                      '& .MuiListItemSecondaryAction-root': {
+                                        top: 22
+                                      },
+                                      '& .MuiDivider-root': {
+                                        my: 0
+                                      },
+                                      '& .list-container': {
+                                        pl: 7
+                                      }
+                                    }}
+                                >
+                                  <ListItemWrapper key={notification.id}>
+                                    <ListItem alignItems="center">
+                                      <ListItemAvatar>
+                                        <Avatar alt={notification.author} src={User1} />
+                                      </ListItemAvatar>
+
+                                      <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
+                                      <ListItemSecondaryAction>
+                                        <Grid container justifyContent="flex-end">
+                                          <Grid item xs={12}>
+                                            <Typography variant="caption" display="block">
+                                              {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
+                                            </Typography>
+                                          </Grid>
+                                        </Grid>
+                                      </ListItemSecondaryAction>
+                                    </ListItem>
+
+                                    <Grid container direction="column" className="list-container">
+                                      <Grid item xs={12} sx={{ pb: 2 }}>
+                                        <Typography variant="subtitle2" className="font-bold">{notification.note}</Typography>
+                                      </Grid>
+                                      <Grid item xs={12}>
+                                        <Grid container>
+
+                                          <Grid item>
+                                            <Chip label={notification.status} sx={chipWarningSX} />
+                                          </Grid>
+                                        </Grid>
+                                      </Grid>
+                                    </Grid>
+
+
+                                  </ListItemWrapper>
+                                </List>
+                            ))
+                        )}
+
+
+
+
                       </PerfectScrollbar>
                     </Grid>
                   </Grid>

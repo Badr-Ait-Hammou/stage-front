@@ -16,6 +16,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import EmptyImg from "../assets/images/empty.png"
 import {Link} from "react-router-dom";
 import {Dropdown} from "primereact/dropdown";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
+
 
 export default function Projects() {
 
@@ -31,10 +33,17 @@ export default function Projects() {
     const dt = useRef(null);
     const [clientId, setClientId] = useState("");
     const [clients, setClient] = useState([]);
+    const [dataTableLoaded, setDataTableLoaded] = useState(false);
+
+
+    const handleDataTableLoad = () => {
+        setDataTableLoaded(true);
+    };
 
     useEffect(() => {
         axios.get("http://localhost:8080/api/projet/all").then((response) => {
             setProjects(response.data);
+            handleDataTableLoad();
         });
     }, []);
 
@@ -266,7 +275,7 @@ export default function Projects() {
 
             <div className="card">
                 <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
-
+                {dataTableLoaded ? (
                 <DataTable ref={dt} value={project}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -281,6 +290,9 @@ export default function Projects() {
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                     <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
+                ) : (
+                    <PopularCart/>
+                )}
             </div>
 
             <Dialog visible={productDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Project" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>

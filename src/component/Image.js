@@ -21,6 +21,7 @@ import "../style/Image.css"
 import html2canvas from 'html2canvas';
 import { IoCameraOutline, IoAddOutline, IoRemoveOutline,IoSquareOutline } from 'react-icons/io5';
 import 'leaflet-draw/dist/leaflet.draw.css'
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
 
 
 
@@ -29,27 +30,25 @@ export default function Image() {
 
 
     const [productDialog, setProductDialog] = useState(false);
-
     const [editproductDialog, seteditProductDialog] = useState(false);
-
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
     const [selectedProject, setSelectedProject] = useState(null);
-
     const [name, setName] = useState('');
     const [photo, setPhoto] = useState('');
     const [description, setDescription] = useState('');
     const [format, setFormat] = useState('');
     const [projetId, setProjetId] = useState("");
     const [projet, setProjet] = useState([]);
+    const [dataTableLoaded, setDataTableLoaded] = useState(false);
     const [image, setImages] =  useState([]);
     const [showImageDialog, setShowImageDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [zoom, setZoom] = useState(100);
-    const [showPolygonDrawing, setShowPolygonDrawing] = useState(false);
-    const [drawnItems, setDrawnItems] = useState(null);
+   // const [showPolygonDrawing, setShowPolygonDrawing] = useState(false);
+    //const [drawnItems, setDrawnItems] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawingStartX, setDrawingStartX] = useState(0);
     const [drawingStartY, setDrawingStartY] = useState(0);
@@ -57,9 +56,14 @@ export default function Image() {
     const [drawingHeight, setDrawingHeight] = useState(0);
 
 
+    const handleDataTableLoad = () => {
+        setDataTableLoaded(true);
+    };
+
 
     useEffect(() => {
         fetchData();
+        handleDataTableLoad();
     }, []);
 
     const fetchData = async () => {
@@ -389,8 +393,8 @@ export default function Image() {
 
             <div className="card">
                 <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
-
-                <DataTable ref={dt} value={image}
+                {dataTableLoaded ? (
+                    <DataTable ref={dt} value={image}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
@@ -402,6 +406,9 @@ export default function Image() {
                     <Column header="Projet" field="projet.name" filter filterPlaceholder="Search Project ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.projet.name}></Column>
                     <Column header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
+                    ):(
+                        <PopularCart/>
+                    )}
             </div>
 
             <Dialog visible={productDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
