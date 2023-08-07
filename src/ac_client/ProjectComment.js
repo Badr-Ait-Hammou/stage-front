@@ -22,7 +22,7 @@ export default function ProjectComment() {
     const [editCommentDialog, seteditCommentDialog] = useState(false);
     const [rate, setRating] = useState(null);
     const [note,setNote]=useState();
-    const [setStatus]=useState();
+    const [status,setStatus]=useState();
     const toast = useRef(null);
     const {id} = useParams();
 

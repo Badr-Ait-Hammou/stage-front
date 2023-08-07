@@ -12,17 +12,24 @@ import {Button} from "primereact/button";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import {Tag} from "primereact/tag";
+import { Paginator } from 'primereact/paginator';
 
 export default function ProjectDetails() {
     const [project, setProject] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const cardsPerPage = 3;
     const toast = useRef(null);
-    const {id} = useParams();
+    const { id } = useParams();
 
     useEffect(() => {
         axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
             setProject(response.data);
         });
-    }, []);
+    }, [id]);
+
+    if (!project.commentList) {
+        return <div>Loading...</div>;
+    }
 
     const loadComments=async ()=>{
         const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
@@ -50,6 +57,69 @@ export default function ProjectDetails() {
         </div>
     );
 
+
+
+
+    /************************************* Paginator **************************************/
+
+    const handlePageChange = (event) => {
+        setCurrentPage(event.page);
+    };
+
+    const displayComments = project.commentList
+        .slice(currentPage * cardsPerPage, (currentPage + 1) * cardsPerPage)
+        .map((comment) => (
+            <Card
+                key={comment.id}
+                className="mt-5"
+                style={{
+                    backgroundColor: 'rgb(236, 230, 245)',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                }}
+            >
+                {comment.status === 'read' && (
+                    <Tag value="You Read This" severity="success"></Tag>
+                )}
+                {comment.status === 'unread' && (
+                    <Tag value="confirm reading comment" severity="warning"></Tag>
+                )}
+                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
+                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                <p style={{ fontSize: '15px', marginTop: '10px' }}>
+                    {formatDateTime(comment.commentDate)}
+                </p>
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        display: 'flex',
+                    }}
+                >
+
+                    <Button
+                        icon="pi pi-trash"
+                        rounded
+                        outlined
+                        severity="danger"
+                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                        onClick={() => handleDeleteComment(comment.id)}
+                    /> {!comment.status || comment.status === 'unread' ? (
+                    <Button
+                        icon="pi pi-eye"
+                        rounded
+                        outlined
+                        severity="success"
+                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                        onClick={() => handleMarkAsRead(comment.id)}
+                    />
+                ) : null}
+                </div>
+            </Card>
+        ));
     /************************************* Date format **************************************/
 
     function formatDateTime(dateTime) {
@@ -130,65 +200,34 @@ export default function ProjectDetails() {
                 </div>
         </MainCard>
 
-            <MainCard className="mt-5" title="Comments" >
-                <div>
-                    {project.commentList &&
-                        project.commentList.map((comment) => (
-                            <Card
-                                className="mt-5"
-                                style={{
-                                    backgroundColor: 'rgb(236,230,245)',
-                                    padding: '20px',
-                                    borderRadius: '10px',
-                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                                    position: 'relative',
-                                }}
-                            >
-                                {comment.status === 'read' && (
-                                    <Tag value="You Read This" severity="success"></Tag>
-                                )}
-                                {comment.status === 'unread' && (
-                                    <Tag value="confirm reading comment" severity="warning"></Tag>
-                                )}
-                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
-                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
-                                <p style={{ fontSize: '15px', marginTop: '10px' }}>
-                                    {formatDateTime(comment.commentDate)}
-                                </p>
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: '10px',
-                                        right: '10px',
-                                        display: 'flex',
-                                    }}
-                                >
-
-                                    <Button
-                                        icon="pi pi-trash"
-                                        rounded
-                                        outlined
-                                        severity="danger"
-                                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
-                                        onClick={() => handleDeleteComment(comment.id)}
-                                    /> {!comment.status || comment.status === 'unread' ? (
-                                    <Button
-                                        icon="pi pi-eye"
-                                        rounded
-                                        outlined
-                                        severity="success"
-                                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
-                                        onClick={() => handleMarkAsRead(comment.id)}
-                                    />
-                                ) : null}
-                                </div>
-                            </Card>
-                        ))}
-                </div>
-
-
-
+            <MainCard className="mt-5" title="Comments">
+                {project.commentList.length > 0 ? (
+                    <div>
+                        {displayComments}
+                        <Paginator
+                            first={currentPage * cardsPerPage}
+                            rows={cardsPerPage}
+                            totalRecords={project.commentList.length}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        <Card
+                            className="mt-5"
+                            style={{
+                                backgroundColor: "rgba(252,67,67,0.18)",
+                                padding: "20px",
+                                borderRadius: "10px",
+                                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                                position: "relative",
+                            }}
+                        >     <strong>No comments available for this project.</strong>
+                        </Card>
+                    </div>
+                )}
             </MainCard>
+
         </>
     );
 }

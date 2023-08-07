@@ -13,11 +13,15 @@ import "../style/buttonGuide.css"
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import { Tag } from 'primereact/tag';
+import { Paginator } from 'primereact/paginator';
 
 export default function AllComments() {
     const [users, setUsers] = useState([]);
     const [selectedProjectComments, setSelectedProjectComments] = useState([]);
+    const [selectedPageComments, setSelectedPageComments] = useState([]);
 
+    const [currentPage, setCurrentPage] = useState(0);
+    const cardsPerPage = 2;
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
@@ -60,12 +64,14 @@ export default function AllComments() {
     const handleProjectClick = async (projectId) => {
         try {
             if (selectedProjectId === projectId) {
-                setSelectedProjectComments([]);
+                setSelectedPageComments([]);
                 setSelectedProjectId(null);
             } else {
                 const res = await axios.get(`http://localhost:8080/api/comment/projet/${projectId}`);
                 setSelectedProjectComments(res.data);
+                setSelectedPageComments(res.data.slice(0, cardsPerPage)); // Set comments for the current page
                 setSelectedProjectId(projectId);
+                setCurrentPage(0); // Reset the current page to 0
             }
         } catch (error) {
             console.error("Failed to load comments for the project with ID: ", projectId);
@@ -94,7 +100,14 @@ export default function AllComments() {
                         detail: 'Comment deleted successfully',
                         life: 3000
                     });
-                    loadComments();
+
+                    setSelectedProjectComments(prevComments =>
+                        prevComments.filter(comment => comment.id !== commentId)
+                    );
+
+                    setSelectedPageComments(prevComments =>
+                        prevComments.filter(comment => comment.id !== commentId)
+                    );
                 })
                 .catch((error) => {
                     console.error("Error while deleting comment:", error);
@@ -110,6 +123,7 @@ export default function AllComments() {
             accept: confirmDelete
         });
     };
+
     /******************************************************* Mark as Read  **************************************/
 
 
@@ -122,7 +136,12 @@ export default function AllComments() {
                 const updatedComments = selectedProjectComments.map((comment) =>
                     comment.id === commentId ? { ...comment, status: "read" } : comment
                 );
-                setSelectedProjectComments(updatedComments); // Update the selectedProjectComments state
+                setSelectedProjectComments(updatedComments);
+
+                setSelectedPageComments(prevComments =>
+                    prevComments.map(comment => comment.id === commentId ? { ...comment, status: "read" } : comment)
+                );
+
                 toast.current.show({
                     severity: 'info',
                     summary: 'Done',
@@ -134,6 +153,7 @@ export default function AllComments() {
                 console.error(error);
             });
     };
+
 
     return (
         <>
@@ -153,7 +173,7 @@ export default function AllComments() {
                         textAlign: "center"
                     }}
                 >
-                    <strong>TO SHOW EACH PROJECT COMMENT CLICK ON THE BUTTON BELOW</strong>
+                    <strong>TO SHOW EACH PROJECT COMMENTS CLICK ON THE BUTTON BELOW</strong>
                 </Card>
                 {users.map((user) => (
                     <Panel key={user.id} header={`UserName: ${user.firstName}`} toggleable collapsed={true}
@@ -190,7 +210,7 @@ export default function AllComments() {
                                     <React.Fragment key={project.id}>
                                         {selectedProjectId === project.id && (
                                             <div>
-                                                {selectedProjectComments.length === 0 ? (
+                                                {selectedPageComments.length === 0 ? (
                                                     <Card
                                                         className="mt-5"
                                                         style={{
@@ -203,7 +223,8 @@ export default function AllComments() {
                                                     >     <strong>No comments available for this project.</strong>
                                                     </Card>
                                                 ) : (
-                                                    selectedProjectComments.map((comment) => (
+                                                    selectedPageComments.map((comment) => (
+
                                                         <Card
                                                             key={comment.id}
                                                             className="mt-5"
@@ -256,10 +277,24 @@ export default function AllComments() {
                                                         </Card>
                                                     ))
                                                 )}
+                                                <div className="mt-3">
+                                                    <Paginator
+                                                        first={currentPage * cardsPerPage}
+                                                        rows={cardsPerPage}
+                                                        totalRecords={selectedProjectComments.length}
+                                                        onPageChange={(e) => {
+                                                            setCurrentPage(e.page);
+                                                            setSelectedPageComments(
+                                                                selectedProjectComments.slice(e.first, e.first + e.rows)
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
                                         )}
                                     </React.Fragment>
                                 ))}
+
                             </Grid>
                         </Grid>
                     </Panel>
