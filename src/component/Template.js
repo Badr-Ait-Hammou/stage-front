@@ -384,12 +384,15 @@ export default function Template() {
                                                         color="primary"
                                                         style={{ marginRight: '15px' }}
                                                     />
-                                                    <InputText
-                                                        placeholder="Input"
-                                                        value={field.inputValue || ''}
-                                                        onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                                        disabled={field.saved} // Disable the input if it's saved
-                                                    />
+                                                    {(!field.fieldValueList[0] || !field.fieldValueList[0].value) ? (
+                                                        <InputText
+                                                            placeholder={field.saved ? "Saved" : "Input"}
+                                                            value={field.inputValue || ''}
+                                                            onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span>{field.fieldValueList[0].value}</span>
+                                                    )}
                                                 </Box>
                                             </Grid>
                                         ))}
