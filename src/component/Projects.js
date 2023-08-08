@@ -3,6 +3,9 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import 'primeicons/primeicons.css';
 import "../style/Image.css"
+import Switch from '@mui/material/Switch';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
@@ -27,13 +30,19 @@ export default function Projects() {
     const [description, setDescription] =  useState('');
     const [productDialog, setProductDialog] = useState(false);
     const [editproductDialog, seteditProductDialog] = useState(false);
+    const [editPhotoDialog, seteditPhotoDialog] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
     const [clientId, setClientId] = useState("");
+    const [resultId, setResultId] = useState("");
     const [clients, setClient] = useState([]);
+    const [results, setResults] = useState([]);
     const [dataTableLoaded, setDataTableLoaded] = useState(false);
+    const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+    const projectsWithPhotos = project.filter(rowData => rowData.images && rowData.images.length);
+    const projectsWithFiles = project.filter(rowData => rowData.result && rowData.result.file);
 
 
     const handleDataTableLoad = () => {
@@ -53,6 +62,12 @@ export default function Projects() {
         });
     }, []);
 
+    useEffect(() => {
+        axios.get("http://localhost:8080/api/result/all").then((response) => {
+            setResults(response.data);
+        });
+    }, []);
+
 
 
 
@@ -68,18 +83,26 @@ export default function Projects() {
         event.preventDefault();
 
         if (name.trim() === '' || description.trim() === '') {
-            toast.current.show({ severity: 'error', summary: 'Successful', detail: 'empty', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
             return;
         }
 
-        axios.post("http://localhost:8080/api/projet/save", {
+        const requestData = {
             name,
             description,
             user: {
                 id: clientId,
-                role:"CLIENT"
-            },
-        })
+                role: "CLIENT"
+            }
+        };
+
+        if (resultId) {
+            requestData.result = {
+                id: resultId
+            };
+        }
+
+        axios.post("http://localhost:8080/api/projet/save", requestData)
             .then((response) => {
                 console.log("API Response:", response.data);
                 setName("");
@@ -135,8 +158,12 @@ export default function Projects() {
         setSubmitted(false);
         setProductDialog(false);
     };
+
     const hideeditDialog = () => {
         seteditProductDialog(false);
+    };
+    const hideeditPhotoDialog = () => {
+        seteditPhotoDialog(false);
     };
 
 
@@ -146,23 +173,49 @@ export default function Projects() {
         setSelectedProject(rowData);
         setName(rowData.name);
         setDescription(rowData.description);
+        setClientId(rowData.user.id);
+        //setResultId(rowData.result ? rowData.result.id : "");
         seteditProductDialog(true);
     };
 
-    const handleEdit = async (projectToUpdate) => {
+    const handlePhotoupdate = (rowData) => {
+        setSelectedProject(rowData);
+        setName(rowData.name);
+        setDescription(rowData.description);
+        setClientId(rowData.user.id);
+        setResultId(rowData.result ? rowData.result.id : "");
+        seteditPhotoDialog(true);
+    };
+
+    const handleEdit = async () => {
         try {
-            const response = await axios.put(`http://localhost:8080/api/projet/${projectToUpdate.id}`, {
-                name: name,
-                description: description,
-            });
+            const updatedProject = {
+                id: selectedProject.id,
+                name,
+                description,
+                user: {
+                    id: clientId,
+                    role: "CLIENT"
+                }
+            };
 
-            const updatedProject = [...project];
-            const updatedProjectIndex = updatedProject.findIndex((project) => project.id === projectToUpdate.id);
-            updatedProject[updatedProjectIndex] = response.data;
+            if (resultId) {
+                updatedProject.result = {
+                    id: resultId
+                };
+            }
 
+            const response = await axios.put(`http://localhost:8080/api/projet/${selectedProject.id}`, updatedProject);
+
+            const updatedProjects = project.map((proj) =>
+                proj.id === response.data.id ? response.data : proj
+            );
+
+            setProjects(updatedProjects);
+            hideeditPhotoDialog();
             hideeditDialog();
             loadProjects();
-            showupdate()
+            showupdate();
         } catch (error) {
             console.error(error);
         }
@@ -214,6 +267,14 @@ export default function Projects() {
             </React.Fragment>
         );
     };
+    const actionPhotoBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button icon="pi pi-pencil" rounded outlined style={{marginRight:"4px"}} onClick={() => handlePhotoupdate(rowData)} />
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => handleDelete(rowData.id)} />
+            </React.Fragment>
+        );
+    };
 
 
     const header = (
@@ -230,6 +291,12 @@ export default function Projects() {
             <Button  label="save"
                      severity="success"
                      raised onClick={(e) => handleSubmit(e)}/>
+        </React.Fragment>
+    );
+    const editPhotoDialogFooter = (
+        <React.Fragment>
+            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideeditPhotoDialog} />
+            <Button label="Update" severity="info"  raised onClick={() => handleEdit(selectedProject)} />
         </React.Fragment>
     );
     const editproductDialogFooter = (
@@ -265,6 +332,16 @@ export default function Projects() {
 
 
 
+    const resultFileBodyTemplate = (rowData) => {
+        if (rowData.result && rowData.result.file) {
+            return (
+                <a href={rowData.result.file} download>
+                    <FileDownloadIcon /> Download
+                </a>
+            );
+        }
+        return null;
+    };
 
 
 
@@ -276,7 +353,7 @@ export default function Projects() {
             <div className="card">
                 <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
                 {dataTableLoaded ? (
-                <DataTable ref={dt} value={project}
+                <DataTable ref={dt} value={projectsWithPhotos}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
@@ -295,7 +372,42 @@ export default function Projects() {
                 )}
             </div>
 
+
+            <div className="card mt-5">
+                {dataTableLoaded ? (
+                    <DataTable ref={dt} value={projectsWithFiles}
+                               dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                        <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
+                            <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                        )}></Column>
+                        <Column header="Result File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
+                        <Column field="result.name" header="Result Name" sortable style={{ minWidth: '10rem' }} />
+                        <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
+                        <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
+                        <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
+                        <Column  header="Action" body={actionPhotoBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
+                    </DataTable>
+                ) : (
+                    <PopularCart/>
+                )}
+            </div>
+
+
+
             <Dialog visible={productDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Project" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                <div className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Add a Template ?
+                    </label>
+                    <Switch
+                        checked={showTemplateDropdown}
+                        onChange={() => setShowTemplateDropdown(!showTemplateDropdown)}
+                        color="primary"
+                    />
+                </div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold ">
                         Name
@@ -319,7 +431,22 @@ export default function Projects() {
                         options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
                         onChange={(e) => setClientId(e.value)}
                         placeholder="Select a client"
-                    />  </div>
+                    />
+                </div>
+                {showTemplateDropdown && (
+                    <div className="field mt-2">
+                        <label htmlFor="description" className="font-bold">
+                            Template
+                        </label>
+                        <Dropdown
+                            style={{ marginTop: "5px" }}
+                            value={resultId}
+                            options={results.map((result) => ({ label: result.name, value: result.id }))}
+                            onChange={(e) => setResultId(e.value)}
+                            placeholder="Select a template"
+                        />
+                    </div>
+                )}
             </Dialog>
 
 
@@ -332,6 +459,7 @@ export default function Projects() {
                      footer={editproductDialogFooter}
                      onHide={hideeditDialog}
             >
+
                 <div className="field">
                     <label htmlFor="newname" className="font-bold mb-4">
                         Name
@@ -356,7 +484,67 @@ export default function Projects() {
                         onChange={(e) => setClientId(e.value)}
                         placeholder="Select a client"
                     />  </div>
+
             </Dialog>
+
+
+
+
+
+
+
+
+
+            <Dialog  visible={editPhotoDialog}
+                     style={{ width: '40rem' }}
+                     breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                     header="Edit Project"
+                     modal
+                     className="p-fluid"
+                     footer={editPhotoDialogFooter}
+                     onHide={hideeditPhotoDialog}
+            >
+
+                <div className="field">
+                    <label htmlFor="newname" className="font-bold mb-4">
+                        Name
+                    </label>
+                    <InputText style={{marginTop:"5px"}} id="newname" value={name} onChange={(e) => setName(e.target.value)} required />
+                    {submitted && !name && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field mt-2">
+                    <label htmlFor="newdescription" className="font-bold">
+                        Description
+                    </label>
+                    <InputTextarea style={{marginTop:"5px"}} id="newdescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                </div>
+                <div className="field mt-2">
+                    <label htmlFor="description" className="font-bold">
+                        Client
+                    </label>
+                    <Dropdown
+                        style={{marginTop:"5px"}}
+                        value={clientId}
+                        options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
+                        onChange={(e) => setClientId(e.value)}
+                        placeholder="Select a client"
+                    />  </div>
+
+                    <div className="field mt-2">
+                        <label htmlFor="description" className="font-bold">
+                            Template
+                        </label>
+                        <Dropdown
+                            style={{ marginTop: "5px" }}
+                            value={resultId}
+                            options={results.map((result) => ({ label: result.name, value: result.id }))}
+                            onChange={(e) => setResultId(e.value)}
+                            placeholder="Select a template"
+                        />
+                    </div>
+
+            </Dialog>
+
 
 
         </div>

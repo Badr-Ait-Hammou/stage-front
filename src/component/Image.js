@@ -54,6 +54,8 @@ export default function Image() {
     const [drawingStartY, setDrawingStartY] = useState(0);
     const [drawingWidth, setDrawingWidth] = useState(0);
     const [drawingHeight, setDrawingHeight] = useState(0);
+    const projectsWithoutFiles = projet.filter(rowData => !rowData.result || !rowData.result.file);
+
 
 
     const handleDataTableLoad = () => {
@@ -480,8 +482,8 @@ export default function Image() {
                                 }}
                             >
                                 <option value="">Select Projet</option>
-                                {projet &&
-                                    projet.map((projet) => (
+                                {projectsWithoutFiles &&
+                                    projectsWithoutFiles.map((projet) => (
                                         <option key={projet.id} value={projet.id}>
                                             {projet.name}
                                         </option>
@@ -560,8 +562,8 @@ export default function Image() {
                             }}
                         >
                             <option value="">Select Projet</option>
-                            {projet &&
-                                projet.map((projet) => (
+                            {projectsWithoutFiles &&
+                                projectsWithoutFiles.map((projet) => (
                                     <option key={projet.id} value={projet.id}>
                                         {projet.name}
                                     </option>
@@ -593,9 +595,9 @@ export default function Image() {
                           height: 'auto',
                           objectFit: 'contain',
                       }}
-                      onMouseDown={handleImageMouseDown} // Enable drawing when clicking on the image
-                      onMouseUp={handleImageMouseUp} // Finish drawing when releasing the mouse button
-                      onMouseMove={handleImageMouseMove} // Update drawing coordinates as the mouse moves
+                      onMouseDown={handleImageMouseDown}
+                      onMouseUp={handleImageMouseUp}
+                      onMouseMove={handleImageMouseMove}
                     />
                     <div
                       style={{

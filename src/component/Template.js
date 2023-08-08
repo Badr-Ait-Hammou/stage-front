@@ -35,7 +35,6 @@ export default function Template() {
   const [file, setFile] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('');
-  const [projetId, setProjetId] = useState("");
   const [projet, setProjet] = useState([]);
   const [fields, setFields] = useState([]);
   const [image, setImages] =  useState([]);
@@ -84,9 +83,6 @@ export default function Template() {
       file,
       description,
       type,
-      projet: {
-        id: projetId
-      }
     }).then((response) => {
       console.log(response.data);
       console.log(file);
@@ -94,7 +90,7 @@ export default function Template() {
       setFile("");
       setDescription("");
       setType("");
-      setProjetId("");
+
       hideDialog();
       loadResult();
       fetchData();
@@ -179,7 +175,6 @@ export default function Template() {
     setFile("");
     setDescription("");
     setType("");
-    setProjetId("");
     setProductDialog(true);
   };
 
@@ -200,7 +195,7 @@ export default function Template() {
   const showusave = () => {
     toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
   }
-  
+
   const showMissing = () => {
     toast.current.show({severity:'error', summary: 'Error', detail:'one of the fields is empty', life: 3000});
   }
@@ -372,35 +367,6 @@ export default function Template() {
           </label>
           <InputTextarea style={{marginTop:"5px"}} id="description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20} />
         </Box>
-        <Grid item xs={12} >
-          <Box className="field mt-1">
-            <label htmlFor="description" className="font-bold">
-              Project
-            </label>
-            <select
-              id="projetId"
-              className="form-control mt-2"
-              value={projetId}
-              onChange={(event) => setProjetId(event.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '1rem',
-                lineHeight: '1.5',
-              }}
-            >
-              <option value="">Select Projet</option>
-              {projet &&
-                projet.map((projet) => (
-                  <option key={projet.id} value={projet.id}>
-                    {projet.name}
-                  </option>
-                ))}
-            </select>
-          </Box>
-        </Grid>
 
       </Dialog>
 
