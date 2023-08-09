@@ -22,6 +22,8 @@ import MainCard from "../ui-component/cards/MainCard";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {Link} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
@@ -49,6 +51,7 @@ export default function Template() {
     const [chipsValue, setChipsValue] = useState([]);
     const [selectedResultId, setSelectedResultId] = useState('');
     const [globalFilter, setGlobalFilter] = useState(null);
+    const navigate = useNavigate();
 
 
 
@@ -150,7 +153,7 @@ export default function Template() {
             file,
             description,
             type,
-        }).then((response) => {
+        }).then(async (response) => {
             console.log(response.data);
             console.log(file);
             setName("");
@@ -158,10 +161,16 @@ export default function Template() {
             setDescription("");
             setType("");
 
-            hideDialog();
-            loadResult();
-            fetchData();
+            await hideDialog();
+            await loadResult();
+            await fetchData();
             showusave();
+
+            console.log("Navigation will be executed");
+
+            navigate(`/template/template_details/${response.data.id}`);
+
+
         }).catch((error) => {
             console.error("Error while saving file:", error);
         });
