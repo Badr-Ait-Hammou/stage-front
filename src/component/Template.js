@@ -229,7 +229,7 @@ export default function Template() {
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button label="New Template" icon="pi pi-plus" severity="success" onClick={openNew}/>
+                <Button label="New " icon="pi pi-plus" severity="success" onClick={openNew}/>
             </div>
         );
     };
@@ -292,12 +292,21 @@ export default function Template() {
         </div>
     );
 
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+    const rightToolbarTemplate = () => {
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    };
+
+
     return (
         <>
             <Toast ref={toast}/>
             <ConfirmDialog/>
                 <div className="card">
-                    <Toolbar className="mb-4" center={leftToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" start={leftToolbarTemplate} center={<strong>Manage Templates</strong>} end={rightToolbarTemplate}></Toolbar>
+
 
                     {dataTableLoaded ? (
                         <DataTable ref={dt} value={result}

@@ -223,7 +223,7 @@ export default function TemplateDetails() {
             <MainCard title={`Template Details -- ${name}`}>
 
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} >
-                    <Box  style={{width: '50rem'}} header="Create Template"  className="p-fluid mt-3" >
+                    <Box  style={{width: '45rem'}} header="Create Template"  className="p-fluid mt-3" >
                         {result ? (
                             <React.Fragment>
                                 <Grid  container spacing={2}>
@@ -295,12 +295,17 @@ export default function TemplateDetails() {
 
                                 <Box className="field mt-5 mb-5" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
                                     <Button label="Update"
-                                            severity="info"
-
-                                            raised onClick={(e) => handleEdit(e)} />
+                                            severity="success"
+                                            outlined
+                                            style={{ flex: 1, maxWidth: '150px' }}
+                                            onClick={(e) => handleEdit(e)} />
                                     <Button label="Delete"
-                                            severity="danger" onClick={() => handleDelete(result.id)} />
+                                            severity="danger"
+                                            outlined
+                                            style={{ flex: 1, maxWidth: '150px' }}
+                                            onClick={() => handleDelete(result.id)} />
                                 </Box>
+
                             </React.Fragment>
                         ) : (
                             <Grid item xs={12} spacing={2} className="mb-3">
@@ -321,7 +326,7 @@ export default function TemplateDetails() {
 
                     <div  >
 
-                        <Toolbar className="mb-4" start="Fields" end={<Button label="Add New"  onClick={addNewCard} className="p-button-primary" />}></Toolbar>
+                        <Toolbar className="mb-4" start="Fields" end={<Button label="Add New" outlined  onClick={addNewCard} className="p-button-primary" />}></Toolbar>
 
                         {[...cards, ...fields].map(item => (
 

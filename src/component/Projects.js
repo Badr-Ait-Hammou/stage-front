@@ -239,6 +239,7 @@ export default function Projects() {
     };
 
 
+
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
