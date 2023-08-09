@@ -382,7 +382,7 @@ export default function Projects() {
                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} template projects" globalFilter={globalFilter} header={header}>
                         <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                            <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                            <Link className="font-bold" to={`project_detailsDoc/${rowData.id}`}>{rowData.name}</Link>
                         )}></Column>
                         <Column header="Result File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
                         <Column field="result.name" header="Template Name" sortable style={{ minWidth: '10rem' }} />

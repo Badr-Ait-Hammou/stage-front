@@ -31,6 +31,7 @@ import ProjectClient from "../ac_client/ProjectsPage"
 import ProjectComment from "../ac_client/ProjectComment"
 import AllComments from "../component/AllComments"
 import TempDetails from "../component/TemplateDetails"
+import ProjectDetailsDoc from "../component/ProjectDetailDoc"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -114,6 +115,10 @@ const MainRoutes = {
     {
       path: 'projects/project_details/:id',
       element: <ProjectDetails />
+    },
+    {
+      path: 'projects/project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
     },
     {
       path: 'projects',

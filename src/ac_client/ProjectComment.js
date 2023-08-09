@@ -14,6 +14,7 @@ import {Button} from "primereact/button";
 import Card from '@mui/material/Card';
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import { Tag } from 'primereact/tag';
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 export default function ProjectComment() {
     const [project, setProject] = useState([]);
@@ -201,7 +202,7 @@ export default function ProjectComment() {
 
     const header = (
         <div className="mt-2 mb-2">
-            <span className="text-xl text-900 font-bold">{project.name} Comment</span>
+            <span className="text-xl text-900 font-bold">{project.name} Comments</span>
         </div>
     );
     const footer = (
@@ -242,6 +243,25 @@ export default function ProjectComment() {
 
 
 
+    const resultFileBodyTemplate = () => {
+        if (project.result && project.result.file) {
+            return (
+                <a href={project.result.file} download>
+                    <FileDownloadIcon /> Download
+                </a>
+            );
+        }
+        return null;
+    };
+    const footer2 = (
+        <div >
+            <p>
+                In total there is 1 Template on the{" "}
+                {project.name} project.
+            </p>
+        </div>
+    );
+
 
 
     return (
@@ -250,18 +270,34 @@ export default function ProjectComment() {
             <Toast ref={toast} />
             <ConfirmDialog />
 
-            <MainCard>
-                <div className="card">
-                    <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
-                    <div style={{borderRadius: '10px', overflow: 'hidden'}}>
-                        <DataTable value={project.images} footer={footer} tableStyle={{minWidth: '30rem'}}>
-                            <Column field="id" sortable header="ID"></Column>
-                            <Column header="Images" body={imageBodyTemplate}></Column>
-                            <Column field="name" sortable filter header="Name"></Column>
-                        </DataTable>
+            {project.result ? (
+                <MainCard>
+                    <div className="card">
+                        <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
+                        <div style={{borderRadius: '10px', overflow: 'hidden'}}>
+                            <DataTable value={[project.result]} footer={footer2} tableStyle={{minWidth: '30rem'}}>
+                                <Column field="id" sortable header="ID"></Column>
+                                <Column header="Result File" body={resultFileBodyTemplate}></Column>
+                                <Column field="name" sortable filter header="Name"></Column>
+                            </DataTable>
+                        </div>
                     </div>
-                </div>
-            </MainCard>
+                </MainCard>
+            ) : (
+                <MainCard>
+                    <div className="card">
+                        <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
+                        <div style={{borderRadius: '10px', overflow: 'hidden'}}>
+                            <DataTable value={project.images} footer={footer} tableStyle={{minWidth: '30rem'}}>
+                                <Column field="id" sortable header="ID"></Column>
+                                <Column header="Images" body={imageBodyTemplate}></Column>
+                                <Column field="name" sortable filter header="Name"></Column>
+                            </DataTable>
+                        </div>
+                    </div>
+                </MainCard>
+            )}
+
 
             <MainCard className="mt-5" title="Comments">
                 <div>
