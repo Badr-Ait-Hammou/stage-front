@@ -222,8 +222,8 @@ export default function TemplateDetails() {
             <ConfirmDialog/>
             <MainCard title={`Template Details -- ${name}`}>
 
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgb(238,238,250)" ,borderRadius:"20px"}} >
-                    <Box  style={{width: '40rem'}} header="Create Template"  className="p-fluid mt-3" >
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} >
+                    <Box  style={{width: '50rem'}} header="Create Template"  className="p-fluid mt-3" >
                         {result ? (
                             <React.Fragment>
                                 <Grid  container spacing={2}>
@@ -247,7 +247,7 @@ export default function TemplateDetails() {
                                                 id="type"
                                                 value={type}
                                                 options={[
-                                                    {label: 'Word', value: 'word'},
+                                                    {label: 'Doc', value: 'doc'},
                                                     {label: 'Excel', value: 'excel'}
                                                 ]}
                                                 onChange={(event) => setType(event.value)}
@@ -295,17 +295,18 @@ export default function TemplateDetails() {
 
                                 <Box className="field mt-5 mb-5" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
                                     <Button label="Update"
-                                            severity="success"
+                                            severity="info"
+
                                             raised onClick={(e) => handleEdit(e)} />
                                     <Button label="Delete"
-                                            severity="warning" onClick={() => handleDelete(result.id)} />
+                                            severity="danger" onClick={() => handleDelete(result.id)} />
                                 </Box>
                             </React.Fragment>
                         ) : (
-                            <Grid item xs={12} spacing={2} className="mt-3">
+                            <Grid item xs={12} spacing={2} className="mb-3">
                                 <Card style={{ backgroundColor: 'rgb(236, 230, 245)' }}>
                                     <CardContent>
-                                        <p>No data available.</p>
+                                        <strong>this Template has been deleted .</strong>
                                     </CardContent>
                                 </Card>
                             </Grid>
@@ -314,17 +315,17 @@ export default function TemplateDetails() {
                 </div>
             </MainCard>
 
-            <div className="mt-5">
+            <div className="mt-5" >
 
                 <MainCard title="Manage Fields">
 
-                    <div>
+                    <div  >
 
-                        <Toolbar className="mb-4" start="Fields" end={<Button label="Add New" severity="success" onClick={addNewCard} className="p-button-primary" />}></Toolbar>
+                        <Toolbar className="mb-4" start="Fields" end={<Button label="Add New"  onClick={addNewCard} className="p-button-primary" />}></Toolbar>
 
                         {[...cards, ...fields].map(item => (
 
-                            <Box  key={item.id} className="card flex flex-column md:flex-row gap-3 mt-5">
+                            <Box  key={item.id} className="card flex flex-column md:flex-row gap-3 mt-5" >
                                 <div className="p-inputgroup flex-1">
                                     <span className="p-inputgroup-addon">
                                         <i >Name</i>
@@ -360,7 +361,7 @@ export default function TemplateDetails() {
                                     icon="pi pi-trash"
                                     className="p-button-danger p-button-sm"
                                     onClick={() => {
-                                        if (item.fieldid.length > 1) {
+                                        if (item.fieldid.length > 0) {
                                             handleDeleteField(item.id);
                                         } else {
                                             removeCard(item.id);
@@ -372,8 +373,12 @@ export default function TemplateDetails() {
                             </Box>
                         ))}
 
-                        <div className="mt-10" style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
-                            <Button label="Create All" onClick={handleSubmitAll} className="p-button-primary" /></div>
+                        <Box className="field mt-5 mb-2" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+
+                            <Button severity="success" raised label="Create All" onClick={handleSubmitAll} className="p-button-primary"  />
+
+
+                        </Box>
                     </div>
                 </MainCard>
             </div>
