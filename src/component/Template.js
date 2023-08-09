@@ -177,6 +177,7 @@ export default function Template() {
                 name,
                 file,
                 description,
+                type,
 
             };
             const response = await axios.put(`http://localhost:8080/api/result/${selectedResult.id}`, updatedProject);
@@ -456,9 +457,10 @@ export default function Template() {
                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Templates" globalFilter={globalFilter} header={header}>
                             <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                             <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                                <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                                <Link className="font-bold" to={`template_details/${rowData.id}`}>{rowData.name}</Link>
                             )}></Column>
                             <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
+                            <Column field="type" header="Type" sortable style={{ minWidth: '10em' }}></Column>
                             <Column field="file" header="file" body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
                             <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                         </DataTable>
@@ -641,7 +643,13 @@ export default function Template() {
 
 
             <Dialog visible={resulteditDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
-                    header="Update Template" modal className="p-fluid" footer={resulteditDialogFooter} onHide={hideeditDialog}>
+                    header="Update Template" modal className="p-fluid" footer={resulteditDialogFooter} onHide={hideeditDialog}
+                    onShow={() => {
+                        setName(selectedResult.name);
+                        setDescription(selectedResult.description);
+                        setType(selectedResult.type);
+                    }}
+            >
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <Box className="field">
@@ -659,6 +667,7 @@ export default function Template() {
                                 Type
                             </label>
                             <Dropdown
+                                placeholder={result.type}
                                 style={{marginTop: "5px"}}
                                 id="type"
                                 value={type}
