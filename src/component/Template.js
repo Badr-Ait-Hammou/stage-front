@@ -11,14 +11,12 @@ import {InputText} from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
-import {Card, CardContent, Chip, Grid,} from '@mui/material';
+import { Grid,} from '@mui/material';
 import {Box} from "@mui/system";
 import {FileUpload} from 'primereact/fileupload';
 import "../style/Image.css"
 import 'leaflet-draw/dist/leaflet.draw.css'
 import {Dropdown} from 'primereact/dropdown';
-import {Chips} from "primereact/chips";
-import MainCard from "../ui-component/cards/MainCard";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {Link} from "react-router-dom";
@@ -39,17 +37,11 @@ export default function Template() {
     const [file, setFile] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState('');
-    const [projet, setProjet] = useState([]);
-    const [fields, setFields] = useState([]);
     const [image, setImages] = useState([]);
     const [result, setResult] = useState([]);
-    const [fielvalue, setFieldvalue] = useState([]);
     const [dataTableLoaded, setDataTableLoaded] = useState(false);
     const dt = useRef(null);
     const [selectedResult, setSelectedResult] = useState(null);
-    const [resultId, setResultId] = useState("");
-    const [chipsValue, setChipsValue] = useState([]);
-    const [selectedResultId, setSelectedResultId] = useState('');
     const [globalFilter, setGlobalFilter] = useState(null);
     const navigate = useNavigate();
 
@@ -67,9 +59,6 @@ export default function Template() {
 
     const fetchData = async () => {
         try {
-            const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
-            setProjet(projetResponse.data);
-
             const resultResponse = await axios.get('http://localhost:8080/api/result/all');
             setResult(resultResponse.data);
             handleDataTableLoad();
@@ -79,71 +68,6 @@ export default function Template() {
         }
     };
 
-    useEffect(() => {
-        axios.get("http://localhost:8080/api/field/all").then((response) => {
-            setFields(response.data);
-        });
-    }, []);
-
-
-
-
-    const handleDeleteField = async (fieldId) => {
-        try {
-            const fieldToDelete = fields.find((field) => field.id === fieldId);
-
-            if (!fieldToDelete) {
-                console.error("Field not found:", fieldId);
-                return;
-            }
-
-            if (fieldToDelete.fieldValueList.length > 0) {
-                const inputIdToDelete = fieldToDelete.fieldValueList[0].id;
-                await handleDeleteInput(inputIdToDelete);
-            }
-
-            const response = await axios.delete(`http://localhost:8080/api/field/${fieldId}`);
-            console.log("Field deleted:", fieldId, response);
-
-            await fetchFields();
-            fetchFieldvalue();
-        } catch (error) {
-            console.error("Error while deleting field:", error);
-        }
-    };
-
-    const handleDeleteInput = async (inputId) => {
-        try {
-            if (!inputId) {
-                console.error("Input ID not provided.");
-                return;
-            }
-
-            const response = await axios.delete(`http://localhost:8080/api/fieldvalue/${inputId}`);
-            console.log("Input deleted:", inputId, response);
-
-            const updatedFields = fields.map((field) => {
-                const updatedField = {...field};
-                updatedField.fieldValueList = updatedField.fieldValueList.filter((input) => input.id !== inputId);
-                return updatedField;
-            });
-            setFields(updatedFields);
-
-        } catch (error) {
-            console.error("Error while deleting input:", error);
-        }
-    };
-
-
-    const fetchFieldsByResult = (resultId) => {
-        axios.get(`http://localhost:8080/api/field/result/${resultId}`)
-            .then((response) => {
-                setFields(response.data);
-            })
-            .catch((error) => {
-                console.error("Error while fetching fields:", error);
-            });
-    };
 
 
     const handleSubmit = (event) => {
@@ -176,7 +100,7 @@ export default function Template() {
         });
     };
 
-    /******************************************** Save  fields ******************************************/
+    /******************************************** Edit template ******************************************/
 
 
     const handleEdit = async () => {
@@ -206,73 +130,9 @@ export default function Template() {
     };
 
 
-    /******************************************** Save  fields ******************************************/
 
 
-    const handleSave = (event) => {
-        event.preventDefault();
 
-        if (chipsValue.length === 0 || resultId.length === 0) {
-            showMissing();
-            return;
-        }
-        const savePromises = chipsValue.map(chip => {
-            return axios.post("http://localhost:8080/api/field/save", {
-                name: chip,
-                result: {
-                    id: resultId
-                }
-            });
-        });
-
-        Promise.all(savePromises)
-            .then((responses) => {
-                console.log("Saved all chips:", responses);
-                setChipsValue([]);
-                fetchFields();
-            })
-            .catch((error) => {
-                console.error("Error while saving chips:", error);
-            });
-    };
-
-    /******************************************** Save inputs with field ***************************************/
-
-    const handleSaveAllInputs = () => {
-        const savePromises = fields.map((field) =>
-            axios.post("http://localhost:8080/api/fieldvalue/save", {
-                value: field.inputValue || "",
-                field: {
-                    id: field.id,
-                },
-            })
-        );
-
-        Promise.all(savePromises)
-            .then((responses) => {
-                console.log("Saved all input values:", responses);
-                setFields(fields.map((field) => ({ ...field, inputValue: "", saved: true }))); // Set saved to true
-
-                fetchData();
-                fetchFieldvalue();
-                fetchFields();
-            })
-            .catch((error) => {
-                console.error("Error while saving input values:", error);
-            });
-    };
-
-
-    const fetchFields = () => {
-        axios.get("http://localhost:8080/api/field/all").then((response) => {
-            setFields(response.data);
-        });
-    };
-    const fetchFieldvalue = () => {
-        axios.get("http://localhost:8080/api/fieldvalue/").then((response) => {
-            setFieldvalue(response.data);
-        });
-    };
 
     const handlefileChange = (event) => {
         const files = event.files;
@@ -360,9 +220,7 @@ export default function Template() {
         toast.current.show({severity: 'info', summary: 'Done', detail: 'item updated successfully', life: 3000});
     }
 
-    const showMissing = () => {
-        toast.current.show({severity: 'error', summary: 'Error', detail: 'one of the fields is empty', life: 3000});
-    }
+
 
 
     /******************************************** components *************************/
@@ -371,7 +229,7 @@ export default function Template() {
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button label="New Template" icon="pi pi-plus" severity="success" onClick={openNew}/>
+                <Button label="New " icon="pi pi-plus" severity="success" onClick={openNew}/>
             </div>
         );
     };
@@ -394,26 +252,8 @@ export default function Template() {
         </React.Fragment>
     );
 
-    const handleInputChange = (fieldId, inputValue) => {
-        const updatedFields = fields.map((field) => {
-            if (field.id === fieldId) {
-                return {...field, inputValue};
-            }
-            return field;
-        });
-        setFields(updatedFields);
-    };
 
 
-    const handleResultChange = (event) => {
-        setResultId(event.value);
-    };
-
-    const handleResult2Change = (event) => {
-        const newResultId = event.value;
-        setSelectedResultId(newResultId);
-        fetchFieldsByResult(newResultId);
-    };
 
 
     const handleupdate = (rowData) => {
@@ -452,12 +292,21 @@ export default function Template() {
         </div>
     );
 
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+    const rightToolbarTemplate = () => {
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    };
+
+
     return (
         <>
             <Toast ref={toast}/>
             <ConfirmDialog/>
                 <div className="card">
-                    <Toolbar className="mb-4" center={leftToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" start={leftToolbarTemplate} center={<strong>Manage Templates</strong>} end={rightToolbarTemplate}></Toolbar>
+
 
                     {dataTableLoaded ? (
                         <DataTable ref={dt} value={result}
@@ -477,106 +326,6 @@ export default function Template() {
                         <PopularCart/>
                     )}
 
-                    <div className="mt-5">
-                    <MainCard title="Manage Fields" >
-
-                    <Grid container spacing={2} className="mt-5">
-                        <Grid item xs={12} sm={6}>
-                            <Box className="field mt-2 " style={{display: 'flex', justifyContent: 'center'}}>
-                                <div className="card p-fluid" style={{width: '100%'}}>
-                                    <span className="p-float-label" style={{width: '100%'}}>
-                                        <Chips value={chipsValue} onChange={(e) => setChipsValue(e.value)}/>
-                                        <label htmlFor="chips">Fields</label>
-                                    </span>
-                                </div>
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <Box className="field mt-2" style={{display: 'flex', justifyContent: 'center'}}>
-
-                                <Dropdown
-                                    id="resultId"
-                                    options={result.map((template) => ({label: template.name, value: template.id}))}
-                                    value={resultId}
-                                    onChange={handleResultChange}
-                                    placeholder="Select Template"
-                                    style={{width: '100%'}}
-                                />
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12} className="mt-1"
-                              style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Button
-                                label="Save"
-                                severity="success"
-                                raised
-                                onClick={handleSave}
-                            />
-                        </Grid>
-                        <Grid item xs={12} className="mt-3"
-                              style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        </Grid>
-
-
-                        <Grid item xs={12}>
-                            <Box className="field" style={{display: 'flex', justifyContent: 'center'}}>
-                                <Dropdown
-                                    id="resultId"
-                                    options={result.map((template) => ({label: template.name, value: template.id}))}
-                                    value={selectedResultId}
-                                    onChange={handleResult2Change}
-                                    placeholder="Select Template"
-                                    style={{width: '100%'}}
-                                />
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12} className="mt-3"
-                              style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <strong>Fields</strong>
-                        </Grid>
-
-                        <Grid item xs={12} spacing={2} className="mt-3">
-                            <Card style={{ backgroundColor: 'rgb(236, 230, 245)' }}>
-                                <CardContent>
-                                    {fields.length === 0 ? (
-                                        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                                            No fields found.
-                                        </div>
-                                    ) : (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
-                                            {fields.map((field, index) => (
-                                                <Grid item xs={12} sm={6} key={field.id}>
-                                                    <Box className="field">
-                                                        <Chip
-                                                            label={field.name}
-                                                            onDelete={() => handleDeleteField(field.id)}
-                                                            color="primary"
-                                                            style={{ marginRight: '15px' }}
-                                                        />
-                                                        {(!field.fieldValueList[0] || !field.fieldValueList[0].value) ? (
-                                                            <InputText
-                                                                placeholder={field.saved ? "Saved" : "Input"}
-                                                                value={field.inputValue || ''}
-                                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                                            />
-                                                        ) : (
-                                                            <span>{field.fieldValueList[0].value}</span>
-                                                        )}
-                                                    </Box>
-                                                </Grid>
-                                            ))}
-
-                                        </div>
-                                    )}
-                                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
-                                        <Button onClick={handleSaveAllInputs}>Save All</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
-                    </MainCard>
-                    </div>
 
                 </div>
 
@@ -605,7 +354,7 @@ export default function Template() {
                                 id="type"
                                 value={type}
                                 options={[
-                                    {label: 'Word', value: 'word'},
+                                    {label: 'Doc', value: 'doc'},
                                     {label: 'Excel', value: 'excel'}
                                 ]}
                                 onChange={(event) => setType(event.value)}
@@ -681,7 +430,7 @@ export default function Template() {
                                 id="type"
                                 value={type}
                                 options={[
-                                    {label: 'Word', value: 'word'},
+                                    {label: 'Doc', value: 'doc'},
                                     {label: 'Excel', value: 'excel'}
                                 ]}
                                 onChange={(event) => setType(event.value)}

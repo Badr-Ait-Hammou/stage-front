@@ -239,6 +239,7 @@ export default function Projects() {
     };
 
 
+
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
@@ -356,7 +357,7 @@ export default function Projects() {
                 <DataTable ref={dt} value={projectsWithPhotos}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} image projects" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
                         <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
@@ -378,15 +379,15 @@ export default function Projects() {
                     <DataTable ref={dt} value={projectsWithFiles}
                                dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} template projects" globalFilter={globalFilter} header={header}>
                         <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
                             <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
                         )}></Column>
                         <Column header="Result File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
-                        <Column field="result.name" header="Result Name" sortable style={{ minWidth: '10rem' }} />
+                        <Column field="result.name" header="Template Name" sortable style={{ minWidth: '10rem' }} />
                         <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
-                        <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
+                        <Column  field="user.firstName" header="Client" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
                         <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                         <Column  header="Action" body={actionPhotoBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                     </DataTable>
