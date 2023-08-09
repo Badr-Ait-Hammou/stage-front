@@ -11,7 +11,7 @@ import {InputText} from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
 import axios from "axios";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
-import {Card, CardContent, Chip, Grid,} from '@mui/material';
+import { Grid,} from '@mui/material';
 import {Box} from "@mui/system";
 import {FileUpload} from 'primereact/fileupload';
 import "../style/Image.css"
@@ -69,7 +69,6 @@ export default function Template() {
         try {
             const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
             setProjet(projetResponse.data);
-
             const resultResponse = await axios.get('http://localhost:8080/api/result/all');
             setResult(resultResponse.data);
             handleDataTableLoad();
@@ -84,8 +83,6 @@ export default function Template() {
             setFields(response.data);
         });
     }, []);
-
-
 
 
     const handleDeleteField = async (fieldId) => {
@@ -238,30 +235,6 @@ export default function Template() {
 
     /******************************************** Save inputs with field ***************************************/
 
-    const handleSaveAllInputs = () => {
-        const savePromises = fields.map((field) =>
-            axios.post("http://localhost:8080/api/fieldvalue/save", {
-                value: field.inputValue || "",
-                field: {
-                    id: field.id,
-                },
-            })
-        );
-
-        Promise.all(savePromises)
-            .then((responses) => {
-                console.log("Saved all input values:", responses);
-                setFields(fields.map((field) => ({ ...field, inputValue: "", saved: true }))); // Set saved to true
-
-                fetchData();
-                fetchFieldvalue();
-                fetchFields();
-            })
-            .catch((error) => {
-                console.error("Error while saving input values:", error);
-            });
-    };
-
 
     const fetchFields = () => {
         axios.get("http://localhost:8080/api/field/all").then((response) => {
@@ -394,15 +367,7 @@ export default function Template() {
         </React.Fragment>
     );
 
-    const handleInputChange = (fieldId, inputValue) => {
-        const updatedFields = fields.map((field) => {
-            if (field.id === fieldId) {
-                return {...field, inputValue};
-            }
-            return field;
-        });
-        setFields(updatedFields);
-    };
+
 
 
     const handleResultChange = (event) => {
@@ -535,45 +500,7 @@ export default function Template() {
                             <strong>Fields</strong>
                         </Grid>
 
-                        <Grid item xs={12} spacing={2} className="mt-3">
-                            <Card style={{ backgroundColor: 'rgb(236, 230, 245)' }}>
-                                <CardContent>
-                                    {fields.length === 0 ? (
-                                        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                                            No fields found.
-                                        </div>
-                                    ) : (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
-                                            {fields.map((field, index) => (
-                                                <Grid item xs={12} sm={6} key={field.id}>
-                                                    <Box className="field">
-                                                        <Chip
-                                                            label={field.name}
-                                                            onDelete={() => handleDeleteField(field.id)}
-                                                            color="primary"
-                                                            style={{ marginRight: '15px' }}
-                                                        />
-                                                        {(!field.fieldValueList[0] || !field.fieldValueList[0].value) ? (
-                                                            <InputText
-                                                                placeholder={field.saved ? "Saved" : "Input"}
-                                                                value={field.inputValue || ''}
-                                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                                            />
-                                                        ) : (
-                                                            <span>{field.fieldValueList[0].value}</span>
-                                                        )}
-                                                    </Box>
-                                                </Grid>
-                                            ))}
 
-                                        </div>
-                                    )}
-                                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
-                                        <Button onClick={handleSaveAllInputs}>Save All</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Grid>
                     </Grid>
                     </MainCard>
                     </div>
