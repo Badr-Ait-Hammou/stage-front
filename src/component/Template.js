@@ -167,6 +167,9 @@ export default function Template() {
         });
     };
 
+    /******************************************** Save  fields ******************************************/
+
+
     const handleEdit = async () => {
         try {
             const updatedProject = {
@@ -174,6 +177,7 @@ export default function Template() {
                 name,
                 file,
                 description,
+                type,
 
             };
             const response = await axios.put(`http://localhost:8080/api/result/${selectedResult.id}`, updatedProject);
@@ -192,6 +196,8 @@ export default function Template() {
         }
     };
 
+
+    /******************************************** Save  fields ******************************************/
 
 
     const handleSave = (event) => {
@@ -220,6 +226,8 @@ export default function Template() {
                 console.error("Error while saving chips:", error);
             });
     };
+
+    /******************************************** Save inputs with field ***************************************/
 
     const handleSaveAllInputs = () => {
         const savePromises = fields.map((field) =>
@@ -279,7 +287,7 @@ export default function Template() {
     }
 
 
-    /******************************************** Delete *************************/
+    /******************************************** Delete Template *********************************************/
 
 
     const handleDelete = (id) => {
@@ -363,7 +371,7 @@ export default function Template() {
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
-            <Button label="save"
+            <Button label="Create"
                     severity="success"
                     raised onClick={(e) => handleSubmit(e)}/>
         </React.Fragment>
@@ -371,7 +379,7 @@ export default function Template() {
     const resulteditDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideeditDialog}/>
-            <Button label="save"
+            <Button label="update"
                     severity="success"
                     raised onClick={(e) => handleEdit(e)}/>
         </React.Fragment>
@@ -439,7 +447,6 @@ export default function Template() {
         <>
             <Toast ref={toast}/>
             <ConfirmDialog/>
-            <MainCard title="Manage Templates">
                 <div className="card">
                     <Toolbar className="mb-4" center={leftToolbarTemplate}></Toolbar>
 
@@ -447,12 +454,13 @@ export default function Template() {
                         <DataTable ref={dt} value={result}
                                    dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Templates" globalFilter={globalFilter} header={header}>
                             <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                             <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                                <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
+                                <Link className="font-bold" to={`template_details/${rowData.id}`}>{rowData.name}</Link>
                             )}></Column>
                             <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
+                            <Column field="type" header="Type" sortable style={{ minWidth: '10em' }}></Column>
                             <Column field="file" header="file" body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
                             <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                         </DataTable>
@@ -460,7 +468,10 @@ export default function Template() {
                         <PopularCart/>
                     )}
 
-                    <Grid container spacing={2}>
+                    <div className="mt-5">
+                    <MainCard title="Manage Fields" >
+
+                    <Grid container spacing={2} className="mt-5">
                         <Grid item xs={12} sm={6}>
                             <Box className="field mt-2 " style={{display: 'flex', justifyContent: 'center'}}>
                                 <div className="card p-fluid" style={{width: '100%'}}>
@@ -545,6 +556,7 @@ export default function Template() {
                                                     </Box>
                                                 </Grid>
                                             ))}
+
                                         </div>
                                     )}
                                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
@@ -553,14 +565,16 @@ export default function Template() {
                                 </CardContent>
                             </Card>
                         </Grid>
-
                     </Grid>
+                    </MainCard>
+                    </div>
+
                 </div>
-            </MainCard>
+
 
 
             <Dialog visible={productDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
-                    header="Add Template" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                    header="Create Template" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <Box className="field">
@@ -629,7 +643,13 @@ export default function Template() {
 
 
             <Dialog visible={resulteditDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
-                    header="Add Template" modal className="p-fluid" footer={resulteditDialogFooter} onHide={hideeditDialog}>
+                    header="Update Template" modal className="p-fluid" footer={resulteditDialogFooter} onHide={hideeditDialog}
+                    onShow={() => {
+                        setName(selectedResult.name);
+                        setDescription(selectedResult.description);
+                        setType(selectedResult.type);
+                    }}
+            >
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <Box className="field">
@@ -647,6 +667,7 @@ export default function Template() {
                                 Type
                             </label>
                             <Dropdown
+                                placeholder={result.type}
                                 style={{marginTop: "5px"}}
                                 id="type"
                                 value={type}

@@ -30,6 +30,7 @@ import AddClient from "../ac_manager/AddClient"
 import ProjectClient from "../ac_client/ProjectsPage"
 import ProjectComment from "../ac_client/ProjectComment"
 import AllComments from "../component/AllComments"
+import TempDetails from "../component/TemplateDetails"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -89,6 +90,10 @@ const MainRoutes = {
     {
       path: 'annotation/Imagedetail/:id',
       element: <ImageDetail />
+    },
+    {
+      path: 'template/template_details/:id',
+      element: <TempDetails />
     },
     {
       path: 'client_projects/Imagedetail/:id',
