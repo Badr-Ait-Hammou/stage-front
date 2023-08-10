@@ -129,7 +129,7 @@ export default function Projects() {
                 })
                 .catch((error) => {
                     console.error('Error deleting project:', error);
-                    toast.current.show({severity:'error', summary: 'Error', detail:'project assigned to an image', life: 3000});
+                    toast.current.show({severity:'error', summary: 'Error', detail:'project assigned to an image or a comment', life: 3000});
                 });
         };
 

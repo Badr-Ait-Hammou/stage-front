@@ -92,7 +92,12 @@ export default function Template() {
 
             console.log("Navigation will be executed");
 
-            navigate(`/template/template_details/${response.data.id}`);
+            if(response.data.type ==="doc"){
+                navigate(`/template/template_details/${response.data.id}`);
+            }else{
+                navigate(`/template/template_detailsExcel/${response.data.id}`);
+
+            }
 
 
         }).catch((error) => {
