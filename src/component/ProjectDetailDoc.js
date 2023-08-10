@@ -12,7 +12,7 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import Doc from "../assets/images/doc.png";
 
 export default function ProjectDetailDoc() {
     const [project, setProject] = useState([]);
@@ -184,7 +184,7 @@ export default function ProjectDetailDoc() {
         if (project.result && project.result.file) {
             return (
                 <a href={project.result.file} download>
-                    <FileDownloadIcon /> Download
+                    <img  src={Doc} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
                 </a>
             );
         }
@@ -203,7 +203,7 @@ export default function ProjectDetailDoc() {
 
                             <Column field="id" header="ID"></Column>
                             <Column field="name" header="Name"></Column>
-                            <Column header="Result File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
+                            <Column header="Template File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
                             <Column field="description" header="Description"></Column>
                             <Column field="type" header="Type"></Column>
                         </DataTable>

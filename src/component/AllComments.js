@@ -55,6 +55,8 @@ export default function AllComments() {
     }
 
 
+
+
     /******************************************************* Delete comment **************************************/
 
     const handleDeleteComment = (id) => {
@@ -166,7 +168,7 @@ export default function AllComments() {
                     outlined
                     severity="danger"
                     style={{ marginRight: '4px', padding: '8px', fontSize: '5px' }}
-                    onClick={() => handleDeleteComment(rowData.id)}  // Change this line
+                    onClick={() => handleDeleteComment(rowData.id)}
                 /> {!rowData.status || rowData.status === 'unread' ? (
                 <Button
                     icon="pi pi-eye"
@@ -174,7 +176,7 @@ export default function AllComments() {
                     outlined
                     severity="success"
                     style={{ marginRight: '4px', padding: '8px', fontSize: '5px' }}
-                    onClick={() => handleMarkAsRead(rowData.id)}  // Change this line
+                    onClick={() => handleMarkAsRead(rowData.id)}
                 /> ) : null}
             </React.Fragment>
         );
@@ -187,6 +189,8 @@ export default function AllComments() {
             <Toast ref={toast} />
             <ConfirmDialog />
 
+
+
             <MainCard>
 
                 <Toolbar className="mb-4"  start={<strong>ALl Comments</strong>} end={rightToolbarTemplate}></Toolbar>
@@ -194,7 +198,7 @@ export default function AllComments() {
                 <DataTable ref={dt} value={comment}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects" globalFilter={globalFilter} header={header}>
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Comments" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="projet" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '15rem' }}  body={(rowData) => (
                         <Link
@@ -202,19 +206,17 @@ export default function AllComments() {
                             to={rowData.projet.result ? `project_detailsDoc/${rowData.projet.id}` : `project_details/${rowData.projet.id}`}
                         >
                             {rowData.projet.name}
-                        </Link>)}></Column>
-
+                        </Link>)}>
+                    </Column>
                     <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
-                    <Column field="commentDate" header="Comment_Date" filter sortable sortField="commentDate"      body={(rowData) => formatDateTime(rowData.commentDate)} style={{ minWidth: "15rem" }}></Column>
-                    <Column field="note" header="Comment" filter sortable style={{ minWidth: '18rem' }} ></Column>
-                    <Column field="status" header="Status" filter sortable  body={statusBodyTemplate} style={{ minWidth: '10rem' }} ></Column>
-                    <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
+                    <Column field="commentDate" header="Comment_Date" filter sortable sortField="commentDate"      body={(rowData) => formatDateTime(rowData.commentDate)} style={{ minWidth: "12rem" }}></Column>
+                    <Column field="note" header="Comment" filter sortable style={{ minWidth: '15rem' }} ></Column>
+                    <Column field="status" header="Status" filter sortable  body={statusBodyTemplate} style={{ minWidth: '5rem' }} ></Column>
+                    <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '10rem' }}></Column>
                 </DataTable>
                 ) : (
                     <PopularCart/>
                 )}
-
-
 
             </MainCard>
 
