@@ -11,6 +11,25 @@
 .show-comments-button.active + .guidance-circle {
     display: none;
 }
+/* Add this CSS in your stylesheet or style block */
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.unread-comment-count-top-right {
+    position: absolute;
+    top: -8px; /* Adjust this value as needed */
+    right: 20px; /* Adjust this value as needed */
+    background-color: red; /* Adjust background color as needed */
+    color: white;
+    padding: 1px 7px;
+    border-radius: 50%;
+
+}
+
+
 
 .guidance-circle {
     width: 20px;

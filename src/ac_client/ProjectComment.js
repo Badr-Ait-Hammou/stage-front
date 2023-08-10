@@ -9,11 +9,11 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {Dialog} from "primereact/dialog";
 import {InputTextarea} from "primereact/inputtextarea";
-import { Rating } from "primereact/rating";
 import {Button} from "primereact/button";
 import Card from '@mui/material/Card';
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import { Tag } from 'primereact/tag';
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 export default function ProjectComment() {
     const [project, setProject] = useState([]);
@@ -60,7 +60,7 @@ export default function ProjectComment() {
 
         axios.post("http://localhost:8080/api/comment/save", {
             note,
-            rate,
+            rate ,
             status:"unread",
             projet:{
                 id: project.id
@@ -201,7 +201,7 @@ export default function ProjectComment() {
 
     const header = (
         <div className="mt-2 mb-2">
-            <span className="text-xl text-900 font-bold">{project.name} Comment</span>
+            <span className="text-xl text-900 font-bold">{project.name} Comments</span>
         </div>
     );
     const footer = (
@@ -234,13 +234,32 @@ export default function ProjectComment() {
     const editcommentDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideeditDialog} />
-            <Button  label="save"
+            <Button  label="Update"
                      severity="success"
                      raised onClick={(e) => handleEdit(e)}/>
         </React.Fragment>
     );
 
 
+
+    const resultFileBodyTemplate = () => {
+        if (project.result && project.result.file) {
+            return (
+                <a href={project.result.file} download>
+                    <FileDownloadIcon /> Download
+                </a>
+            );
+        }
+        return null;
+    };
+    const footer2 = (
+        <div >
+            <p>
+                In total there is 1 Template on the{" "}
+                {project.name} project.
+            </p>
+        </div>
+    );
 
 
 
@@ -250,18 +269,34 @@ export default function ProjectComment() {
             <Toast ref={toast} />
             <ConfirmDialog />
 
-            <MainCard>
-                <div className="card">
-                    <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
-                    <div style={{borderRadius: '10px', overflow: 'hidden'}}>
-                        <DataTable value={project.images} footer={footer} tableStyle={{minWidth: '30rem'}}>
-                            <Column field="id" sortable header="ID"></Column>
-                            <Column header="Images" body={imageBodyTemplate}></Column>
-                            <Column field="name" sortable filter header="Name"></Column>
-                        </DataTable>
+            {project.result ? (
+                <MainCard>
+                    <div className="card">
+                        <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
+                        <div style={{borderRadius: '10px', overflow: 'hidden'}}>
+                            <DataTable value={[project.result]} footer={footer2} tableStyle={{minWidth: '30rem'}}>
+                                <Column field="id" sortable header="ID"></Column>
+                                <Column header="Result File" body={resultFileBodyTemplate}></Column>
+                                <Column field="name" sortable filter header="Name"></Column>
+                            </DataTable>
+                        </div>
                     </div>
-                </div>
-            </MainCard>
+                </MainCard>
+            ) : (
+                <MainCard>
+                    <div className="card">
+                        <Toolbar className="mb-2" end={leftToolbarTemplate} start={header}/>
+                        <div style={{borderRadius: '10px', overflow: 'hidden'}}>
+                            <DataTable value={project.images} footer={footer} tableStyle={{minWidth: '30rem'}}>
+                                <Column field="id" sortable header="ID"></Column>
+                                <Column header="Images" body={imageBodyTemplate}></Column>
+                                <Column field="name" sortable filter header="Name"></Column>
+                            </DataTable>
+                        </div>
+                    </div>
+                </MainCard>
+            )}
+
 
             <MainCard className="mt-5" title="Comments">
                 <div>
@@ -284,13 +319,13 @@ export default function ProjectComment() {
                                 {comment.status === 'unread' && (
                                     <Tag value="Unread" severity="warning"></Tag>
                                 )}
-                                <Rating
+                                {/*<Rating
                                     value={comment.rate}
                                     readOnly
                                     cancel={false}
                                     style={{ fontSize: '18px', marginTop: '10px' }}
-                                />
-                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                                />*/}
+                                <p style={{ fontSize: '25px', marginTop: '15px' }}>{comment.note}</p>
                                 <p style={{ fontSize: '15px', marginTop: '10px' }}>
                                     {formatDateTime(comment.commentDate)}
                                 </p>
@@ -334,9 +369,9 @@ export default function ProjectComment() {
                      footer={commentDialogFooter}
                      onHide={hideDialog}
             >
-                <div className="card flex justify-content-center">
+                {/* <div className="card flex justify-content-center">
                     <Rating value={rate} onChange={(e) => setRating(e.value)} cancel={false} />
-                </div>
+                </div>*/}
                 <div className="field mt-2">
                     <label htmlFor="newcmt" className="font-bold">
                         Note
@@ -348,15 +383,15 @@ export default function ProjectComment() {
             <Dialog  visible={editCommentDialog}
                      style={{ width: '40rem' }}
                      breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                     header="Add Comment"
+                     header="Edit Comment"
                      modal
                      className="p-fluid"
                      footer={editcommentDialogFooter}
                      onHide={hideeditDialog}
             >
-                <div className="card flex justify-content-center">
+                {/*<div className="card flex justify-content-center">
                     <Rating value={rate} onChange={(e) => setRating(e.value)} cancel={false} />
-                </div>
+                </div>*/}
                 <div className="field mt-2">
                     <label htmlFor="newcmt" className="font-bold">
                         Note

@@ -12,8 +12,9 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
+import Doc from "../assets/images/doc.png";
 
-export default function ProjectDetails() {
+export default function ProjectDetailDoc() {
     const [project, setProject] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 3;
@@ -36,9 +37,7 @@ export default function ProjectDetails() {
     }
 
 
-    const imageBodyTemplate = (photo) => {
-        return <img className=" image-item-small " src={photo.photo} alt={photo.name}/>
-    };
+
 
     const header = (
         <div className="mt-2 mb-2">
@@ -48,9 +47,7 @@ export default function ProjectDetails() {
     const footer = (
         <div >
             <p>
-                In total there {project.images && project.images.length === 1 ? "is" : "are"}{" "}
-                {project.images ? project.images.length : 0}{" "}
-                {project.images && project.images.length === 1 ? "image" : "images"} on the{" "}
+                In total there is 1 Template on the{" "}
                 {project.name} project.
             </p>
         </div>
@@ -182,22 +179,37 @@ export default function ProjectDetails() {
     };
 
 
+
+    const resultFileBodyTemplate = () => {
+        if (project.result && project.result.file) {
+            return (
+                <a href={project.result.file} download>
+                    <img  src={Doc} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
+                </a>
+            );
+        }
+        return null;
+    };
+
     return (
         <>
             <Toast ref={toast} />
             <ConfirmDialog />
-        <MainCard>
-            <div className="card">
-                <Toolbar className="mb-2"  center={header}/>
-                <div style={{ borderRadius: '10px', overflow: 'hidden' }}>
-                    <DataTable value={project.images} footer={footer} tableStyle={{ minWidth: '30rem' }}>
-                        <Column field="id" sortable  header="ID"></Column>
-                        <Column header="Images" body={imageBodyTemplate}></Column>
-                        <Column field="name" sortable filter header="Name" ></Column>
-                    </DataTable>
+            <MainCard>
+                <div className="card">
+                    <Toolbar className="mb-2"  center={header}/>
+                    <div style={{ borderRadius: '10px', overflow: 'hidden' }}>
+                        <DataTable value={[project.result]} footer={footer} tableStyle={{ minWidth: '30rem' }}>
+
+                            <Column field="id" header="ID"></Column>
+                            <Column field="name" header="Name"></Column>
+                            <Column header="Template File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
+                            <Column field="description" header="Description"></Column>
+                            <Column field="type" header="Type"></Column>
+                        </DataTable>
+                    </div>
                 </div>
-                </div>
-        </MainCard>
+            </MainCard>
 
             <MainCard className="mt-5" title="Comments">
                 {project.commentList.length > 0 ? (

@@ -15,7 +15,7 @@ import {Toast} from "primereact/toast";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {useRef} from "react";
 import {Toolbar} from "primereact/toolbar";
-export default function TemplateDetails() {
+export default function TemplateDetailsExcel() {
     const { id } = useParams();
     const [result, setResult] = useState(null);
     const [name, setName] = useState('');
@@ -220,9 +220,9 @@ export default function TemplateDetails() {
 
             <Toast ref={toast}/>
             <ConfirmDialog/>
-            <MainCard title={`Template Details -- ${name}`}>
+            <MainCard title={`Template Details Excel -- ${name}`}>
 
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} className="mb-10" >
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} >
                     <Box  style={{width: '45rem'}} header="Create Template"  className="p-fluid mt-3" >
                         {result ? (
                             <React.Fragment>
@@ -293,7 +293,18 @@ export default function TemplateDetails() {
                                                    onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20}/>
                                 </Box>
 
-
+                                <Box className="field mt-5 mb-5" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+                                    <Button label="Update"
+                                            severity="success"
+                                            outlined
+                                            style={{ flex: 1, maxWidth: '150px' }}
+                                            onClick={(e) => handleEdit(e)} />
+                                    <Button label="Delete"
+                                            severity="danger"
+                                            outlined
+                                            style={{ flex: 1, maxWidth: '150px' }}
+                                            onClick={() => handleDelete(result.id)} />
+                                </Box>
 
                             </React.Fragment>
                         ) : (
@@ -307,11 +318,15 @@ export default function TemplateDetails() {
                         )}
                     </Box>
                 </div>
+            </MainCard>
 
+            <div className="mt-5" >
 
-                    <div className="mt-10" >
+                <MainCard title="Manage Fields">
 
-                        <Toolbar className="mb-4 mt-10" start="Fields" end={<Button label="Add New" outlined  onClick={addNewCard} className="p-button-primary" />}></Toolbar>
+                    <div  >
+
+                        <Toolbar className="mb-4" start="Fields" end={<Button label="Add New" outlined  onClick={addNewCard} className="p-button-primary" />}></Toolbar>
 
                         {[...cards, ...fields].map(item => (
 
@@ -363,23 +378,15 @@ export default function TemplateDetails() {
                             </Box>
                         ))}
 
+                        <Box className="field mt-5 mb-2" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
 
-                        <Box className="field mt-7 mb-5" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-                            <Button label="Update"
-                                    severity="success"
-                                    outlined
-                                    style={{ flex: 1, maxWidth: '150px' }}
-                                    onClick={(e) => handleEdit(e)} />
-                            <Button label="Delete"
-                                    severity="danger"
-                                    outlined
-                                    style={{ flex: 1, maxWidth: '150px' }}
-                                    onClick={() => handleDelete(result.id)} />
-                            <Button severity="success" raised label="Create All Fields" onClick={handleSubmitAll} className="p-button-primary"  />
+                            <Button severity="success" raised label="Create All" onClick={handleSubmitAll} className="p-button-primary"  />
+
 
                         </Box>
                     </div>
                 </MainCard>
+            </div>
 
 
         </>

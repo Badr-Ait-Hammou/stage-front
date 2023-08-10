@@ -31,6 +31,8 @@ import ProjectClient from "../ac_client/ProjectsPage"
 import ProjectComment from "../ac_client/ProjectComment"
 import AllComments from "../component/AllComments"
 import TempDetails from "../component/TemplateDetails"
+import TempDetailsExcel from "../component/TemplateDetailsExcel"
+import ProjectDetailsDoc from "../component/ProjectDetailDoc"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -96,6 +98,11 @@ const MainRoutes = {
       element: <TempDetails />
     },
     {
+      path: 'template/template_detailsExcel/:id',
+      element: <TempDetailsExcel />
+    },
+
+    {
       path: 'client_projects/Imagedetail/:id',
       element: <ImageDetail />
     },
@@ -114,6 +121,18 @@ const MainRoutes = {
     {
       path: 'projects/project_details/:id',
       element: <ProjectDetails />
+    },
+    {
+      path: 'all_comments/project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'all_comments/project_details/:id',
+      element: <ProjectDetails />
+    },
+    {
+      path: 'projects/project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
     },
     {
       path: 'projects',
