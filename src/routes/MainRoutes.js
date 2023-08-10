@@ -101,6 +101,7 @@ const MainRoutes = {
       path: 'template/template_detailsExcel/:id',
       element: <TempDetailsExcel />
     },
+
     {
       path: 'client_projects/Imagedetail/:id',
       element: <ImageDetail />
@@ -119,6 +120,14 @@ const MainRoutes = {
     },
     {
       path: 'projects/project_details/:id',
+      element: <ProjectDetails />
+    },
+    {
+      path: 'all_comments/project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'all_comments/project_details/:id',
       element: <ProjectDetails />
     },
     {

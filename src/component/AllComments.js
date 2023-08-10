@@ -1,11 +1,11 @@
 import React, {useState, useEffect,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import axios from "axios";
-import {Panel} from "primereact/panel";
+import NoImg from "../assets/images/nopic.png"
+import NoFile from "../assets/images/nofile.png"
 import {Grid} from "@mui/material";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
-import EmptyImg from "../assets/images/empty.png";
 import Card from "@mui/material/Card";
 import {Rating} from "primereact/rating";
 import {Button} from 'primereact/button';
@@ -14,12 +14,15 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import { Tag } from 'primereact/tag';
 import { Paginator } from 'primereact/paginator';
+import {Link} from "react-router-dom";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import {InputText} from "primereact/inputtext";
 
 export default function AllComments() {
-    const [users, setUsers] = useState([]);
+    const [project, setProjects] = useState([]);
     const [selectedProjectComments, setSelectedProjectComments] = useState([]);
     const [selectedPageComments, setSelectedPageComments] = useState([]);
-
+    const [globalFilter, setGlobalFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 2;
     const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -28,12 +31,14 @@ export default function AllComments() {
 
 
     useEffect(() => {
-        loadComments();
+        loadProjects();
     }, []);
 
-    const loadComments = async () => {
-        const res = await axios.get("http://localhost:8080/api/users/role/CLIENT");
-        setUsers(res.data);
+
+
+    const loadProjects = async () => {
+        const res = await axios.get("http://localhost:8080/api/projet/role/CLIENT");
+        setProjects(res.data);
     };
 
     const photoBodyTemplate = (rowData) => {
@@ -57,7 +62,7 @@ export default function AllComments() {
                 </div>
             );
         } else {
-            return <img src={EmptyImg} alt="No" style={{width: '30px', height: 'auto'}}/>;
+            return <img src={NoImg} alt="No" style={{width: '30px', height: 'auto'}}/>;
         }
     };
 
@@ -155,151 +160,169 @@ export default function AllComments() {
     };
 
 
+
+    const resultFileBodyTemplate = (rowData) => {
+        if (rowData.result && rowData.result.file) {
+            return (
+                <a href={rowData.result.file} download>
+                    <FileDownloadIcon /> Download
+                </a>
+            );
+        } else {
+            return <img src={NoFile} alt="NoFile" style={{width: '30px', height: 'auto'}}/>;
+
+        }
+    };
+
+
+    const header = (
+        <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
+            </span>
+        </div>
+    );
+
+
+
+
     return (
         <>
             <Toast ref={toast} />
             <ConfirmDialog />
-            <MainCard title="All Comments">
-                <Card
-                    className="mt-5"
-                    style={{
-                        backgroundColor: "rgba(252,240,38,0.51)",
-                        padding: "20px",
-                        borderRadius: "10px",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                        position: "relative",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        textAlign: "center"
-                    }}
-                >
-                    <strong>TO SHOW EACH PROJECT COMMENTS CLICK ON THE BUTTON BELOW</strong>
-                </Card>
-                {users.map((user) => (
-                    <Panel key={user.id} header={`UserName: ${user.firstName}`} toggleable collapsed={true}
-                           className="mt-5">
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <div style={{borderRadius: "10px", overflow: "hidden"}}>
-                                    <DataTable ref={dt} value={user.projetList} tableStyle={{height: "5rem"}}>
-                                        <Column field="id" sortable header="ID"></Column>
-                                        <Column field="name" sortable filter header="Project Name"></Column>
-                                        <Column header="Images" body={photoBodyTemplate}></Column>
-                                        <Column
-                                            header="Comments"
-                                            body={(rowData) => (
-                                                <div className="button-container">
-                                                    <Button
-                                                        onClick={() => handleProjectClick(rowData.id)}
-                                                        className={`show-comments-button ${selectedProjectId === rowData.id ? 'active' : ''}`}
-                                                    >
-                                                        {selectedProjectId === rowData.id ? "Hide " : "Show "}
-                                                    </Button>
-                                                    <div className="guidance-circle"></div>
-                                                </div>
-                                            )}
-                                        ></Column>
 
-                                    </DataTable>
-                                </div>
-                            </Grid>
-                            <Grid item xs={12} className="mt-5" >
+            <MainCard>
 
-                                <strong>Comments:</strong>
-                                {user.projetList.map((project) => (
-                                    <React.Fragment key={project.id}>
-                                        {selectedProjectId === project.id && (
-                                            <div>
-                                                {selectedPageComments.length === 0 ? (
-                                                    <Card
-                                                        className="mt-5"
-                                                        style={{
-                                                            backgroundColor: "rgba(252,67,67,0.18)",
-                                                            padding: "20px",
-                                                            borderRadius: "10px",
-                                                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                                                            position: "relative",
-                                                        }}
-                                                    >     <strong>No comments available for this project.</strong>
-                                                    </Card>
-                                                ) : (
-                                                    selectedPageComments.map((comment) => (
+                <DataTable ref={dt} value={project}
+                           dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} image projects" globalFilter={globalFilter} header={header}>
+                    <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
+                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
+                        <Link
+                            className="font-bold"
+                            to={rowData.images && rowData.images.length > 0  ? `project_details/${rowData.id}` : `project_detailsDoc/${rowData.id}`}
+                        >   {rowData.name}
+                        </Link>)}></Column>
 
-                                                        <Card
-                                                            key={comment.id}
-                                                            className="mt-5"
-                                                            style={{
-                                                                backgroundColor: "rgb(236,230,245)",
-                                                                padding: "20px",
-                                                                borderRadius: "10px",
-                                                                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                                                                position: "relative",
-                                                            }}
-                                                        >
-                                                        {comment.status === 'read' && (
-                                                            <Tag value="You Read This" severity="success"></Tag>
-                                                        )}
-                                                        {comment.status === 'unread' && (
-                                                            <Tag value="confirm reading comment" severity="warning"></Tag>
-                                                        )}
-                                                        <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
-                                                        <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
-                                                        <p style={{ fontSize: '15px', marginTop: '10px' }}>
-                                                            {formatDateTime(comment.commentDate)}
-                                                        </p>
-                                                        <div
-                                                            style={{
-                                                                position: 'absolute',
-                                                                top: '10px',
-                                                                right: '10px',
-                                                                display: 'flex',
-                                                            }}
-                                                        >
+                    <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
+                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
+                    <Column field="result.file" header="file" body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
+                    <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
+                    <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
+                    <Column
+                        header="Comments"
+                        body={(rowData) => (
+                            <div className="button-container">
+                                <Button style={{alignItems:"center",justifyContent:"center"}}
+                                    onClick={() => handleProjectClick(rowData.id)}
+                                    className={`show-comments-button  ${selectedProjectId === rowData.id ? 'active' : ''}`}
+                                >
+                                    {selectedProjectId === rowData.id ? "Hide " : "Show "}
+                                </Button>
+                                <div className="guidance-circle"></div>
+                            </div>
+                        )}
+                    ></Column>
+                </DataTable>
 
-                                                            <Button
-                                                                icon="pi pi-trash"
-                                                                rounded
-                                                                outlined
-                                                                severity="danger"
-                                                                style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
-                                                                onClick={() => handleDeleteComment(comment.id)}
-                                                            /> {!comment.status || comment.status === 'unread' ? (
-                                                            <Button
-                                                                icon="pi pi-eye"
-                                                                rounded
-                                                                outlined
-                                                                severity="success"
-                                                                style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
-                                                                onClick={() => handleMarkAsRead(comment.id)}
-                                                            />
-                                                        ) : null}
-                                                        </div>
-                                                        </Card>
-                                                    ))
+                <Grid item xs={12} className="mt-5" >
+
+                    <strong>Comments:</strong>
+                    {project.map((project) => (
+                        <React.Fragment key={project.id}>
+                            {selectedProjectId === project.id && (
+                                <div>
+                                    {selectedPageComments.length === 0 ? (
+                                        <Card
+                                            className="mt-5"
+                                            style={{
+                                                backgroundColor: "rgba(252,67,67,0.18)",
+                                                padding: "20px",
+                                                borderRadius: "10px",
+                                                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                                                position: "relative",
+                                            }}
+                                        >     <strong>No comments available for this project.</strong>
+                                        </Card>
+                                    ) : (
+                                        selectedPageComments.map((comment) => (
+
+                                            <Card
+                                                key={comment.id}
+                                                className="mt-5"
+                                                style={{
+                                                    backgroundColor: "rgb(236,230,245)",
+                                                    padding: "20px",
+                                                    borderRadius: "10px",
+                                                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                                                    position: "relative",
+                                                }}
+                                            >
+                                                {comment.status === 'read' && (
+                                                    <Tag value="You Read This" severity="success"></Tag>
                                                 )}
-                                                <div className="mt-3">
-                                                    <Paginator
-                                                        first={currentPage * cardsPerPage}
-                                                        rows={cardsPerPage}
-                                                        totalRecords={selectedProjectComments.length}
-                                                        onPageChange={(e) => {
-                                                            setCurrentPage(e.page);
-                                                            setSelectedPageComments(
-                                                                selectedProjectComments.slice(e.first, e.first + e.rows)
-                                                            );
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </React.Fragment>
-                                ))}
+                                                {comment.status === 'unread' && (
+                                                    <Tag value="confirm reading comment" severity="warning"></Tag>
+                                                )}
+                                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
+                                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                                                <p style={{ fontSize: '15px', marginTop: '10px' }}>
+                                                    {formatDateTime(comment.commentDate)}
+                                                </p>
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '10px',
+                                                        right: '10px',
+                                                        display: 'flex',
+                                                    }}
+                                                >
 
-                            </Grid>
-                        </Grid>
-                    </Panel>
-                ))}
+                                                    <Button
+                                                        icon="pi pi-trash"
+                                                        rounded
+                                                        outlined
+                                                        severity="danger"
+                                                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                                                        onClick={() => handleDeleteComment(comment.id)}
+                                                    /> {!comment.status || comment.status === 'unread' ? (
+                                                    <Button
+                                                        icon="pi pi-eye"
+                                                        rounded
+                                                        outlined
+                                                        severity="success"
+                                                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                                                        onClick={() => handleMarkAsRead(comment.id)}
+                                                    />
+                                                ) : null}
+                                                </div>
+                                            </Card>
+                                        ))
+                                    )}
+                                    <div className="mt-3">
+                                        <Paginator
+                                            first={currentPage * cardsPerPage}
+                                            rows={cardsPerPage}
+                                            totalRecords={selectedProjectComments.length}
+                                            onPageChange={(e) => {
+                                                setCurrentPage(e.page);
+                                                setSelectedPageComments(
+                                                    selectedProjectComments.slice(e.first, e.first + e.rows)
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+
+                </Grid>
+
             </MainCard>
+
         </>
     );
 }
