@@ -320,8 +320,9 @@ export default function Template() {
                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Templates" globalFilter={globalFilter} header={header}>
                             <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                             <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                                <Link className="font-bold" to={`template_details/${rowData.id}`}>{rowData.name}</Link>
-                            )}></Column>
+                                <Link className="font-bold" to={rowData.type === 'excel' ? `template_detailsExcel/${rowData.id}` : `template_details/${rowData.id}`}>
+                                    {rowData.name}
+                                </Link>                            )}></Column>
                             <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                             <Column field="type" header="Type" sortable style={{ minWidth: '10em' }}></Column>
                             <Column field="file" header="file" body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
