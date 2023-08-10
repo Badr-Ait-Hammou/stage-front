@@ -9,7 +9,6 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {Dialog} from "primereact/dialog";
 import {InputTextarea} from "primereact/inputtextarea";
-import { Rating } from "primereact/rating";
 import {Button} from "primereact/button";
 import Card from '@mui/material/Card';
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
@@ -61,7 +60,7 @@ export default function ProjectComment() {
 
         axios.post("http://localhost:8080/api/comment/save", {
             note,
-            rate,
+            rate ,
             status:"unread",
             projet:{
                 id: project.id
@@ -235,7 +234,7 @@ export default function ProjectComment() {
     const editcommentDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideeditDialog} />
-            <Button  label="save"
+            <Button  label="Update"
                      severity="success"
                      raised onClick={(e) => handleEdit(e)}/>
         </React.Fragment>
@@ -320,13 +319,13 @@ export default function ProjectComment() {
                                 {comment.status === 'unread' && (
                                     <Tag value="Unread" severity="warning"></Tag>
                                 )}
-                                <Rating
+                                {/*<Rating
                                     value={comment.rate}
                                     readOnly
                                     cancel={false}
                                     style={{ fontSize: '18px', marginTop: '10px' }}
-                                />
-                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                                />*/}
+                                <p style={{ fontSize: '25px', marginTop: '15px' }}>{comment.note}</p>
                                 <p style={{ fontSize: '15px', marginTop: '10px' }}>
                                     {formatDateTime(comment.commentDate)}
                                 </p>
@@ -370,9 +369,9 @@ export default function ProjectComment() {
                      footer={commentDialogFooter}
                      onHide={hideDialog}
             >
-                <div className="card flex justify-content-center">
+                {/* <div className="card flex justify-content-center">
                     <Rating value={rate} onChange={(e) => setRating(e.value)} cancel={false} />
-                </div>
+                </div>*/}
                 <div className="field mt-2">
                     <label htmlFor="newcmt" className="font-bold">
                         Note
@@ -384,15 +383,15 @@ export default function ProjectComment() {
             <Dialog  visible={editCommentDialog}
                      style={{ width: '40rem' }}
                      breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                     header="Add Comment"
+                     header="Edit Comment"
                      modal
                      className="p-fluid"
                      footer={editcommentDialogFooter}
                      onHide={hideeditDialog}
             >
-                <div className="card flex justify-content-center">
+                {/*<div className="card flex justify-content-center">
                     <Rating value={rate} onChange={(e) => setRating(e.value)} cancel={false} />
-                </div>
+                </div>*/}
                 <div className="field mt-2">
                     <label htmlFor="newcmt" className="font-bold">
                         Note

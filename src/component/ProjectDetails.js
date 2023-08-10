@@ -7,7 +7,6 @@ import {useParams} from "react-router-dom";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import Card from "@mui/material/Card";
-import {Rating} from "primereact/rating";
 import {Button} from "primereact/button";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
@@ -86,7 +85,7 @@ export default function ProjectDetails() {
                 {comment.status === 'unread' && (
                     <Tag value="confirm reading comment" severity="warning"></Tag>
                 )}
-                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
+                {/*<Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />*/}
                 <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
                 <p style={{ fontSize: '15px', marginTop: '10px' }}>
                     {formatDateTime(comment.commentDate)}

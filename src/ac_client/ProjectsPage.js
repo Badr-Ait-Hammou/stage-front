@@ -93,7 +93,7 @@ export default function ProjectPage() {
                         <DataTable value={client.projetList.filter(project => project.images && project.images.length > 0)} ref={dt}
                                    dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image Projects" globalFilter={globalFilter} header={header}>
                             <Column field="name" header="Project Name" sortable filter filterPlaceholder="Search Name ..."  style={{ minWidth: '10rem' }}  body={(rowData) => (
                                 <Link className="font-bold" to={`project_comment/${rowData.id}`}>{rowData.name}</Link>
                             )}></Column>
@@ -117,7 +117,7 @@ export default function ProjectPage() {
 
                         <DataTable value={client.projetList.filter(project => project.result)} tableStyle={{ minWidth: '30rem' }}  dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Template Projects" globalFilter={globalFilter} header={header}>
                             <Column field="name" header="Project Name" sortable filter style={{ minWidth: '10rem' }} body={(rowData) => (
                                 <Link className="font-bold" to={`project_comment/${rowData.id}`}>{rowData.name}</Link>
                             )}></Column>

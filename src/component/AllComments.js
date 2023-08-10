@@ -7,7 +7,6 @@ import {Grid} from "@mui/material";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import Card from "@mui/material/Card";
-import {Rating} from "primereact/rating";
 import {Button} from 'primereact/button';
 import "../style/buttonGuide.css"
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
@@ -17,6 +16,8 @@ import { Paginator } from 'primereact/paginator';
 import {Link} from "react-router-dom";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import {InputText} from "primereact/inputtext";
+import {Toolbar} from "primereact/toolbar";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
 
 export default function AllComments() {
     const [project, setProjects] = useState([]);
@@ -26,13 +27,31 @@ export default function AllComments() {
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 2;
     const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [projectUnreadCounts, setProjectUnreadCounts] = useState({});
     const toast = useRef(null);
     const dt = useRef(null);
+    const [dataTableLoaded, setDataTableLoaded] = useState(false);
+
+    const handleDataTableLoad = () => {
+        setDataTableLoaded(true);
+    };
 
 
     useEffect(() => {
         loadProjects();
+        handleDataTableLoad();
+
     }, []);
+
+    useEffect(() => {
+        if (selectedProjectId && selectedProjectComments.length > 0) {
+            const unreadCount = selectedProjectComments.filter(comment => comment.status === 'unread').length;
+            setProjectUnreadCounts(prevCounts => ({
+                ...prevCounts,
+                [selectedProjectId]: unreadCount
+            }));
+        }
+    }, [selectedProjectComments]);
 
 
 
@@ -66,6 +85,25 @@ export default function AllComments() {
         }
     };
 
+    useEffect(() => {
+        const loadProjectsAndUnreadCounts = async () => {
+            try {
+                const res = await axios.get("http://localhost:8080/api/projet/role/CLIENT");
+                setProjects(res.data);
+
+                const unreadCounts = {};
+                res.data.forEach((project) => {
+                    unreadCounts[project.id] = project.commentList.filter(comment => comment.status === 'unread').length;
+                });
+                setProjectUnreadCounts(unreadCounts);
+            } catch (error) {
+                console.error("Failed to load projects: ", error);
+            }
+        };
+
+        loadProjectsAndUnreadCounts();
+    }, []);
+
     const handleProjectClick = async (projectId) => {
         try {
             if (selectedProjectId === projectId) {
@@ -74,14 +112,15 @@ export default function AllComments() {
             } else {
                 const res = await axios.get(`http://localhost:8080/api/comment/projet/${projectId}`);
                 setSelectedProjectComments(res.data);
-                setSelectedPageComments(res.data.slice(0, cardsPerPage)); // Set comments for the current page
+                setSelectedPageComments(res.data.slice(0, cardsPerPage));
                 setSelectedProjectId(projectId);
-                setCurrentPage(0); // Reset the current page to 0
+                setCurrentPage(0);
             }
         } catch (error) {
             console.error("Failed to load comments for the project with ID: ", projectId);
         }
     };
+
 
     function formatDateTime(dateTime) {
         const dateObj = new Date(dateTime);
@@ -141,6 +180,11 @@ export default function AllComments() {
                 const updatedComments = selectedProjectComments.map((comment) =>
                     comment.id === commentId ? { ...comment, status: "read" } : comment
                 );
+
+                setProjectUnreadCounts(prevCounts => ({
+                    ...prevCounts,
+                    [selectedProjectId]: Math.max(0, prevCounts[selectedProjectId] - 1)
+                }));
                 setSelectedProjectComments(updatedComments);
 
                 setSelectedPageComments(prevComments =>
@@ -158,6 +202,7 @@ export default function AllComments() {
                 console.error(error);
             });
     };
+
 
 
 
@@ -185,6 +230,31 @@ export default function AllComments() {
     );
 
 
+    const CommentsColumnContent = ({ rowData, handleProjectClick, selectedProjectId, unreadCount }) => {
+        return (
+            <div className="button-container">
+                <Button
+                    style={{ alignItems: "center", justifyContent: "center", position: "relative" }}
+                    onClick={() => handleProjectClick(rowData.id)}
+                    className={`show-comments-button  ${selectedProjectId === rowData.id ? 'active' : ''}`}
+                >
+                    {selectedProjectId === rowData.id ? "Hide" : "Show"}
+                </Button>
+                {unreadCount > 0 && (
+                    <span className="unread-comment-count-top-right">{unreadCount}</span>
+                )}
+            </div>
+        );
+    };
+
+    const rightToolbarTemplate = () => {
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    };
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+
+
 
 
     return (
@@ -194,38 +264,40 @@ export default function AllComments() {
 
             <MainCard>
 
+                <Toolbar className="mb-4"  start={<strong>ALl Comments</strong>} end={rightToolbarTemplate}></Toolbar>
+                {dataTableLoaded ? (
                 <DataTable ref={dt} value={project}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} image projects" globalFilter={globalFilter} header={header}>
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
+                    <Column field="name" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
                         <Link
                             className="font-bold"
                             to={rowData.images && rowData.images.length > 0  ? `project_details/${rowData.id}` : `project_detailsDoc/${rowData.id}`}
                         >   {rowData.name}
                         </Link>)}></Column>
 
+                    <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
                     <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
-                    <Column field="result.file" header="file" body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
-                    <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
+                    <Column field="result.file" header="file" filter body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
                     <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
                     <Column
                         header="Comments"
                         body={(rowData) => (
-                            <div className="button-container">
-                                <Button style={{alignItems:"center",justifyContent:"center"}}
-                                    onClick={() => handleProjectClick(rowData.id)}
-                                    className={`show-comments-button  ${selectedProjectId === rowData.id ? 'active' : ''}`}
-                                >
-                                    {selectedProjectId === rowData.id ? "Hide " : "Show "}
-                                </Button>
-                                <div className="guidance-circle"></div>
-                            </div>
+                            <CommentsColumnContent
+                                rowData={rowData}
+                                handleProjectClick={handleProjectClick}
+                                selectedProjectId={selectedProjectId}
+                                unreadCount={projectUnreadCounts[rowData.id] || 0}
+                            />
                         )}
-                    ></Column>
+                    />
                 </DataTable>
+                ) : (
+                    <PopularCart/>
+                )}
 
                 <Grid item xs={12} className="mt-5" >
 
@@ -266,7 +338,7 @@ export default function AllComments() {
                                                 {comment.status === 'unread' && (
                                                     <Tag value="confirm reading comment" severity="warning"></Tag>
                                                 )}
-                                                <Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />
+                                                {/*<Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />*/}
                                                 <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
                                                 <p style={{ fontSize: '15px', marginTop: '10px' }}>
                                                     {formatDateTime(comment.commentDate)}

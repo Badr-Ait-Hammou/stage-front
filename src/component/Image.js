@@ -399,7 +399,7 @@ export default function Image() {
                     <DataTable ref={dt} value={image}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}>
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter} header={header}>
                     <Column field="id"  header="ID" sortable style={{ minWidth: '7rem' }}></Column>
                     <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
                     <Column field="name" filter filterPlaceholder="Search Name ..." header="Name" sortable style={{ minWidth: '7rem' }}></Column>
