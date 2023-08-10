@@ -14,37 +14,35 @@ export default function ExcelFile() {
 
 
   const handleFileUpload = (event) => {
-    console.log("handleFileUpload function called");
-    const file = event.target?.files[0];
-    if(file){
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
 
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        const parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        if (parsedData.length > 0) {
+          const [headerRow, ...dataRows] = parsedData;
+          setHeaders(headerRow);
+          setTableData(dataRows);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
     }
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-
-      const parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      if (parsedData.length > 0) {
-        const [headerRow, ...dataRows] = parsedData;
-        setHeaders(headerRow);
-        setTableData(dataRows);
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
   };
+
 
   const rightToolbarTemplate = () => {
     return (
       <div className="p-fileupload p-component">
         <span className="p-button p-fileupload-choose">
-          <form>
   <FileUpload
     className="mt-2"
     name="photo"
@@ -55,10 +53,8 @@ export default function ExcelFile() {
     chooseLabel="Select File"
     uploadLabel="Upload"
     cancelLabel="Cancel"
-    onSelect={(e) => handleFileUpload(e)}
+    onChange={(e) => handleFileUpload(e)}
   />
-</form>
-
         </span>
       </div>
     );
@@ -80,7 +76,7 @@ export default function ExcelFile() {
         <DataTable
           ref={dt}
           value={tableData}
-          header={headers.map((header, index) => (
+          header={headers?.map((header, index) => (
             <Column key={index} field={header} header={header} />
           ))}
         ></DataTable>
