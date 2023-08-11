@@ -97,16 +97,24 @@ export default function TemplateDetails() {
     };
 
     const handleDelete = (id) => {
-        const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/result/${id}`)
-                .then(() => {
-                    setResult(result.id !== id);
-                    toast.current.show({severity:'success', summary: 'Done', detail:'Template deleted successfully', life: 3000});
-                })
-                .catch((error) => {
-                    console.error('Error deleting project:', error);
-                    toast.current.show({severity:'error', summary: 'Error', detail:'Template Associated with a project or Fields', life: 3000});
-                });
+        const confirmDelete = async () => {
+            try {
+
+                await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)));
+
+
+                await axios.delete(`http://localhost:8080/api/result/${id}`);
+
+
+                setFields([]);
+
+                setResult(null);
+
+                toast.current.show({severity:'success', summary: 'Done', detail:'Template deleted successfully', life: 3000});
+            } catch (error) {
+                console.error('Error deleting template and fields:', error);
+                toast.current.show({severity:'error', summary: 'Error', detail:'Error deleting template and fields', life: 3000});
+            }
         };
 
         confirmDialog({
@@ -121,13 +129,14 @@ export default function TemplateDetails() {
     };
 
 
+
     const showuedit = () => {
         toast.current.show({severity: 'info', summary: 'Done', detail: 'item updated successfully', life: 3000});
     }
 
 
 
-    const handlefileChange = (event) => {
+    const handlefileChange = async (event) => {
         const files = event.files;
 
         if (files && files.length > 0) {
@@ -142,23 +151,69 @@ export default function TemplateDetails() {
                 const firstRow = lines[0].split(",");
                 console.log("First Row Attributes:", firstRow);
 
-                //setName("");
-
-                const nonEmptyAttributes = firstRow.filter(attribute => attribute.trim() !== "" && attribute.trim() !== "\"\"");
+                const nonEmptyAttributes = firstRow.filter(
+                    (attribute) => attribute.trim() !== "" && attribute.trim() !== "\"\""
+                );
                 console.log("Non-Empty Attributes:", nonEmptyAttributes);
 
-                setFile(fileContent);
+                try {
+                    // Delete old fields
+                    await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)))
+                        .then(() => {
+                            console.log("Old fields deleted successfully.");
+                        })
+                        .catch((error) => {
+                            console.error("Error deleting old fields:", error);
+                        });
 
-                // Use the first row attributes as field names
-                if (nonEmptyAttributes.length > 0) {
-                    setNamef(nonEmptyAttributes[0]);
+                    if (result) {
+                        // Update existing result
+                        const updatedResult = {
+                            ...result,
+                            file: fileContent, // Update with the new file content
+                        };
+                        await axios.put(`http://localhost:8080/api/result/${id}`, updatedResult);
+                        setResult(updatedResult);
+                    } else {
+                        // Create new result (template)
+                        const newResult = {
+                            id: id,
+                            name: name,
+                            file: fileContent, // Update with the new file content
+                            description: description,
+                            type: "excel",
+                        };
+                        const resultResponse = await axios.post("http://localhost:8080/api/result/save", newResult);
+                        setResult(resultResponse.data);
+                    }
+
+                    // Save new fields
+                    const resultId = result ? result.id : id;
+                    for (const attribute of nonEmptyAttributes) {
+                        const trimmedAttribute = attribute.trim();
+                        const fieldToSave = {
+                            namef: trimmedAttribute.replace(/"/g, ""),
+                            fieldid: trimmedAttribute.replace(/"/g, "").toUpperCase(),
+                            type: "text",
+                            result: { id: resultId },
+                        };
+                        await axios.post("http://localhost:8080/api/field/save", fieldToSave);
+                    }
+
+                    showuedit();
+                    loadResult();
+                    loadFields();
+
+                    console.log("New fields and result saved successfully!");
+                } catch (error) {
+                    console.error("Error while updating result and saving new fields:", error);
                 }
-
-                // You can similarly process other fields if needed
             };
             reader.readAsText(file);
         }
     };
+
+
 
 
 
@@ -223,7 +278,7 @@ export default function TemplateDetails() {
                                             uploadLabel="Upload"
                                             cancelLabel="Cancel"
                                             onSelect={(e) => handlefileChange(e)}
-                                            disabled={true}
+                                            //disabled={true}
                                         />
 
                                     </Box>

@@ -173,7 +173,7 @@ export default function Template() {
                 name,
                 description,
                 type,
-                file: csvDataUrl, // CSV data as data URL
+                file: csvDataUrl,
             });
 
             const resultId = resultResponse.data.id;
@@ -185,7 +185,7 @@ export default function Template() {
                 const trimmedAttribute = attribute.trim(); // Trim whitespace
                 if (trimmedAttribute !== "") {
                     const fieldToSave = {
-                        namef: trimmedAttribute.replace(/"/g, ""), // Remove surrounding double quotes
+                        namef: trimmedAttribute.replace(/"/g, ""),
                         fieldid: trimmedAttribute.replace(/"/g, "").toUpperCase(),
                         type: "text",
                         result: { id: resultId },
@@ -227,12 +227,11 @@ export default function Template() {
 
                 setFile(fileContent);
 
-                // Use the first row attributes as field names
                 if (nonEmptyAttributes.length > 0) {
                     setNamef(nonEmptyAttributes[0]);
                 }
 
-                // You can similarly process other fields if needed
+
             };
             reader.readAsText(file);
         }
