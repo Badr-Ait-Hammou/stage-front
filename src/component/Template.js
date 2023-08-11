@@ -44,6 +44,8 @@ export default function Template() {
     const [selectedResult, setSelectedResult] = useState(null);
     const [globalFilter, setGlobalFilter] = useState(null);
     const navigate = useNavigate();
+    const [namef, setNamef] = useState("");
+
 
 
 
@@ -95,6 +97,7 @@ export default function Template() {
             if(response.data.type ==="doc"){
                 navigate(`/template/template_details/${response.data.id}`);
             }else{
+
                 navigate(`/template/template_detailsExcel/${response.data.id}`);
 
             }
@@ -140,18 +143,101 @@ export default function Template() {
 
 
     const handlefileChange = (event) => {
+
+            const files = event.files;
+
+            if (files && files.length > 0) {
+                const file = files[0];
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    setFile(e.target.result);
+                };
+                reader.readAsDataURL(file);
+
+
+            }
+
+    };
+
+
+
+
+
+
+    const saveAllFieldsWithResult = async () => {
+        try {
+            const csvDataUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(file)}`;
+
+            const resultResponse = await axios.post("http://localhost:8080/api/result/save", {
+                name,
+                description,
+                type,
+                file: csvDataUrl,
+            });
+
+            const resultId = resultResponse.data.id;
+
+            const attributes = file.split("\n")[0].split(",");
+
+
+            for (const attribute of attributes) {
+                const trimmedAttribute = attribute.trim(); // Trim whitespace
+                if (trimmedAttribute !== "") {
+                    const fieldToSave = {
+                        namef: trimmedAttribute.replace(/"/g, ""),
+                        fieldid: trimmedAttribute.replace(/"/g, "").toUpperCase(),
+                        type: "text",
+                        result: { id: resultId },
+                    };
+
+                    await axios.post("http://localhost:8080/api/field/save", fieldToSave);
+                }
+            }
+            showusave();
+
+            navigate(`/template/template_detailsExcel/${resultResponse.data.id}`);
+
+            console.log("Fields and result saved successfully!");
+
+        } catch (error) {
+            console.error("Error while saving fields and result:", error);
+        }
+    };
+
+    const handlefileChange2 = (event) => {
         const files = event.files;
 
         if (files && files.length > 0) {
             const file = files[0];
 
             const reader = new FileReader();
-            reader.onload = (e) => {
-                setFile(e.target.result);
+            reader.onload = async (e) => {
+                const fileContent = e.target.result;
+                console.log("FileReader Output:", fileContent);
+
+                const lines = fileContent.split("\n");
+                const firstRow = lines[0].split(",");
+                console.log("First Row Attributes:", firstRow);
+
+                //setName("");
+
+                const nonEmptyAttributes = firstRow.filter(attribute => attribute.trim() !== "" && attribute.trim() !== "\"\"");
+                console.log("Non-Empty Attributes:", nonEmptyAttributes);
+
+                setFile(fileContent);
+
+                if (nonEmptyAttributes.length > 0) {
+                    setNamef(nonEmptyAttributes[0]);
+                }
+
+
             };
-            reader.readAsDataURL(file);
+            reader.readAsText(file);
         }
     };
+
+
 
 
     /********************************************Load Result *************************/
@@ -243,9 +329,19 @@ export default function Template() {
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
-            <Button label="Create"
-                    severity="success"
-                    raised onClick={(e) => handleSubmit(e)}/>
+            <Button
+                label="Create"
+                severity="success"
+                raised
+                onClick={(e) => {
+                    if (type === 'excel') {
+                        saveAllFieldsWithResult();
+                    } else {
+                        handleSubmit(e);
+                    }
+                }}
+            />
+
         </React.Fragment>
     );
     const resulteditDialogFooter = (
@@ -388,8 +484,13 @@ export default function Template() {
                             chooseLabel="Select File"
                             uploadLabel="Upload"
                             cancelLabel="Cancel"
-                            onSelect={(e) => handlefileChange(e)}
-                        />
+                            onSelect={(e) => {
+                                if (type === 'excel') {
+                                    handlefileChange2(e);
+                                } else {
+                                    handlefileChange(e);
+                                }
+                            }}                        />
 
                     </Box>
                 </Grid>

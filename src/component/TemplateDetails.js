@@ -67,7 +67,7 @@ export default function TemplateDetails() {
                 setName(response.data.name);
                 setType(response.data.type);
                 setDescription(response.data.description);
-                setFile(response.data.file); // Adjust the property name based on your API response
+                setFile(response.data.file);
 
             })
             .catch((error) => {
@@ -100,7 +100,7 @@ export default function TemplateDetails() {
 
         const savePromises = cards.map((card) =>
             axios.post("http://localhost:8080/api/field/save", {
-                name: card.fname,
+                namef: card.fname,
                 fieldid: card.fieldid,
                 type: card.ftype,
                 result: {
@@ -220,7 +220,7 @@ export default function TemplateDetails() {
 
             <Toast ref={toast}/>
             <ConfirmDialog/>
-            <MainCard title={`Template Details -- ${name}`}>
+            <MainCard title={`Doc Template Details -- ${name}`}>
 
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} className="mb-10" >
                     <Box  style={{width: '45rem'}} header="Create Template"  className="p-fluid mt-3" >
@@ -322,7 +322,7 @@ export default function TemplateDetails() {
                                     </span>
                                     <InputText
                                         placeholder="Name"
-                                        value={item.name}
+                                        value={item.namef}
                                         onChange={(e) => updateCardInput(item.id, 'fname', e.target.value)}
                                     />
                                 </div>

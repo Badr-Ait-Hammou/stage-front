@@ -8,14 +8,12 @@ import MainCard from "../ui-component/cards/MainCard";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {Box} from "@mui/system";
 import {InputText} from "primereact/inputtext";
-import {Dropdown} from "primereact/dropdown";
 import {FileUpload} from "primereact/fileupload";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Toast} from "primereact/toast";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {useRef} from "react";
-import {Toolbar} from "primereact/toolbar";
-export default function TemplateDetailsExcel() {
+export default function TemplateDetails() {
     const { id } = useParams();
     const [result, setResult] = useState(null);
     const [name, setName] = useState('');
@@ -24,34 +22,9 @@ export default function TemplateDetailsExcel() {
     const [type, setType] = useState('');
     const toast = useRef(null);
     const [fields, setFields] = useState([]);
+    const [namef, setNamef] = useState("");
 
 
-
-
-    const [cards, setCards] = useState([]);
-
-    const addNewCard = () => {
-        const newCard = {
-            id: Date.now(),
-            fname: '',
-            fieldid: '',
-            ftype: '',
-            saved: false
-        };
-        setCards(prevCards => [...prevCards, newCard]);
-    };
-
-    const updateCardInput = (cardId, inputName, inputValue) => {
-        setCards(prevCards => prevCards.map(card => {
-            if (card.id === cardId) {
-                return {
-                    ...card,
-                    [inputName]: inputValue
-                };
-            }
-            return card;
-        }));
-    };
 
     useEffect(() => {
         // Load result and associated fields
@@ -67,7 +40,7 @@ export default function TemplateDetailsExcel() {
                 setName(response.data.name);
                 setType(response.data.type);
                 setDescription(response.data.description);
-                setFile(response.data.file); // Adjust the property name based on your API response
+                setFile(response.data.file);
 
             })
             .catch((error) => {
@@ -87,46 +60,7 @@ export default function TemplateDetailsExcel() {
 
 
 
-    const handleSubmitAll = () => {
-        const hasEmptyFields = cards.some(
-            (card) => !card.fname || !card.fieldid || !card.ftype
-        );
 
-        if (hasEmptyFields) {
-            showempty();
-            console.log("Cannot save due to empty fields.");
-            return;
-        }
-
-        const savePromises = cards.map((card) =>
-            axios.post("http://localhost:8080/api/field/save", {
-                name: card.fname,
-                fieldid: card.fieldid,
-                type: card.ftype,
-                result: {
-                    id: id
-                },
-            })
-        );
-
-        Promise.all(savePromises)
-            .then((responses) => {
-                console.log("Saved all field inputs:", responses);
-                loadResult();
-                loadFields();
-                showsave();
-                setCards([]);
-
-            })
-            .catch((error) => {
-                console.error("Error while saving field inputs:", error);
-            });
-    };
-
-
-    const removeCard = (cardId) => {
-        setCards(prevCards => prevCards.filter(card => card.id !== cardId));
-    };
 
 
 
@@ -139,6 +73,7 @@ export default function TemplateDetailsExcel() {
                 console.error("Error deleting field:", error);
             });
     };
+
 
     const handleEdit = async () => {
         try {
@@ -162,17 +97,28 @@ export default function TemplateDetailsExcel() {
         }
     };
 
+    /************************************************   delete template with all the  fields **********************************/
+
+
     const handleDelete = (id) => {
-        const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/result/${id}`)
-                .then(() => {
-                    setResult(result.id !== id);
-                    toast.current.show({severity:'success', summary: 'Done', detail:'Template deleted successfully', life: 3000});
-                })
-                .catch((error) => {
-                    console.error('Error deleting project:', error);
-                    toast.current.show({severity:'error', summary: 'Error', detail:'Template Associated with a project or Fields', life: 3000});
-                });
+        const confirmDelete = async () => {
+            try {
+
+                await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)));
+
+
+                await axios.delete(`http://localhost:8080/api/result/${id}`);
+
+
+                setFields([]);
+
+                setResult(null);
+
+                toast.current.show({severity:'success', summary: 'Done', detail:'Template deleted successfully', life: 3000});
+            } catch (error) {
+                console.error('Error deleting template and fields:', error);
+                toast.current.show({severity:'error', summary: 'Error', detail:'Error deleting template and fields', life: 3000});
+            }
         };
 
         confirmDialog({
@@ -187,30 +133,95 @@ export default function TemplateDetailsExcel() {
     };
 
 
+
     const showuedit = () => {
         toast.current.show({severity: 'info', summary: 'Done', detail: 'item updated successfully', life: 3000});
     }
-    const showsave = () => {
-        toast.current.show({severity: 'success', summary: 'Done', detail: 'item added successfully', life: 3000});
-    }
-    const showempty = () => {
-        toast.current.show({severity: 'error', summary: 'Heads Up', detail: 'one of the input fields is empty', life: 3000});
+
+    const showNewFileU = () => {
+        toast.current.show({severity: 'success', summary: 'Done', detail: 'New Csv File Uploaded ', life: 3000});
     }
 
 
-    const handlefileChange = (event) => {
+    /************************************************  Upload new file / delete all  the old fields "using Promise" and create the new files fields**********************************/
+
+    const handlefileChange = async (event) => {
         const files = event.files;
 
         if (files && files.length > 0) {
             const file = files[0];
 
             const reader = new FileReader();
-            reader.onload = (e) => {
-                setFile(e.target.result);
+            reader.onload = async (e) => {
+                const fileContent = e.target.result;
+                console.log("FileReader Output:", fileContent);
+
+                const lines = fileContent.split("\n");
+                const firstRow = lines[0].split(",");
+                console.log("First Row Attributes:", firstRow);
+
+                const nonEmptyAttributes = firstRow.filter(
+                    (attribute) => attribute.trim() !== "" && attribute.trim() !== "\"\""
+                );
+                console.log("Non-Empty Attributes:", nonEmptyAttributes);
+
+                try {
+
+                    await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)))
+                        .then(() => {
+                            console.log("Old fields deleted successfully.");
+                        })
+                        .catch((error) => {
+                            console.error("Error deleting old fields:", error);
+                        });
+
+                    if (result) {
+
+                        const updatedResult = {
+                            ...result,
+                            file: fileContent,
+                        };
+                        await axios.put(`http://localhost:8080/api/result/${id}`, updatedResult);
+                        setResult(updatedResult);
+                    } else {
+
+                        const newResult = {
+                            id: id,
+                            name: name,
+                            file: fileContent,
+                            description: description,
+                            type: "excel",
+                        };
+                        const resultResponse = await axios.post("http://localhost:8080/api/result/save", newResult);
+                        setResult(resultResponse.data);
+                    }
+
+
+                    const resultId = result ? result.id : id;
+                    for (const attribute of nonEmptyAttributes) {
+                        const trimmedAttribute = attribute.trim();
+                        const fieldToSave = {
+                            namef: trimmedAttribute.replace(/"/g, ""),
+                            fieldid: trimmedAttribute.replace(/"/g, "").toUpperCase(),
+                            type: "text",
+                            result: { id: resultId },
+                        };
+                        await axios.post("http://localhost:8080/api/field/save", fieldToSave);
+                    }
+
+                    showNewFileU();
+                    loadResult();
+                    loadFields();
+
+                    console.log("New fields and result saved successfully!");
+                } catch (error) {
+                    console.error("Error while updating result and saving new fields:", error);
+                }
             };
-            reader.readAsDataURL(file);
+            reader.readAsText(file);
         }
     };
+
 
 
 
@@ -220,9 +231,9 @@ export default function TemplateDetailsExcel() {
 
             <Toast ref={toast}/>
             <ConfirmDialog/>
-            <MainCard title={`Template Details Excel -- ${name}`}>
+            <MainCard title={`Csv Template Details -- ${name}`}>
 
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} >
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' ,backgroundColor:"rgba(238,238,250,0.41)" ,borderRadius:"20px"}} className="mb-10" >
                     <Box  style={{width: '45rem'}} header="Create Template"  className="p-fluid mt-3" >
                         {result ? (
                             <React.Fragment>
@@ -242,17 +253,12 @@ export default function TemplateDetailsExcel() {
                                             <label htmlFor="type" className="font-bold">
                                                 Type
                                             </label>
-                                            <Dropdown
+                                            <InputText
+                                                readOnly={true}
                                                 style={{marginTop: "5px"}}
                                                 id="type"
                                                 value={type}
-                                                options={[
-                                                    {label: 'Doc', value: 'doc'},
-                                                    {label: 'Excel', value: 'excel'}
-                                                ]}
-                                                onChange={(event) => setType(event.value)}
-                                                optionLabel="label"
-                                                optionValue="value"
+
                                             />
                                         </Box>
                                     </Grid>
@@ -281,6 +287,7 @@ export default function TemplateDetailsExcel() {
                                             uploadLabel="Upload"
                                             cancelLabel="Cancel"
                                             onSelect={(e) => handlefileChange(e)}
+                                            //disabled={true}
                                         />
 
                                     </Box>
@@ -293,18 +300,7 @@ export default function TemplateDetailsExcel() {
                                                    onChange={(e) => setDescription(e.target.value)} required rows={3} cols={20}/>
                                 </Box>
 
-                                <Box className="field mt-5 mb-5" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-                                    <Button label="Update"
-                                            severity="success"
-                                            outlined
-                                            style={{ flex: 1, maxWidth: '150px' }}
-                                            onClick={(e) => handleEdit(e)} />
-                                    <Button label="Delete"
-                                            severity="danger"
-                                            outlined
-                                            style={{ flex: 1, maxWidth: '150px' }}
-                                            onClick={() => handleDelete(result.id)} />
-                                </Box>
+
 
                             </React.Fragment>
                         ) : (
@@ -318,75 +314,74 @@ export default function TemplateDetailsExcel() {
                         )}
                     </Box>
                 </div>
-            </MainCard>
 
-            <div className="mt-5" >
 
-                <MainCard title="Manage Fields">
+                <div className="mt-10" >
 
-                    <div  >
 
-                        <Toolbar className="mb-4" start="Fields" end={<Button label="Add New" outlined  onClick={addNewCard} className="p-button-primary" />}></Toolbar>
+                    {fields.map(item => (
 
-                        {[...cards, ...fields].map(item => (
-
-                            <Box  key={item.id} className="card flex flex-column md:flex-row gap-3 mt-5" >
-                                <div className="p-inputgroup flex-1">
+                        <Box  key={item.id} className="card flex flex-column md:flex-row gap-3 mt-5" >
+                            <div className="p-inputgroup flex-1">
                                     <span className="p-inputgroup-addon">
                                         <i >Name</i>
                                     </span>
-                                    <InputText
-                                        placeholder="Name"
-                                        value={item.name}
-                                        onChange={(e) => updateCardInput(item.id, 'fname', e.target.value)}
-                                    />
-                                </div>
-                                <div className="p-inputgroup flex-1">
-                                    <span className="p-inputgroup-addon"><i>Id</i></span>
-                                    <InputText
-                                        value={item.fieldid}
-                                        onChange={(e) => updateCardInput(item.id, 'fieldid', e.target.value)}
-                                        placeholder="Id"
-                                    />
-                                </div>
-                                <div className="p-inputgroup flex-1">
-                                    <span className="p-inputgroup-addon"><i>Type</i></span>
-                                    <Dropdown
-                                        placeholder={item.type || "Type"}
-                                        value={item.ftype}
-                                        options={[
-                                            { label: 'Text', value: 'text' },
-                                            { label: 'Number', value: 'number' }
-                                        ]}
-                                        onChange={(e) => updateCardInput(item.id, 'ftype', e.target.value)}
-                                    />
-
-                                </div>
-                                <Button
-                                    icon="pi pi-trash"
-                                    className="p-button-danger p-button-sm"
-                                    onClick={() => {
-                                        if (item.fieldid.length > 0) {
-                                            handleDeleteField(item.id);
-                                        } else {
-                                            removeCard(item.id);
-                                        }
-                                    }}
+                                <InputText
+                                    placeholder="Name"
+                                    value={item.namef}
+                                    onChange={(e) => updateCardInput(item.id, 'fname', e.target.value)}
+                                    readOnly={true}
+                                />
+                            </div>
+                            <div className="p-inputgroup flex-1">
+                                <span className="p-inputgroup-addon"><i>Id</i></span>
+                                <InputText
+                                    value={item.fieldid}
+                                    onChange={(e) => updateCardInput(item.id, 'fieldid', e.target.value)}
+                                    placeholder="Id"
+                                    readOnly={true}
+                                />
+                            </div>
+                            <div className="p-inputgroup flex-1">
+                                <span className="p-inputgroup-addon"><i>Type</i></span>
+                                <InputText
+                                    value={item.ftype}
+                                    onChange={(e) => updateCardInput(item.id, 'ftype', e.target.value)}
+                                    placeholder={item.type || "Type"}
+                                    readOnly={true}
                                 />
 
 
-                            </Box>
-                        ))}
+                            </div>
+                            <Button
+                                icon="pi pi-trash"
+                                className="p-button-danger p-button-sm"
+                                onClick={() => {
+                                        handleDeleteField(item.id);
 
-                        <Box className="field mt-5 mb-2" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-
-                            <Button severity="success" raised label="Create All" onClick={handleSubmitAll} className="p-button-primary"  />
+                                }}
+                            />
 
 
                         </Box>
-                    </div>
-                </MainCard>
-            </div>
+                    ))}
+
+
+                    <Box className="field mt-7 mb-5" style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+                        <Button label="Update"
+                                severity="success"
+                                outlined
+                                style={{ flex: 1, maxWidth: '150px' }}
+                                onClick={(e) => handleEdit(e)} />
+                        <Button label="Delete"
+                                severity="danger"
+                                outlined
+                                style={{ flex: 1, maxWidth: '150px' }}
+                                onClick={() => handleDelete(result.id)} />
+
+                    </Box>
+                </div>
+            </MainCard>
 
 
         </>
