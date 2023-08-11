@@ -74,6 +74,7 @@ export default function TemplateDetails() {
             });
     };
 
+
     const handleEdit = async () => {
         try {
             const updatedProject = {
@@ -95,6 +96,9 @@ export default function TemplateDetails() {
             console.error(error);
         }
     };
+
+    /************************************************   delete template with all the  fields **********************************/
+
 
     const handleDelete = (id) => {
         const confirmDelete = async () => {
@@ -134,7 +138,12 @@ export default function TemplateDetails() {
         toast.current.show({severity: 'info', summary: 'Done', detail: 'item updated successfully', life: 3000});
     }
 
+    const showNewFileU = () => {
+        toast.current.show({severity: 'success', summary: 'Done', detail: 'New Csv File Uploaded ', life: 3000});
+    }
 
+
+    /************************************************  Upload new file / delete all  the old fields "using Promise" and create the new files fields**********************************/
 
     const handlefileChange = async (event) => {
         const files = event.files;
@@ -157,7 +166,7 @@ export default function TemplateDetails() {
                 console.log("Non-Empty Attributes:", nonEmptyAttributes);
 
                 try {
-                    // Delete old fields
+
                     await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)))
                         .then(() => {
                             console.log("Old fields deleted successfully.");
@@ -167,19 +176,19 @@ export default function TemplateDetails() {
                         });
 
                     if (result) {
-                        // Update existing result
+
                         const updatedResult = {
                             ...result,
-                            file: fileContent, // Update with the new file content
+                            file: fileContent,
                         };
                         await axios.put(`http://localhost:8080/api/result/${id}`, updatedResult);
                         setResult(updatedResult);
                     } else {
-                        // Create new result (template)
+
                         const newResult = {
                             id: id,
                             name: name,
-                            file: fileContent, // Update with the new file content
+                            file: fileContent,
                             description: description,
                             type: "excel",
                         };
@@ -187,7 +196,7 @@ export default function TemplateDetails() {
                         setResult(resultResponse.data);
                     }
 
-                    // Save new fields
+
                     const resultId = result ? result.id : id;
                     for (const attribute of nonEmptyAttributes) {
                         const trimmedAttribute = attribute.trim();
@@ -200,7 +209,7 @@ export default function TemplateDetails() {
                         await axios.post("http://localhost:8080/api/field/save", fieldToSave);
                     }
 
-                    showuedit();
+                    showNewFileU();
                     loadResult();
                     loadFields();
 
