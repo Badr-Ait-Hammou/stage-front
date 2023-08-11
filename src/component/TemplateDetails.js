@@ -5,7 +5,6 @@ import { Button } from "primereact/button";
 import {Card, CardContent, Grid,} from '@mui/material';
 
 import MainCard from "../ui-component/cards/MainCard";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {Box} from "@mui/system";
 import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
@@ -15,6 +14,7 @@ import {Toast} from "primereact/toast";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {useRef} from "react";
 import {Toolbar} from "primereact/toolbar";
+import Doc from "../assets/images/doc.png"
 export default function TemplateDetails() {
     const { id } = useParams();
     const [result, setResult] = useState(null);
@@ -242,17 +242,12 @@ export default function TemplateDetails() {
                                             <label htmlFor="type" className="font-bold">
                                                 Type
                                             </label>
-                                            <Dropdown
+                                            <InputText
+                                                readOnly={true}
                                                 style={{marginTop: "5px"}}
                                                 id="type"
                                                 value={type}
-                                                options={[
-                                                    {label: 'Doc', value: 'doc'},
-                                                    {label: 'Excel', value: 'excel'}
-                                                ]}
                                                 onChange={(event) => setType(event.value)}
-                                                optionLabel="label"
-                                                optionValue="value"
                                             />
                                         </Box>
                                     </Grid>
@@ -272,12 +267,16 @@ export default function TemplateDetails() {
                                             url={'/api/upload'}
                                             maxFileSize={100000000}
                                             emptyTemplate={
-                                                file ? (
-                                                    <strong>File : <a href={result.file}> <FileDownloadIcon /> Download</a></strong>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
+                                                    {file ? (
+                                                    <strong><a href={result.file}> <img src={Doc} alt="NoFile" style={{ width: '40px', height: 'auto'}} /></a></strong>
                                                 ) : (
                                                     <p className="m-0">Drag and drop files here to upload.</p>
-                                                )
-                                            }                        chooseLabel="Select File"
+                                                )}
+                                                </div>
+                                            }
+                                            chooseLabel="Select File"
                                             uploadLabel="Upload"
                                             cancelLabel="Cancel"
                                             onSelect={(e) => handlefileChange(e)}

@@ -24,6 +24,9 @@ import { useNavigate } from "react-router-dom";
 
 import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import Doc from "../assets/images/doc.png";
+import Csv from "../assets/images/csv.png";
+import NoFile from "../assets/images/nofile.png";
 
 
 export default function Template() {
@@ -45,6 +48,8 @@ export default function Template() {
     const [globalFilter, setGlobalFilter] = useState(null);
     const navigate = useNavigate();
     const [namef, setNamef] = useState("");
+    const [fields, setFields] = useState([]);
+
 
 
 
@@ -57,6 +62,7 @@ export default function Template() {
 
     useEffect(() => {
         fetchData();
+        loadFields();
     }, []);
 
     const fetchData = async () => {
@@ -64,13 +70,17 @@ export default function Template() {
             const resultResponse = await axios.get('http://localhost:8080/api/result/all');
             setResult(resultResponse.data);
             handleDataTableLoad();
-
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
 
-
+    const loadFields = async () => {
+        if (selectedResult) {
+            const res = await axios.get(`http://localhost:8080/api/field/result/${selectedResult.id}`);
+            setFields(res.data);
+        }
+    };
 
     const handleSubmit = (event) => {
         event?.preventDefault();
@@ -374,14 +384,26 @@ export default function Template() {
         );
     };
     const resultFileBodyTemplate = (rowData) => {
-        if (rowData.file && rowData.file) {
+        if (rowData.type ) {
+            let icon;
+
+            if (rowData.type === 'doc') {
+                icon = Doc;
+            } else if (rowData.type === 'excel') {
+                icon = Csv;
+            } else {
+                icon = <FileDownloadIcon />;
+            }
+
             return (
                 <a href={rowData.file} download>
-                    <FileDownloadIcon /> Download
+                    <img  src={icon} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
+
                 </a>
             );
+        } else {
+            return <img src={NoFile} alt="NoFile" style={{ width: '30px', height: 'auto' }} />;
         }
-        return null;
     };
 
     const header = (
@@ -398,6 +420,86 @@ export default function Template() {
     };
     const rightToolbarTemplate = () => {
         return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    };
+
+
+    /************************************************  Upload new file / delete all  the old fields "using Promise" and create the new files fields**********************************/
+
+
+
+    const handlefileChange3 = async (event) => {
+        const files = event.files;
+
+        if (files && files.length > 0) {
+            const file = files[0];
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const fileContent = e.target.result;
+                console.log('FileReader Output:', fileContent);
+
+                const lines = fileContent.split('\n');
+                const firstRow = lines[0].split(',');
+                console.log('First Row Attributes:', firstRow);
+
+                const nonEmptyAttributes = firstRow.filter(
+                    (attribute) => attribute.trim() !== '' && attribute.trim() !== '""'
+                );
+                console.log('Non-Empty Attributes:', nonEmptyAttributes);
+
+                try {
+
+                    const deletePromises = fields.map((field) =>
+                        axios.delete(`http://localhost:8080/api/field/${field.id}`)
+                    );
+
+                    await Promise.all(deletePromises);
+
+                    console.log("Old fields deleted successfully.");
+
+                    const resultId = selectedResult?.id || id;
+                    const csvDataUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(fileContent)}`;
+
+                    if (selectedResult) {
+                        const updatedResult = {
+                            ...selectedResult,
+                            file: csvDataUrl,
+                        };
+
+                        await axios.put(`http://localhost:8080/api/result/${selectedResult.id}`, updatedResult);
+                        setResult(updatedResult);
+                    } else {
+                        const newResult = {
+                            name: name,
+                            file: csvDataUrl,
+                            description: description,
+                            type: 'excel',
+                        };
+                        const resultResponse = await axios.post('http://localhost:8080/api/result/save', newResult);
+                        setResult(resultResponse.data);
+                    }
+
+                    for (const attribute of nonEmptyAttributes) {
+                        const trimmedAttribute = attribute.trim();
+                        const fieldToSave = {
+                            namef: trimmedAttribute.replace(/"/g, ''),
+                            fieldid: trimmedAttribute.replace(/"/g, '').toUpperCase(),
+                            type: 'text',
+                            result: { id: resultId },
+                        };
+                        await axios.post('http://localhost:8080/api/field/save', fieldToSave);
+                    }
+
+                    loadResult();
+                    loadFields();
+
+                    console.log('New fields and result saved successfully!');
+                } catch (error) {
+                    console.error('Error while updating result and saving new fields:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
     };
 
 
@@ -532,18 +634,14 @@ export default function Template() {
                             <label htmlFor="type" className="font-bold">
                                 Type
                             </label>
-                            <Dropdown
+                            <InputText
                                 placeholder={result.type}
                                 style={{marginTop: "5px"}}
                                 id="type"
                                 value={type}
-                                options={[
-                                    {label: 'Doc', value: 'doc'},
-                                    {label: 'Excel', value: 'excel'}
-                                ]}
+                                readOnly={true}
                                 onChange={(event) => setType(event.value)}
-                                optionLabel="label"
-                                optionValue="value"
+
                             />
                         </Box>
                     </Grid>
@@ -565,8 +663,15 @@ export default function Template() {
                             chooseLabel="Select File"
                             uploadLabel="Upload"
                             cancelLabel="Cancel"
-                            onSelect={(e) => handlefileChange(e)}
-                        />
+                            disabled={type === 'excel'}
+
+                            onSelect={(e) => {
+                                if (type === 'excel') {
+                                    handlefileChange3(e);
+                                } else {
+                                    handlefileChange(e);
+                                }
+                            }}                                             />
 
                     </Box>
                 </Grid>
