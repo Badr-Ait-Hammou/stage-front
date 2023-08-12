@@ -5,7 +5,6 @@ import { Button } from "primereact/button";
 import {Card, CardContent, Grid,} from '@mui/material';
 
 import MainCard from "../ui-component/cards/MainCard";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {Box} from "@mui/system";
 import {InputText} from "primereact/inputtext";
 import {FileUpload} from "primereact/fileupload";
@@ -13,6 +12,7 @@ import {InputTextarea} from "primereact/inputtextarea";
 import {Toast} from "primereact/toast";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {useRef} from "react";
+import Csv from "../assets/images/csv.png"
 export default function TemplateDetails() {
     const { id } = useParams();
     const [result, setResult] = useState(null);
@@ -22,12 +22,12 @@ export default function TemplateDetails() {
     const [type, setType] = useState('');
     const toast = useRef(null);
     const [fields, setFields] = useState([]);
-    const [namef, setNamef] = useState("");
+    //const [namef, setNamef] = useState("");
 
 
 
     useEffect(() => {
-        // Load result and associated fields
+
         loadResult();
         loadFields();
     }, [id]);
@@ -278,12 +278,16 @@ export default function TemplateDetails() {
                                             url={'/api/upload'}
                                             maxFileSize={100000000}
                                             emptyTemplate={
-                                                file ? (
-                                                    <strong>File : <a href={result.file}> <FileDownloadIcon /> Download</a></strong>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
+                                                    {file ? (
+                                                    <strong > <a href={result.file}> <img src={Csv} alt="NoFile" style={{ width: '40px', height: 'auto'}} /> </a></strong>
                                                 ) : (
                                                     <p className="m-0">Drag and drop files here to upload.</p>
-                                                )
-                                            }                        chooseLabel="Select File"
+                                                )}
+                                                </div>
+                                            }
+                                            chooseLabel="Select File"
                                             uploadLabel="Upload"
                                             cancelLabel="Cancel"
                                             onSelect={(e) => handlefileChange(e)}
