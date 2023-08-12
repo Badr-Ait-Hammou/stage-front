@@ -336,6 +336,7 @@ export default function Projects() {
                 console.log("API Response:", response.data);
                 setName("");
                 setDescription("");
+                setResultId("");
                 setSubmitted(true);
                 hideDialog();
                 loadProjects();
