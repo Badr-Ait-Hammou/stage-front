@@ -573,7 +573,9 @@ export default function Projects() {
                         <Column field="name" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
                             <Link
                                 className="font-bold"
-                                to={rowData.images && rowData.images.length > 0  ? `project_details/${rowData.id}` : `project_detailsDoc/${rowData.id}`}
+                                to={rowData.images && rowData.images.length > 0  ? `project_details/${rowData.id}` : rowData.result.type === "excel"
+                                    ? `project_detailsExcel/${rowData.id}`
+                                    : `project_detailsDoc/${rowData.id}` }
                             >   {rowData.name}
                             </Link>)}></Column>
 

@@ -3,7 +3,7 @@ import React, { useState, useEffect,useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import axios from "axios";
 import MainCard from "../ui-component/cards/MainCard";
-import {useParams} from "react-router-dom";
+import { useParams} from "react-router-dom";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import Card from "@mui/material/Card";
@@ -15,17 +15,34 @@ import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 
-export default function ProjectDetailDoc() {
+export default function ProjectDetailsCsv() {
     const [project, setProject] = useState([]);
+    const [fields, setFields] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 3;
     const toast = useRef(null);
     const { id } = useParams();
+    const dt = useRef(null);
+
+    const loadFields = async (projectId) => {
+        try {
+            const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
+            setFields(res.data);
+        } catch (error) {
+            console.error("Error loading fields:", error);
+        }
+    };
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
-            setProject(response.data);
-        });
+        if (id) {
+            axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
+                setProject(response.data);
+                // Once the project data is available, call loadFields with project.result.id
+                if (response.data.result && response.data.result.id) {
+                    loadFields(response.data.result.id);
+                }
+            });
+        }
     }, [id]);
 
     if (!project.commentList) {
@@ -40,9 +57,14 @@ export default function ProjectDetailDoc() {
 
 
 
+
+
+
+
+
     const header = (
         <div className="mt-2 mb-2">
-            <span className="text-xl text-900 font-bold">{project.name} Template</span>
+            <span className="text-xl text-900 font-bold">{project.name} Csv</span>
         </div>
     );
     const footer = (
@@ -190,16 +212,15 @@ export default function ProjectDetailDoc() {
                 </a>
             )
 
-            }else{
+        }else{
             return(
                 <a href={project.result.file} download>
 
                     <img  src={Csv} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
                 </a>
             )
-
-
         }
+
     };
 
     return (
@@ -221,6 +242,34 @@ export default function ProjectDetailDoc() {
                     </div>
                 </div>
             </MainCard>
+
+
+
+            <div className="mt-5">
+            <MainCard>
+                <DataTable
+                    ref={dt}
+                    value={[{}]}
+                    dataKey="id"
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects"
+                    header={header}
+                >
+                    {project.result.fieldList.map((field) => (
+                        <Column
+                            key={field.id}
+                           // field={`result.fieldValueList[${field.id - 693}]`}
+                            header={field.namef}
+                            sortable
+                            style={{ minWidth: '10rem' }}
+                        ></Column>
+                    ))}
+                </DataTable>
+            </MainCard>
+            </div>
 
             <MainCard className="mt-5" title="Comments">
                 {project.commentList.length > 0 ? (
