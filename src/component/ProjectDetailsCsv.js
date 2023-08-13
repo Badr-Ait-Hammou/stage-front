@@ -15,6 +15,8 @@ import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 
+
+
 export default function ProjectDetailsCsv() {
     const [project, setProject] = useState([]);
     const [fields, setFields] = useState([]);
@@ -23,21 +25,85 @@ export default function ProjectDetailsCsv() {
     const toast = useRef(null);
     const { id } = useParams();
     const dt = useRef(null);
+    const [data, setData] = useState([{}]);
+    const [savedFieldValues, setSavedFieldValues] = useState([]);
+    const [fetchedFieldValues, setFetchedFieldValues] = useState([]);
+
+
+
+
+
+
+
+
+
+    const handleSaveAll = () => {
+        const hasEmptyFields = data.some((row) =>
+            project.result.fieldList.some(
+                (field) => !row[field.namef.toLowerCase()]
+            )
+        );
+
+        if (hasEmptyFields) {
+            console.log("Cannot save due to empty fields.");
+            return;
+        }
+
+        const savePromises = data.flatMap((row) =>
+            project.result.fieldList.map((field) =>
+                axios.post("http://localhost:8080/api/fieldvalue/save", {
+                    value: row[field.namef.toLowerCase()],
+                    field: {
+                        id: field.id,
+                    },
+                })
+            )
+        );
+
+        Promise.all(savePromises)
+            .then((responses) => {
+                console.log("Saved all field values:", responses);
+                // Handle success
+            })
+        axios.get(`http://localhost:8080/api/projet/${id}`)
+            .then((response) => {
+                setProject(response.data);
+                if (response.data.result && response.data.result.id) {
+                    loadFields(response.data.result.id);
+                }
+            })
+
+
+
+            .catch((error) => {
+                console.error("Error while saving field values:", error);
+                // Handle error
+            });
+
+
+    };
+
+
+
+
 
     const loadFields = async (projectId) => {
         try {
             const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
             setFields(res.data);
+            console.log("fetched fields",res.data);
+
+            setFetchedFieldValues(res.data);
         } catch (error) {
             console.error("Error loading fields:", error);
         }
     };
 
+
     useEffect(() => {
         if (id) {
             axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
                 setProject(response.data);
-                // Once the project data is available, call loadFields with project.result.id
                 if (response.data.result && response.data.result.id) {
                     loadFields(response.data.result.id);
                 }
@@ -53,6 +119,61 @@ export default function ProjectDetailsCsv() {
         const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
         setProject(res.data);
     }
+
+
+
+
+    const addRowButton = () => (
+        <Button  onClick={handleAddRow}>Add Row</Button>
+    );
+
+    const saveall = () => (
+        <Button  onClick={handleSaveAll}>Save all</Button>
+    );
+
+    const handleAddRow = () => {
+        const newRow = {};
+        const newData = [...data, newRow];
+
+        setData(newData);
+    };
+
+
+    const getSavedValue = (fieldId) => {
+        const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
+
+        if (fieldValue && fieldValue.fieldValueList && fieldValue.fieldValueList.length > 0) {
+            return fieldValue.fieldValueList.map(item => item.value).join(', ');
+        } else {
+            return '';
+        }
+    };
+
+
+
+
+    const handleInputChange = (rowData, fieldId, value) => {
+        // Find the existing saved value for the field
+        const existingSavedValue = savedFieldValues.find(
+            (savedValue) => savedValue.field.id === fieldId
+        );
+
+        // Update the existing saved value or create a new one
+        if (existingSavedValue) {
+            existingSavedValue.value = value;
+        } else {
+            const newSavedValue = {
+                field: { id: fieldId },
+                value: value,
+            };
+            setSavedFieldValues([...savedFieldValues, newSavedValue]);
+        }
+
+        // Update the input value for the current row
+        rowData[fieldId] = value;
+        setData([...data]); // Force re-render
+    };
+
 
 
 
@@ -223,6 +344,12 @@ export default function ProjectDetailsCsv() {
 
     };
 
+    const getSavedFieldValues = (fieldId) => {
+        const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
+        return fieldValue ? fieldValue.fieldValueList : [];
+    };
+
+
     return (
         <>
             <Toast ref={toast} />
@@ -246,29 +373,51 @@ export default function ProjectDetailsCsv() {
 
 
             <div className="mt-5">
-            <MainCard>
-                <DataTable
-                    ref={dt}
-                    value={[{}]}
-                    dataKey="id"
-                    paginator
-                    rows={10}
-                    rowsPerPageOptions={[5, 10, 25]}
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects"
-                    header={header}
-                >
-                    {project.result.fieldList.map((field) => (
+                <MainCard>
+                    <DataTable
+                        value={data}
+                        dataKey="id"
+                        paginator
+                        rows={10}
+                        rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects"
+                        header={header}
+                    >
                         <Column
-                            key={field.id}
-                           // field={`result.fieldValueList[${field.id - 693}]`}
-                            header={field.namef}
-                            sortable
-                            style={{ minWidth: '10rem' }}
-                        ></Column>
-                    ))}
-                </DataTable>
-            </MainCard>
+                            key="actions"
+                            header="Actions"
+                            body={addRowButton}
+                            style={{ width: '8rem', textAlign: 'center' }}
+                        />
+                        <Column
+                            key="save"
+                            header="saveall"
+                            body={saveall}
+                            style={{ width: '8rem', textAlign: 'center' }}
+                        />
+                        {project.result.fieldList.map((field) => (
+                            <Column
+                                key={field.id}
+                                header={field.namef}
+                                body={(rowData) => (
+                                    <input
+                                        type="text"
+                                        value={getSavedValue(field.id)}
+                                        onChange={(e) =>
+                                            handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
+                                        }
+                                    />
+                                )}
+                                style={{ minWidth: '10rem' }}
+                            />
+                        ))}
+
+
+                    </DataTable>
+
+
+                </MainCard>
             </div>
 
             <MainCard className="mt-5" title="Comments">
