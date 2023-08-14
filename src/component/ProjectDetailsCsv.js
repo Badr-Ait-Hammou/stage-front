@@ -24,8 +24,12 @@ export default function ProjectDetailsCsv() {
     const cardsPerPage = 3;
     const toast = useRef(null);
     const { id } = useParams();
+    const dt = useRef(null);
+
     const [data, setData] = useState([{}]);
     const [savedFieldValues, setSavedFieldValues] = useState([]);
+    const [globalFilter, setGlobalFilter] = useState(null);
+
 
 
 
@@ -122,11 +126,9 @@ export default function ProjectDetailsCsv() {
 
 
 
-    
 
-    const saveall = () => (
-        <Button  onClick={handleSaveAll}>Save all</Button>
-    );
+
+
 
     const handleAddRow = () => {
         const newRow = {};
@@ -174,6 +176,23 @@ export default function ProjectDetailsCsv() {
 
     };
 
+    const leftToolbarTemplate = () => {
+        return (
+            <div className="flex flex-wrap gap-2">
+                <Button   label="New" icon="pi pi-plus" severity="success" onClick={handleAddRow} />
+            </div>
+        );
+    };
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button icon="pi pi-plus" rounded outlined style={{marginRight:"4px"}} onClick={handleSaveAll} />
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => handleDeleteRow(rowData)} />
+            </React.Fragment>
+        );
+    };
+
 
 
     const handleInputChange = (rowData, fieldId, value) => {
@@ -192,16 +211,10 @@ export default function ProjectDetailsCsv() {
             setSavedFieldValues([...savedFieldValues, newSavedValue]);
         }
 
-        rowData[fieldId] = value;
-        setData([...data]);
-
+        const updatedRowData = { ...rowData, [fieldId]: value }; // Create a new object with the updated value
+        const updatedData = data.map((row, index) => (index === data.indexOf(rowData) ? updatedRowData : row)); // Update the corresponding row in the data array
+        setData(updatedData);
     };
-
-
-
-
-
-
 
     const handleUpdateRow = async (rowData) => {
         console.log("Row Data:", rowData);
@@ -250,12 +263,6 @@ export default function ProjectDetailsCsv() {
     };
 
 
-
-    const header = (
-        <div className="mt-2 mb-2">
-            <span className="text-xl text-900 font-bold">{project.name} Csv</span>
-        </div>
-    );
     const footer = (
         <div >
             <p>
@@ -412,6 +419,28 @@ export default function ProjectDetailsCsv() {
 
     };
 
+    const header = (
+        <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+    <span className="p-input-icon-left">
+      <i className="pi pi-search" />
+      <InputText
+          type="search"
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search..."
+      />
+    </span>
+
+        </div>
+    );
+
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+    const rightToolbarTemplate = () => {
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    };
+
 
 
 
@@ -439,20 +468,19 @@ export default function ProjectDetailsCsv() {
 
             <div className="mt-5">
                 <MainCard>
-                    <Button  onClick={handleAddRow}>Add Row</Button>
+                    <Toolbar className="mb-2"  center={<strong>Manage Csv</strong>} start={leftToolbarTemplate} end={rightToolbarTemplate} />
+
 
                     <DataTable
+                        ref={dt}
                         value={data}
                         dataKey={(rowData, index) => index}
-                        paginator
-                        rows={10}
-                        rowsPerPageOptions={[5, 10, 25]}
+                        paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects"
-                        header={header}
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter}  header={header}
                     >
 
-                        <Column
+                        {/* <Column
                             key="update"
                             body={(rowData) => (
                                 <Button
@@ -463,32 +491,30 @@ export default function ProjectDetailsCsv() {
                             )}
                             style={{ width: '8rem', textAlign: 'center' }}
                         />
-                        <Column
-                            key="delete"
-                            body={(rowData) => (
-                                <Button
-                                    label="Delete"
-                                    onClick={() => handleDeleteRow(rowData)}
-                                    className="p-button-danger"
-                                />
-                            )}
-                            style={{ width: '8rem', textAlign: 'center' }}
-                        />
+                        */}
 
 
-                        <Column
-                            key="save"
-                            header="saveall"
-                            body={saveall}
-                            style={{ width: '8rem', textAlign: 'center' }}
-                        />
+
+
                         {project.result.fieldList.map((field) => (
                             <Column
+
                                 key={`input-${field.id}`}
                                 header={field.namef}
                                 field={field.namef.toLowerCase()}
+                                style={{ minWidth: '7rem' }}
                                 body={(rowData) => (
                                     <InputText
+                                        style={{
+                                            border: 'none',
+                                            background: 'none',
+                                            outline: 'none',
+                                            boxShadow: 'none',
+                                            fontSize: 'inherit',
+                                            color: 'inherit',
+                                            width: '100%',
+                                            textAlign: 'left',
+                                        }}
                                         type="text"
                                         value={rowData[field.namef.toLowerCase()]}
                                         onChange={(e) =>
@@ -496,9 +522,15 @@ export default function ProjectDetailsCsv() {
                                         }
                                     />
                                 )}
-                                style={{ minWidth: '10rem' }}
+
                             />
                         ))}
+                        <Column
+                            key="save"
+                            header="Action"
+                            body={actionBodyTemplate}
+                            style={{ minWidth: '12rem' }}
+                        />
                     </DataTable>
                 </MainCard>
             </div>
