@@ -33,6 +33,8 @@ import AllComments from "../component/AllComments"
 import TempDetails from "../component/TemplateDetails"
 import TempDetailsExcel from "../component/TemplateDetailsExcel"
 import ProjectDetailsDoc from "../component/ProjectDetailDoc"
+import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -133,6 +135,10 @@ const MainRoutes = {
     {
       path: 'projects/project_detailsDoc/:id',
       element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'projects/project_detailsExcel/:id',
+      element: <ProjectDetailsCsv />
     },
     {
       path: 'projects',

@@ -3,7 +3,7 @@ import React, { useState, useEffect,useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import axios from "axios";
 import MainCard from "../ui-component/cards/MainCard";
-import {useParams} from "react-router-dom";
+import { useParams} from "react-router-dom";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import Card from "@mui/material/Card";
@@ -15,17 +15,100 @@ import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 
-export default function ProjectDetailDoc() {
+
+
+export default function ProjectDetailsCsv() {
     const [project, setProject] = useState([]);
+    const [fields, setFields] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 3;
     const toast = useRef(null);
     const { id } = useParams();
+    const dt = useRef(null);
+    const [data, setData] = useState([{}]);
+    const [savedFieldValues, setSavedFieldValues] = useState([]);
+    const [fetchedFieldValues, setFetchedFieldValues] = useState([]);
+
+
+
+
+
+
+
+
+
+    const handleSaveAll = () => {
+        const hasEmptyFields = data.some((row) =>
+            project.result.fieldList.some(
+                (field) => !row[field.namef.toLowerCase()]
+            )
+        );
+
+        if (hasEmptyFields) {
+            console.log("Cannot save due to empty fields.");
+            return;
+        }
+
+        const savePromises = data.flatMap((row) =>
+            project.result.fieldList.map((field) =>
+                axios.post("http://localhost:8080/api/fieldvalue/save", {
+                    value: row[field.namef.toLowerCase()],
+                    field: {
+                        id: field.id,
+                    },
+                })
+            )
+        );
+
+        Promise.all(savePromises)
+            .then((responses) => {
+                console.log("Saved all field values:", responses);
+                // Handle success
+            })
+        axios.get(`http://localhost:8080/api/projet/${id}`)
+            .then((response) => {
+                setProject(response.data);
+                if (response.data.result && response.data.result.id) {
+                    loadFields(response.data.result.id);
+                }
+            })
+
+
+
+            .catch((error) => {
+                console.error("Error while saving field values:", error);
+                // Handle error
+            });
+
+
+    };
+
+
+
+
+
+    const loadFields = async (projectId) => {
+        try {
+            const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
+            setFields(res.data);
+            console.log("fetched fields",res.data);
+
+            setFetchedFieldValues(res.data);
+        } catch (error) {
+            console.error("Error loading fields:", error);
+        }
+    };
+
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
-            setProject(response.data);
-        });
+        if (id) {
+            axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
+                setProject(response.data);
+                if (response.data.result && response.data.result.id) {
+                    loadFields(response.data.result.id);
+                }
+            });
+        }
     }, [id]);
 
     if (!project.commentList) {
@@ -40,9 +123,69 @@ export default function ProjectDetailDoc() {
 
 
 
+    const addRowButton = () => (
+        <Button  onClick={handleAddRow}>Add Row</Button>
+    );
+
+    const saveall = () => (
+        <Button  onClick={handleSaveAll}>Save all</Button>
+    );
+
+    const handleAddRow = () => {
+        const newRow = {};
+        const newData = [...data, newRow];
+
+        setData(newData);
+    };
+
+
+    const getSavedValue = (fieldId) => {
+        const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
+
+        if (fieldValue && fieldValue.fieldValueList && fieldValue.fieldValueList.length > 0) {
+            return fieldValue.fieldValueList.map(item => item.value).join(', ');
+        } else {
+            return '';
+        }
+    };
+
+
+
+
+    const handleInputChange = (rowData, fieldId, value) => {
+        // Find the existing saved value for the field
+        const existingSavedValue = savedFieldValues.find(
+            (savedValue) => savedValue.field.id === fieldId
+        );
+
+        // Update the existing saved value or create a new one
+        if (existingSavedValue) {
+            existingSavedValue.value = value;
+        } else {
+            const newSavedValue = {
+                field: { id: fieldId },
+                value: value,
+            };
+            setSavedFieldValues([...savedFieldValues, newSavedValue]);
+        }
+
+        // Update the input value for the current row
+        rowData[fieldId] = value;
+        setData([...data]); // Force re-render
+    };
+
+
+
+
+
+
+
+
+
+
     const header = (
         <div className="mt-2 mb-2">
-            <span className="text-xl text-900 font-bold">{project.name} Template</span>
+            <span className="text-xl text-900 font-bold">{project.name} Csv</span>
         </div>
     );
     const footer = (
@@ -190,17 +333,22 @@ export default function ProjectDetailDoc() {
                 </a>
             )
 
-            }else{
+        }else{
             return(
                 <a href={project.result.file} download>
 
                     <img  src={Csv} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
                 </a>
             )
-
-
         }
+
     };
+
+    const getSavedFieldValues = (fieldId) => {
+        const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
+        return fieldValue ? fieldValue.fieldValueList : [];
+    };
+
 
     return (
         <>
@@ -221,6 +369,56 @@ export default function ProjectDetailDoc() {
                     </div>
                 </div>
             </MainCard>
+
+
+
+            <div className="mt-5">
+                <MainCard>
+                    <DataTable
+                        value={data}
+                        dataKey="id"
+                        paginator
+                        rows={10}
+                        rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects"
+                        header={header}
+                    >
+                        <Column
+                            key="actions"
+                            header="Actions"
+                            body={addRowButton}
+                            style={{ width: '8rem', textAlign: 'center' }}
+                        />
+                        <Column
+                            key="save"
+                            header="saveall"
+                            body={saveall}
+                            style={{ width: '8rem', textAlign: 'center' }}
+                        />
+                        {project.result.fieldList.map((field) => (
+                            <Column
+                                key={field.id}
+                                header={field.namef}
+                                body={(rowData) => (
+                                    <input
+                                        type="text"
+                                        value={getSavedValue(field.id)}
+                                        onChange={(e) =>
+                                            handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
+                                        }
+                                    />
+                                )}
+                                style={{ minWidth: '10rem' }}
+                            />
+                        ))}
+
+
+                    </DataTable>
+
+
+                </MainCard>
+            </div>
 
             <MainCard className="mt-5" title="Comments">
                 {project.commentList.length > 0 ? (
