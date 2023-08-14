@@ -74,43 +74,7 @@ export default function ProjectDetailsCsv() {
             });
     };
 
-    const updateAll = () => {
-        const updatePromises = [];
 
-        project.result.fieldList.forEach((field) => {
-            if (field.fieldValueList && field.fieldValueList.length > 0) {
-                field.fieldValueList.forEach((fieldValue) => {
-                    const inputValue = savedFieldValues.find(
-                        (savedValue) => savedValue.field.id === fieldValue.field.id
-                    )?.value;
-
-                    console.log("Field ID:", fieldValue.field.id);
-                    console.log("Saved Value:", inputValue);
-
-                    if (inputValue !== undefined) {
-                        console.log("Updating field value ID:", fieldValue.id);
-                        updatePromises.push(
-                            axios.put(`http://localhost:8080/api/fieldvalue/${fieldValue.id}`, {
-                                value: inputValue,
-                            })
-                        );
-                    }
-                });
-            }
-        });
-
-
-        Promise.all(updatePromises)
-            .then((responses) => {
-                console.log("Updated all field values:", responses);
-                // Reload data after successful update
-                loadFields(project.result.id);
-            })
-            .catch((error) => {
-                console.error("Error while updating field values:", error);
-                // Handle error
-            });
-    };
 
     const loadFields = async (projectId) => {
         try {
@@ -158,9 +122,7 @@ export default function ProjectDetailsCsv() {
 
 
 
-    const addRowButton = () => (
-        <Button  onClick={handleAddRow}>Add Row</Button>
-    );
+    
 
     const saveall = () => (
         <Button  onClick={handleSaveAll}>Save all</Button>
@@ -215,12 +177,10 @@ export default function ProjectDetailsCsv() {
 
 
     const handleInputChange = (rowData, fieldId, value) => {
-        // Find the existing saved value for the field
         const existingSavedValueIndex = savedFieldValues.findIndex(
             (savedValue) => savedValue.field.id === fieldId
         );
 
-        // Update the existing saved value or create a new one
         if (existingSavedValueIndex !== -1) {
             savedFieldValues[existingSavedValueIndex].value = value;
             setSavedFieldValues([...savedFieldValues]);
@@ -232,9 +192,9 @@ export default function ProjectDetailsCsv() {
             setSavedFieldValues([...savedFieldValues, newSavedValue]);
         }
 
-        // Update the input value for the current row
         rowData[fieldId] = value;
-        setData([...data]); // Force re-render
+        setData([...data]);
+
     };
 
 
@@ -243,7 +203,51 @@ export default function ProjectDetailsCsv() {
 
 
 
+    const handleUpdateRow = async (rowData) => {
+        console.log("Row Data:", rowData);
 
+        if (!rowData) {
+            console.error("Row data not found for update");
+            return;
+        }
+
+        const updatePromises = [];
+
+        for (const field of project.result.fieldList) {
+            const fieldName = field.namef.toLowerCase();
+            const fieldValue = rowData[fieldName];
+
+            console.log("Field Name:", fieldName);
+            console.log("Field Value:", fieldValue);
+
+            if (fieldValue !== undefined) {
+                const fieldValueId = field.fieldValueList.find(
+                    (value) => value.field.id === field.id
+                )?.id;
+
+                console.log("Field Value ID:", fieldValueId);
+
+                if (fieldValueId) {
+                    const response = await axios.put(
+                        `http://localhost:8080/api/fieldvalue/${fieldValueId}`,
+                        { value: fieldValue }
+                    );
+                    updatePromises.push(response);
+                }
+            }
+        }
+
+        Promise.all(updatePromises)
+            .then((responses) => {
+                console.log("Updated all field values:", responses);
+                // Reload data after successful update
+                loadFields(project.result.id);
+            })
+            .catch((error) => {
+                console.error("Error updating field values:", error);
+                // Handle error
+            });
+    };
 
 
 
@@ -447,21 +451,15 @@ export default function ProjectDetailsCsv() {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects"
                         header={header}
                     >
-                        <Column
-                            key="actions"
-                            header="Actions"
-                            body={addRowButton}
-                            style={{ width: '8rem', textAlign: 'center' }}
-                        />
-                        <Column
-                            key="updateAll"
-                            header="Update All"
-                            body={(rowData, rowIndex) => (
-                                <Button
-                                    onClick={() => updateAll(data[rowIndex], rowIndex)}
-                                    label="Update"
-                                />
 
+                        <Column
+                            key="update"
+                            body={(rowData) => (
+                                <Button
+                                    label="Update"
+                                    onClick={() => handleUpdateRow(rowData)}
+                                    className="p-button-success"
+                                />
                             )}
                             style={{ width: '8rem', textAlign: 'center' }}
                         />
@@ -486,9 +484,9 @@ export default function ProjectDetailsCsv() {
                         />
                         {project.result.fieldList.map((field) => (
                             <Column
-                                key={`input-${field.namef}`}
+                                key={`input-${field.id}`}
                                 header={field.namef}
-                               // field={field.namef.toLowerCase()}
+                                field={field.namef.toLowerCase()}
                                 body={(rowData) => (
                                     <InputText
                                         type="text"
