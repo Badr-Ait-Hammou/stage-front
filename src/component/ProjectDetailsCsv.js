@@ -14,20 +14,18 @@ import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
+import {InputText} from "primereact/inputtext";
 
 
 
 export default function ProjectDetailsCsv() {
     const [project, setProject] = useState([]);
-    const [fields, setFields] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 3;
     const toast = useRef(null);
     const { id } = useParams();
-    const dt = useRef(null);
     const [data, setData] = useState([{}]);
     const [savedFieldValues, setSavedFieldValues] = useState([]);
-    const [fetchedFieldValues, setFetchedFieldValues] = useState([]);
 
 
 
@@ -38,66 +36,103 @@ export default function ProjectDetailsCsv() {
 
 
     const handleSaveAll = () => {
-        const hasEmptyFields = data.some((row) =>
-            project.result.fieldList.some(
-                (field) => !row[field.namef.toLowerCase()]
-            )
-        );
+        const lastRowValues = data[data.length - 1];
+
+        const hasEmptyFields = Object.values(lastRowValues).some((value) => value === '');
 
         if (hasEmptyFields) {
             console.log("Cannot save due to empty fields.");
             return;
         }
 
-        const savePromises = data.flatMap((row) =>
-            project.result.fieldList.map((field) =>
-                axios.post("http://localhost:8080/api/fieldvalue/save", {
-                    value: row[field.namef.toLowerCase()],
-                    field: {
-                        id: field.id,
-                    },
-                })
-            )
+        const savePromises = project.result.fieldList.map((field) =>
+            axios.post("http://localhost:8080/api/fieldvalue/save", {
+                value: lastRowValues[field.namef.toLowerCase()],
+                field: {
+                    id: field.id,
+                },
+            })
         );
 
         Promise.all(savePromises)
             .then((responses) => {
                 console.log("Saved all field values:", responses);
-                // Handle success
+                const newRow = {};
+                project.result.fieldList.forEach((field) => {
+                    newRow[field.namef.toLowerCase()] = '';
+                });
+                const newData = [...data];
+                newData[newData.length - 1] = newRow;
+                setData(newData);
+                loadFields(project.result.id);
+
+
             })
-        axios.get(`http://localhost:8080/api/projet/${id}`)
-            .then((response) => {
-                setProject(response.data);
-                if (response.data.result && response.data.result.id) {
-                    loadFields(response.data.result.id);
-                }
-            })
-
-
-
             .catch((error) => {
                 console.error("Error while saving field values:", error);
                 // Handle error
             });
-
-
     };
 
+    const updateAll = () => {
+        const updatePromises = [];
+
+        project.result.fieldList.forEach((field) => {
+            if (field.fieldValueList && field.fieldValueList.length > 0) {
+                field.fieldValueList.forEach((fieldValue) => {
+                    const inputValue = savedFieldValues.find(
+                        (savedValue) => savedValue.field.id === fieldValue.field.id
+                    )?.value;
+
+                    console.log("Field ID:", fieldValue.field.id);
+                    console.log("Saved Value:", inputValue);
+
+                    if (inputValue !== undefined) {
+                        console.log("Updating field value ID:", fieldValue.id);
+                        updatePromises.push(
+                            axios.put(`http://localhost:8080/api/fieldvalue/${fieldValue.id}`, {
+                                value: inputValue,
+                            })
+                        );
+                    }
+                });
+            }
+        });
 
 
-
+        Promise.all(updatePromises)
+            .then((responses) => {
+                console.log("Updated all field values:", responses);
+                // Reload data after successful update
+                loadFields(project.result.id);
+            })
+            .catch((error) => {
+                console.error("Error while updating field values:", error);
+                // Handle error
+            });
+    };
 
     const loadFields = async (projectId) => {
         try {
             const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
-            setFields(res.data);
-            console.log("fetched fields",res.data);
+            const newData = [];
 
-            setFetchedFieldValues(res.data);
+            for (let i = 0; i < res.data.length; i++) {
+                const field = res.data[i];
+                field.fieldValueList.forEach((value, index) => {
+                    if (!newData[index]) {
+                        newData[index] = {};
+                    }
+                    newData[index][field.namef.toLowerCase()] = value.value;
+                });
+            }
+
+            setData(newData);
         } catch (error) {
             console.error("Error loading fields:", error);
         }
     };
+
 
 
     useEffect(() => {
@@ -133,34 +168,62 @@ export default function ProjectDetailsCsv() {
 
     const handleAddRow = () => {
         const newRow = {};
+        project.result.fieldList.forEach((field) => {
+            newRow[field.namef.toLowerCase()] = '';
+        });
         const newData = [...data, newRow];
-
         setData(newData);
     };
 
-
-    const getSavedValue = (fieldId) => {
-        const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
-
-        if (fieldValue && fieldValue.fieldValueList && fieldValue.fieldValueList.length > 0) {
-            return fieldValue.fieldValueList.map(item => item.value).join(', ');
-        } else {
-            return '';
+    const handleDeleteRow = (rowData) => {
+        if (!rowData) {
+            console.error("Row data not found for deletion");
+            return;
         }
-    };
 
+        const deletePromises = [];
+
+        for (const field of project.result.fieldList) {
+            const fieldValue = rowData[field.namef.toLowerCase()];
+            if (fieldValue !== undefined) {
+                const fieldValueId = field.fieldValueList.find(
+                    (value) => value.value === fieldValue
+                )?.id;
+
+                if (fieldValueId) {
+                    deletePromises.push(
+                        axios.delete(`http://localhost:8080/api/fieldvalue/${fieldValueId}`)
+                    );
+                }
+            }
+        }
+
+
+        Promise.all(deletePromises)
+            .then(() => {
+                console.log("Deleted all values for row:", rowData);
+                const updatedData = data.filter((row) => row !== rowData);
+                setData(updatedData);
+            })
+            .catch((error) => {
+                console.error("Error deleting row values:", error);
+            });
+
+
+    };
 
 
 
     const handleInputChange = (rowData, fieldId, value) => {
         // Find the existing saved value for the field
-        const existingSavedValue = savedFieldValues.find(
+        const existingSavedValueIndex = savedFieldValues.findIndex(
             (savedValue) => savedValue.field.id === fieldId
         );
 
         // Update the existing saved value or create a new one
-        if (existingSavedValue) {
-            existingSavedValue.value = value;
+        if (existingSavedValueIndex !== -1) {
+            savedFieldValues[existingSavedValueIndex].value = value;
+            setSavedFieldValues([...savedFieldValues]);
         } else {
             const newSavedValue = {
                 field: { id: fieldId },
@@ -173,6 +236,7 @@ export default function ProjectDetailsCsv() {
         rowData[fieldId] = value;
         setData([...data]); // Force re-render
     };
+
 
 
 
@@ -344,10 +408,7 @@ export default function ProjectDetailsCsv() {
 
     };
 
-    const getSavedFieldValues = (fieldId) => {
-        const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
-        return fieldValue ? fieldValue.fieldValueList : [];
-    };
+
 
 
     return (
@@ -374,9 +435,11 @@ export default function ProjectDetailsCsv() {
 
             <div className="mt-5">
                 <MainCard>
+                    <Button  onClick={handleAddRow}>Add Row</Button>
+
                     <DataTable
                         value={data}
-                        dataKey="id"
+                        dataKey={(rowData, index) => index}
                         paginator
                         rows={10}
                         rowsPerPageOptions={[5, 10, 25]}
@@ -391,6 +454,31 @@ export default function ProjectDetailsCsv() {
                             style={{ width: '8rem', textAlign: 'center' }}
                         />
                         <Column
+                            key="updateAll"
+                            header="Update All"
+                            body={(rowData, rowIndex) => (
+                                <Button
+                                    onClick={() => updateAll(data[rowIndex], rowIndex)}
+                                    label="Update"
+                                />
+
+                            )}
+                            style={{ width: '8rem', textAlign: 'center' }}
+                        />
+                        <Column
+                            key="delete"
+                            body={(rowData) => (
+                                <Button
+                                    label="Delete"
+                                    onClick={() => handleDeleteRow(rowData)}
+                                    className="p-button-danger"
+                                />
+                            )}
+                            style={{ width: '8rem', textAlign: 'center' }}
+                        />
+
+
+                        <Column
                             key="save"
                             header="saveall"
                             body={saveall}
@@ -398,12 +486,13 @@ export default function ProjectDetailsCsv() {
                         />
                         {project.result.fieldList.map((field) => (
                             <Column
-                                key={field.id}
+                                key={`input-${field.namef}`}
                                 header={field.namef}
+                               // field={field.namef.toLowerCase()}
                                 body={(rowData) => (
-                                    <input
+                                    <InputText
                                         type="text"
-                                        value={getSavedValue(field.id)}
+                                        value={rowData[field.namef.toLowerCase()]}
                                         onChange={(e) =>
                                             handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
                                         }
@@ -412,11 +501,7 @@ export default function ProjectDetailsCsv() {
                                 style={{ minWidth: '10rem' }}
                             />
                         ))}
-
-
                     </DataTable>
-
-
                 </MainCard>
             </div>
 
