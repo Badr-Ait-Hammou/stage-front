@@ -15,6 +15,8 @@ import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 import {InputText} from "primereact/inputtext";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
+
 
 
 
@@ -29,54 +31,11 @@ export default function ProjectDetailsCsv() {
     const [data, setData] = useState([{}]);
     const [savedFieldValues, setSavedFieldValues] = useState([]);
     const [globalFilter, setGlobalFilter] = useState(null);
+    const [showSaveAllButton, setShowSaveAllButton] = useState(false);
 
 
 
-
-
-
-
-
-
-
-    const handleSaveAll = () => {
-        const lastRowValues = data[data.length - 1];
-
-        const hasEmptyFields = Object.values(lastRowValues).some((value) => value === '');
-
-        if (hasEmptyFields) {
-            console.log("Cannot save due to empty fields.");
-            return;
-        }
-
-        const savePromises = project.result.fieldList.map((field) =>
-            axios.post("http://localhost:8080/api/fieldvalue/save", {
-                value: lastRowValues[field.namef.toLowerCase()],
-                field: {
-                    id: field.id,
-                },
-            })
-        );
-
-        Promise.all(savePromises)
-            .then((responses) => {
-                console.log("Saved all field values:", responses);
-                const newRow = {};
-                project.result.fieldList.forEach((field) => {
-                    newRow[field.namef.toLowerCase()] = '';
-                });
-                const newData = [...data];
-                newData[newData.length - 1] = newRow;
-                setData(newData);
-                loadFields(project.result.id);
-
-
-            })
-            .catch((error) => {
-                console.error("Error while saving field values:", error);
-                // Handle error
-            });
-    };
+    /******************************************** Load  *******************************************/
 
 
 
@@ -115,7 +74,7 @@ export default function ProjectDetailsCsv() {
     }, [id]);
 
     if (!project.commentList) {
-        return <div>Loading...</div>;
+        return <PopularCart/>;
     }
 
     const loadComments=async ()=>{
@@ -129,52 +88,116 @@ export default function ProjectDetailsCsv() {
 
 
 
+    /******************************************** Add Datatable Row  *******************************************/
+
+
 
     const handleAddRow = () => {
+
         const newRow = {};
         project.result.fieldList.forEach((field) => {
             newRow[field.namef.toLowerCase()] = '';
         });
         const newData = [...data, newRow];
         setData(newData);
+        setShowSaveAllButton(true); // Show the "Save All" button for the newly added row
+
     };
 
-    const handleDeleteRow = (rowData) => {
+    /******************************************** Save all row values *******************************************/
+
+
+    const handleSaveAll = () => {
+        const lastRowValues = data[data.length - 1];
+
+        const hasEmptyFields = Object.values(lastRowValues).some((value) => value === '');
+
+        if (hasEmptyFields) {
+            console.log("Cannot save due to empty fields.");
+            showEmpty();
+            return;
+        }
+
+        const savePromises = project.result.fieldList.map((field) =>
+            axios.post("http://localhost:8080/api/fieldvalue/save", {
+                value: lastRowValues[field.namef.toLowerCase()],
+                field: {
+                    id: field.id,
+                },
+            })
+        );
+
+        Promise.all(savePromises)
+            .then((responses) => {
+                console.log("Saved all field values:", responses);
+                const newRow = {};
+                project.result.fieldList.forEach((field) => {
+                    newRow[field.namef.toLowerCase()] = '';
+                });
+                const newData = [...data];
+                newData[newData.length - 1] = newRow;
+                setData(newData);
+                loadFields(project.result.id);
+                setShowSaveAllButton(false);
+                showusave();
+
+
+
+            })
+            .catch((error) => {
+                console.error("Error while saving field values:", error);
+                // Handle error
+            });
+    };
+
+
+    /******************************************** Delete all row values *******************************************/
+
+
+    const handleDeleteRow = async (rowData) => {
         if (!rowData) {
             console.error("Row data not found for deletion");
             return;
         }
 
-        const deletePromises = [];
+        const confirmDelete = async () => {
+            try {
+                for (const field of project.result.fieldList) {
+                    const fieldValue = rowData[field.namef.toLowerCase()];
+                    if (fieldValue !== undefined) {
+                        const fieldValueId = field.fieldValueList.find(
+                            (value) => value.value === fieldValue
+                        )?.id;
 
-        for (const field of project.result.fieldList) {
-            const fieldValue = rowData[field.namef.toLowerCase()];
-            if (fieldValue !== undefined) {
-                const fieldValueId = field.fieldValueList.find(
-                    (value) => value.value === fieldValue
-                )?.id;
-
-                if (fieldValueId) {
-                    deletePromises.push(
-                        axios.delete(`http://localhost:8080/api/fieldvalue/${fieldValueId}`)
-                    );
+                        if (fieldValueId) {
+                            await axios.delete(`http://localhost:8080/api/fieldvalue/${fieldValueId}`);
+                        }
+                    }
                 }
-            }
-        }
 
-
-        Promise.all(deletePromises)
-            .then(() => {
-                console.log("Deleted all values for row:", rowData);
                 const updatedData = data.filter((row) => row !== rowData);
                 setData(updatedData);
-            })
-            .catch((error) => {
+                showDelete();
+                console.log("Deleted all values for row:", rowData);
+            } catch (error) {
                 console.error("Error deleting row values:", error);
-            });
+            }
+        };
 
-
+        confirmDialog({
+            message: 'Are you sure you want to delete this row?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete,
+        });
     };
+
+
+    /******************************************** Datatable component *******************************************/
+
 
     const leftToolbarTemplate = () => {
         return (
@@ -184,14 +207,77 @@ export default function ProjectDetailsCsv() {
         );
     };
 
-    const actionBodyTemplate = (rowData) => {
+
+    const actionBodyTemplate = (rowData, rowIndex) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-plus" rounded outlined style={{marginRight:"4px"}} onClick={handleSaveAll} />
-                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => handleDeleteRow(rowData)} />
+                {showSaveAllButton && rowIndex === data.length - 1 && (
+                    <Button
+                        icon="pi pi-check"
+                        rounded
+                        outlined
+                        style={{ marginRight: '4px' }}
+                        onClick={handleSaveAll}
+                    />
+                )}
+                <Button
+                    icon="pi pi-trash"
+                    rounded
+                    outlined
+                    severity="danger"
+                    onClick={() => handleDeleteRow(rowData)}
+                />
             </React.Fragment>
         );
     };
+
+    const footer = (
+        <div >
+            <p>
+                In total there is 1 Template on the{" "}
+                {project.name} project.
+            </p>
+        </div>
+    );
+
+
+
+
+    const header = (
+        <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText type="search" value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Search..."
+                />
+            </span>
+        </div>
+    );
+
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+    const rightToolbarTemplate = () => {
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    };
+
+
+
+
+    /****************************************************** Toasts ****************************************/
+
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'success', detail:'row saved successfully', life: 3000});
+    }
+
+    const showDelete = () => {
+        toast.current.show({severity:'error', summary: 'done', detail:'row deleted successfully', life: 3000});
+    }
+    const showEmpty = () => {
+        toast.current.show({severity:'warn', summary: 'heads up', detail:'the values are empty', life: 3000});
+    }
+
+
+    /****************************************************** InputChange ****************************************/
 
 
 
@@ -216,66 +302,12 @@ export default function ProjectDetailsCsv() {
         setData(updatedData);
     };
 
-    const handleUpdateRow = async (rowData) => {
-        console.log("Row Data:", rowData);
-
-        if (!rowData) {
-            console.error("Row data not found for update");
-            return;
-        }
-
-        const updatePromises = [];
-
-        for (const field of project.result.fieldList) {
-            const fieldName = field.namef.toLowerCase();
-            const fieldValue = rowData[fieldName];
-
-            console.log("Field Name:", fieldName);
-            console.log("Field Value:", fieldValue);
-
-            if (fieldValue !== undefined) {
-                const fieldValueId = field.fieldValueList.find(
-                    (value) => value.field.id === field.id
-                )?.id;
-
-                console.log("Field Value ID:", fieldValueId);
-
-                if (fieldValueId) {
-                    const response = await axios.put(
-                        `http://localhost:8080/api/fieldvalue/${fieldValueId}`,
-                        { value: fieldValue }
-                    );
-                    updatePromises.push(response);
-                }
-            }
-        }
-
-        Promise.all(updatePromises)
-            .then((responses) => {
-                console.log("Updated all field values:", responses);
-                // Reload data after successful update
-                loadFields(project.result.id);
-            })
-            .catch((error) => {
-                console.error("Error updating field values:", error);
-                // Handle error
-            });
-    };
-
-
-    const footer = (
-        <div >
-            <p>
-                In total there is 1 Template on the{" "}
-                {project.name} project.
-            </p>
-        </div>
-    );
 
 
 
 
-    /************************************* Paginator **************************************/
+
+    /************************************************* Comment Paginator *****************************************/
 
     const handlePageChange = (event) => {
         setCurrentPage(event.page);
@@ -419,27 +451,6 @@ export default function ProjectDetailsCsv() {
 
     };
 
-    const header = (
-        <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-    <span className="p-input-icon-left">
-      <i className="pi pi-search" />
-      <InputText
-          type="search"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search..."
-      />
-    </span>
-
-        </div>
-    );
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    };
-    const rightToolbarTemplate = () => {
-        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
-    };
 
 
 
@@ -480,26 +491,12 @@ export default function ProjectDetailsCsv() {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter}  header={header}
                     >
 
-                        {/* <Column
-                            key="update"
-                            body={(rowData) => (
-                                <Button
-                                    label="Update"
-                                    onClick={() => handleUpdateRow(rowData)}
-                                    className="p-button-success"
-                                />
-                            )}
-                            style={{ width: '8rem', textAlign: 'center' }}
-                        />
-                        */}
-
-
-
 
                         {project.result.fieldList.map((field) => (
                             <Column
 
                                 key={`input-${field.id}`}
+
                                 header={field.namef}
                                 field={field.namef.toLowerCase()}
                                 style={{ minWidth: '7rem' }}
@@ -516,6 +513,7 @@ export default function ProjectDetailsCsv() {
                                             textAlign: 'left',
                                         }}
                                         type="text"
+                                        //key={`input-${field.id}-${rowData.id}`} // Unique key for each input
                                         value={rowData[field.namef.toLowerCase()]}
                                         onChange={(e) =>
                                             handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
@@ -528,9 +526,11 @@ export default function ProjectDetailsCsv() {
                         <Column
                             key="save"
                             header="Action"
-                            body={actionBodyTemplate}
+                            body={(rowData) => actionBodyTemplate(rowData, data.indexOf(rowData))}
                             style={{ minWidth: '12rem' }}
                         />
+
+
                     </DataTable>
                 </MainCard>
             </div>
