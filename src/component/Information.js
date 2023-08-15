@@ -8,11 +8,13 @@ import {Toast} from "primereact/toast";
 import {styled} from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
+import Addphoto from "../assets/images/add photo.png";
 
 
 const SmallAvatar = styled(Avatar)(({ theme }) => ({
     width: 22,
     height: 22,
+    padding:2,
     border: `2px solid ${theme.palette.background.paper}`,
 }));
 
@@ -25,7 +27,7 @@ export default function Information() {
     const [fax,setFax]=useState("");
     const [webSite,setWebSite]=useState("");
     const [logo, setLogo] = useState("");
-    const [valIds,setValIds]=useState("");
+    const [email,setEmail]=useState("");
     const [valRc,setValRc]=useState("");
     const [valPatente,setValPatente]=useState("");
     const [valIf,setvalIf]=useState("");
@@ -49,7 +51,7 @@ export default function Information() {
             if (!fax && companyData) setFax(companyData.fax);
             if (!webSite && companyData) setWebSite(companyData.webSite);
             if (!logo && companyData) setLogo(companyData.logo);
-            if (!valIds && companyData) setValIds(companyData.valIds);
+            if (!email && companyData) setEmail(companyData.email);
             if (!valRc && companyData) setValRc(companyData.valRc);
             if (!valPatente && companyData) setValPatente(companyData.valPatente);
             if (!valCnss && companyData) setValcnss(companyData.valCnss);
@@ -62,7 +64,7 @@ export default function Information() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (name.trim() === '' || phone.trim() === '' || valCnss.trim() === '' || address.trim() === '' || valRc.trim() === '' || valPatente.trim() === '' || valIds.trim() === '') {
+        if (name.trim() === '' || phone.trim() === '' || valCnss.trim() === '' || address.trim() === '' || valRc.trim() === '' || valPatente.trim() === '' || email.trim() === '') {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
             return;
         }
@@ -75,7 +77,7 @@ export default function Information() {
             fax,
             webSite,
             logo,
-            valIds,
+            email,
             valRc,
             valPatente,
             valCnss,
@@ -107,7 +109,7 @@ export default function Information() {
             fax :fax,
             webSite :webSite,
             logo: logo,
-            valIds :valIds,
+            email :email,
             valRc :valRc,
             valPatente :valPatente,
             valCnss :valCnss,
@@ -150,7 +152,7 @@ export default function Information() {
             if (!fax && companyData) setFax(companyData.fax);
             if (!webSite && companyData) setWebSite(companyData.webSite);
             if (!logo && companyData) setLogo(companyData.logo);
-            if (!valIds && companyData) setValIds(companyData.valIds);
+            if (!email && companyData) setEmail(companyData.email);
             if (!valRc && companyData) setValRc(companyData.valRc);
             if (!valPatente && companyData) setValPatente(companyData.valPatente);
             if (!valCnss && companyData) setValcnss(companyData.valCnss);
@@ -171,7 +173,7 @@ export default function Information() {
     };
 
     return (
-        <MainCard title="Information">
+        <MainCard >
             <Toast ref={toast} />
 
 
@@ -179,17 +181,17 @@ export default function Information() {
                 <Box className="card mb-4">
                     <Box className=" text-center">
                         <label htmlFor="uploadImage">
-                            <Box style={{ alignItems: "center", justifyContent: 'center', display: "flex" }}>
+                            <Box style={{ alignItems: "center", justifyContent: 'center', display: "flex",marginBottom:"8px" }}>
                                 {company && company.logo ? (
                                     <Badge
 
                                         overlap="circular"
                                         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                         badgeContent={
-                                            <SmallAvatar  alt="Remy Sharp" src='/static/images/avatar/1.jpg'  />
+                                            <SmallAvatar  alt="Remy Sharp" src={Addphoto}  />
                                         }
                                     >
-                                        <Avatar alt="AH" src={company.logo} style={{ width: '150px',height:'150px', cursor: 'pointer' }}  />
+                                        <Avatar alt="AH" src={company.logo} style={{ width: '150px',height:'145px', cursor: 'pointer',padding:"30px",alignItems:"center",justifyContent:"center" }}  />
                                     </Badge>
                                 ) : (
                                     <div>No logo available</div>
@@ -197,9 +199,19 @@ export default function Information() {
                             </Box>
                         </label>
                         <input type="file" id="uploadImage" style={{ display: 'none' }} onChange={handleImageUpload} />
-                        <h5 className="my-3">{ company ? company.name || 'name' : 'Name'}</h5>
-                        <strong className="text-muted mb-1">{ company ? company.phone || 'phone' : 'Phone'}</strong>
-                        <p className="text-muted mb-4">{ company ? company.webSite || 'website' : 'WEBSITE'}</p>
+                            <strong
+                                className="my-3 font-serif mt-5"><i className="mx-2 pi pi-building "></i>
+                                { company ? company.name || 'name' : 'Name'}
+                            </strong>
+
+                        <h3
+                            className="text-muted mb-1 mt-1"><i className="mx-2 pi pi-phone  "></i>
+                            { company ? company.phone || 'phone' : 'Phone'}
+                        </h3>
+                        <p
+                            className="text-muted mb-4">  <i className="mx-2 pi  pi-globe "></i>
+                            { company ? company.webSite || 'website' : 'WEBSITE'}
+                        </p>
                         <Box className="card">
                             <div className="d-flex justify-content-center mb-2">
                                 {company && company.id ? (
@@ -282,13 +294,16 @@ export default function Information() {
 
                 <div className="p-inputgroup flex-1">
                     <span className="p-inputgroup-addon">
-                        <i >I.C.E</i>
+                        <i >Email</i>
+
                     </span>
-                    <InputText placeholder={company ? company.valIce || 'valIce' : 'I.C.E'}
-                               value={valIce}
-                               onChange={(e) => setValIce(e.target.value)}
+                    <InputText placeholder={ company ? company.email || 'email' : 'Email'}
+                               value={email}
+                               onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
+
+
             </Box>
 
 
@@ -329,12 +344,11 @@ export default function Information() {
 
                 <div className="p-inputgroup flex-1">
                     <span className="p-inputgroup-addon">
-                        <i >I.D.S</i>
-
+                        <i >I.C.E</i>
                     </span>
-                    <InputText placeholder={ company ? company.valIds || 'valIds' : 'I.D.S'}
-                               value={valIds}
-                               onChange={(e) => setValIds(e.target.value)}
+                    <InputText placeholder={company ? company.valIce || 'valIce' : 'I.C.E'}
+                               value={valIce}
+                               onChange={(e) => setValIce(e.target.value)}
                     />
                 </div>
 

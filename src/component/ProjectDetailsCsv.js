@@ -22,12 +22,12 @@ import 'jspdf-autotable';
 
 export default function ProjectDetailsCsv() {
     const [project, setProject] = useState([]);
+    const [company, setCompany] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const cardsPerPage = 3;
     const toast = useRef(null);
     const { id } = useParams();
     const dt = useRef(null);
-
     const [data, setData] = useState([{}]);
     const [savedFieldValues, setSavedFieldValues] = useState([]);
     const [globalFilter, setGlobalFilter] = useState(null);
@@ -71,6 +71,10 @@ export default function ProjectDetailsCsv() {
                 }
             });
         }
+        axios.get(`http://localhost:8080/api/company/getfirst`).then((response) => {
+            const companyData = response.data;
+            setCompany(companyData);
+        });
     }, [id]);
 
     if (!project.commentList) {
@@ -81,6 +85,9 @@ export default function ProjectDetailsCsv() {
         const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
         setProject(res.data);
     }
+
+
+
 
 
 
@@ -464,31 +471,66 @@ export default function ProjectDetailsCsv() {
     const handleExportPDF = () => {
         const doc = new jsPDF();
 
-        // Title
-        doc.setFontSize(18);
-        doc.text('DataTable Export', 15, 15);
+        const imgData = company ? company.logo : "no logo";
+        console.log("imgData:", imgData);
+        const logoWidth = 25;
+        const logoHeight = 25;
+        const logoX = (doc.internal.pageSize.width - logoWidth) / 2;
+        const logoY = 10;
 
-        // DataTable content
+        doc.addImage(imgData, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+
+        // Title
+        doc.setFontSize(10);
+        const titleX = doc.internal.pageSize.width / 2; // Center horizontally
+        doc.text(` ${company.name} - Company-`, titleX, 50, { align: 'center' });
+
+
+        const currentDate = new Date();
+        const dateTimeString = currentDate.toLocaleString();
+        doc.setFontSize(8);
+        doc.text(` ${dateTimeString}`, titleX, 55, { align: 'center' });
+
+
         const columns = project.result.fieldList.map((field) => field.namef);
         const rows = data.map((rowData) => project.result.fieldList.map((field) => rowData[field.namef.toLowerCase()]));
 
         doc.autoTable({
             head: [columns],
             body: rows,
-            startY: 30,
+            startY: 80,
         });
 
-        // Footer
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 0; i < pageCount; i++) {
             doc.setPage(i);
-            doc.text(`Page ${i + 1} of ${pageCount}`, 15, doc.internal.pageSize.height - 10);
+            const footerX = doc.internal.pageSize.width / 2;
+            const footerY = doc.internal.pageSize.height - 10;
+
+            doc.text(`Page ${i + 1} of ${pageCount}`, footerX, footerY, { align: 'center' });
+
+            const companyInfo = [
+                `I.D.S: ${company.valIds}   | R.C: ${company.valRc}  | WEBSITE :${company.webSite}`,
+                `CNSS: ${company.valCnss}   | I.C.E: ${company.valIce}  |  I.F: ${company.valIf} ` ,
+                `PHONE: ${company.phone}   | ADDRESS: ${company.address}  |  FAX: ${company.fax}`,
+
+
+
+            ];
+
+            const lineHeight = 8;
+            const infoFontSize = 8;
+            doc.setFontSize(infoFontSize);
+
+            for (let j = 0; j < companyInfo.length; j++) {
+                const lineY = footerY - (lineHeight * (j + 1));
+                doc.text(companyInfo[j], footerX, lineY, { align: 'center' });
+            }
         }
 
-        // Save the PDF
+
         doc.save('datatable-export.pdf');
     };
-
 
 
 
