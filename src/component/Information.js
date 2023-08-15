@@ -205,11 +205,11 @@ export default function Information() {
                             </strong>
 
                         <h3
-                            className="text-muted mb-1 mt-1"><i className="mx-2 pi pi-phone  "></i>
+                            className="text-muted mb-1 mt-3"><i className="mx-2 pi pi-phone  "></i>
                             { company ? company.phone || 'phone' : 'Phone'}
                         </h3>
                         <p
-                            className="text-muted mb-4">  <i className="mx-2 pi  pi-globe "></i>
+                            className="text-muted mb-4 mt-2">  <i className="mx-2 pi  pi-globe "></i>
                             { company ? company.webSite || 'website' : 'WEBSITE'}
                         </p>
                         <Box className="card">
@@ -229,8 +229,8 @@ export default function Information() {
 
             <Box className="card flex flex-column md:flex-row gap-3">
                 <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i >Name</i>
+                <span className="p-inputgroup-addon" >
+                    <i style={{fontSize:"12px"}}>Name</i>
                 </span>
                     <InputText placeholder={company ? company.name ||'name' : 'NAME'}
                                value={name}
@@ -240,7 +240,7 @@ export default function Information() {
 
                 <div className="p-inputgroup flex-1">
                     <span className="p-inputgroup-addon">
-                        <i >Address</i>
+                        <i>Address</i>
                     </span>
                     <InputText placeholder={ company ? company.address ||'address' : 'ADDRESS'}
                                value={address}
@@ -257,7 +257,7 @@ export default function Information() {
             <Box className="card flex flex-column md:flex-row gap-3 mt-2">
                 <div className="p-inputgroup flex-1">
                     <span className="p-inputgroup-addon">
-                        <i >WebSite</i>
+                        <i style={{fontSize:"12px"}}>WebSite</i>
                     </span>
                     <InputText placeholder={ company ? company.webSite || 'website' : 'WEBSITE'}
                                value={webSite}
@@ -267,7 +267,7 @@ export default function Information() {
 
                 <div className="p-inputgroup flex-1">
                 <span className="p-inputgroup-addon">
-                    <i >Phone</i>
+                    <i style={{fontSize:"12px"}} >Phone</i>
                 </span>
                     <InputText placeholder={ company ? company.phone || 'phone' : 'PHONE'}
                                value={phone}
@@ -344,7 +344,7 @@ export default function Information() {
 
                 <div className="p-inputgroup flex-1">
                     <span className="p-inputgroup-addon">
-                        <i >I.C.E</i>
+                        <i style={{fontSize:"16px"}}>I.C.E</i>
                     </span>
                     <InputText placeholder={company ? company.valIce || 'valIce' : 'I.C.E'}
                                value={valIce}

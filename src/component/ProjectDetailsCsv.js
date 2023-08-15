@@ -18,6 +18,7 @@ import {InputText} from "primereact/inputtext";
 import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import Pdftemplate from "../assets/images/pdftemplate7.png"
 
 
 export default function ProjectDetailsCsv() {
@@ -153,7 +154,6 @@ export default function ProjectDetailsCsv() {
             })
             .catch((error) => {
                 console.error("Error while saving field values:", error);
-                // Handle error
             });
     };
 
@@ -471,25 +471,74 @@ export default function ProjectDetailsCsv() {
     const handleExportPDF = () => {
         const doc = new jsPDF();
 
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+        doc.addImage(Pdftemplate, 'JPEG', 0, 0, pageWidth, pageHeight);
+
+        // Company Logo
         const imgData = company ? company.logo : "no logo";
-        console.log("imgData:", imgData);
         const logoWidth = 25;
         const logoHeight = 25;
-        const logoX = (doc.internal.pageSize.width - logoWidth) / 2;
+        const logoX = 10; // Adjust this value to position the logo on the left
         const logoY = 10;
 
         doc.addImage(imgData, 'JPEG', logoX, logoY, logoWidth, logoHeight);
 
+        // Company Name
+        const nameX = logoX +6 ;
+        const nameY = logoY + logoHeight + 4;
+        doc.setFontSize(10);
+        doc.text(company.name, nameX, nameY);
+
+        const maxAddressLength = 30;
+
+        const splitAddress = (address) => {
+            const lines = [];
+            let currentLine = '';
+
+            for (let i = 0; i < address.length; i++) {
+                currentLine += address[i];
+                if (currentLine.length >= maxAddressLength || i === address.length - 1) {
+                    lines.push(currentLine);
+                    currentLine = '';
+                }
+            }
+
+            return lines;
+        };
+
+        const contactInfoX = doc.internal.pageSize.width - 48;
+        const contactInfoY = 16;
+
+        const addressLines = splitAddress(company.address);
+
+        const companyInfo = [
+            `${company.phone}`,
+            `${company.email}`,
+            `${company.webSite}`,
+            ...addressLines, // Use the split address lines
+
+        ];
+
+        const lineHeight = 6;
+        const infoFontSize = 8;
+        doc.setFontSize(infoFontSize);
+
+        for (let j = 0; j < companyInfo.length; j++) {
+            const lineY = contactInfoY + (lineHeight * j);
+            doc.text(companyInfo[j], contactInfoX, lineY, { align: 'left' });
+        }
         // Title
         doc.setFontSize(10);
-        const titleX = doc.internal.pageSize.width / 2; // Center horizontally
-        doc.text(` ${company.name} - Company-`, titleX, 50, { align: 'center' });
+        const titleX = doc.internal.pageSize.width / 2;
+        doc.setFontSize(16);
+        doc.text(` ${company.name} - Company`, titleX, 60, { align: 'center' });
 
 
         const currentDate = new Date();
         const dateTimeString = currentDate.toLocaleString();
         doc.setFontSize(8);
-        doc.text(` ${dateTimeString}`, titleX, 55, { align: 'center' });
+        doc.text(` ${dateTimeString}`, titleX, 65, { align: 'center' });
 
 
         const columns = project.result.fieldList.map((field) => field.namef);
@@ -499,7 +548,28 @@ export default function ProjectDetailsCsv() {
             head: [columns],
             body: rows,
             startY: 80,
+            theme: 'grid',
+            styles: {
+                fontSize: 10,
+                halign: 'center',
+                valign: 'middle',
+                cellPadding:3 ,
+            },
+            headStyles: {
+                fillColor: [75, 76, 88],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+            },
+
+            columnStyles: {
+                cellWidth: 20 ,
+            },
+            alternateRowStyles: {
+                fillColor: [245, 245, 245],
+            },
         });
+
+
 
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 0; i < pageCount; i++) {
@@ -518,7 +588,7 @@ export default function ProjectDetailsCsv() {
 
             ];
 
-            const lineHeight = 8;
+            const lineHeight = 5;
             const infoFontSize = 8;
             doc.setFontSize(infoFontSize);
 
