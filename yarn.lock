@@ -6644,6 +6644,11 @@ jsonpointer@^5.0.0:
   resolved "https://registry.npmjs.org/jsonpointer/-/jsonpointer-5.0.1.tgz"
   integrity sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==
 
+jspdf-autotable@^3.5.31:
+  version "3.5.31"
+  resolved "https://registry.npmjs.org/jspdf-autotable/-/jspdf-autotable-3.5.31.tgz"
+  integrity sha512-Lc1KuLGDQWW/5t57Z/+c2E94XQV3jV2QVU3xMRiwvcm/nMx79aCkpPCsxLzJZVFneZvz4XoA8+egQR1QajYiWw==
+
 jspdf-html2canvas@^1.4.9:
   version "1.4.9"
   resolved "https://registry.npmjs.org/jspdf-html2canvas/-/jspdf-html2canvas-1.4.9.tgz"

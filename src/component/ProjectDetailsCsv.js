@@ -16,8 +16,8 @@ import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 import {InputText} from "primereact/inputtext";
 import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
-
-
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 
 export default function ProjectDetailsCsv() {
@@ -257,7 +257,12 @@ export default function ProjectDetailsCsv() {
         dt.current.exportCSV();
     };
     const rightToolbarTemplate = () => {
-        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+        return (
+            <div>
+        <Button label="Export" icon="pi pi-upload" className="p-button-help" style={{marginRight:"5px"}} onClick={exportCSV} />
+        <Button label="Export PDF" icon="pi pi-file-pdf" className="p-button-danger "  onClick={handleExportPDF} />
+        </div>
+        );
     };
 
 
@@ -450,6 +455,40 @@ export default function ProjectDetailsCsv() {
         }
 
     };
+
+
+    /******************************************** Export pdf *******************************************/
+
+
+
+    const handleExportPDF = () => {
+        const doc = new jsPDF();
+
+        // Title
+        doc.setFontSize(18);
+        doc.text('DataTable Export', 15, 15);
+
+        // DataTable content
+        const columns = project.result.fieldList.map((field) => field.namef);
+        const rows = data.map((rowData) => project.result.fieldList.map((field) => rowData[field.namef.toLowerCase()]));
+
+        doc.autoTable({
+            head: [columns],
+            body: rows,
+            startY: 30,
+        });
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 0; i < pageCount; i++) {
+            doc.setPage(i);
+            doc.text(`Page ${i + 1} of ${pageCount}`, 15, doc.internal.pageSize.height - 10);
+        }
+
+        // Save the PDF
+        doc.save('datatable-export.pdf');
+    };
+
 
 
 
