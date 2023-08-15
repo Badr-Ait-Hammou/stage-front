@@ -1,56 +1,42 @@
-import React from "react"
+import React, { useState, useRef } from "react";
 import MainCard from "../ui-component/cards/MainCard";
-import { Panel } from 'primereact/panel';
-import {Grid} from "@mui/material";
-export default function ExcelFile(){
-  return(
+import {ExcelRenderer} from 'react-excel-renderer';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
 
+
+
+export default function ExcelFile() {
+  const [header, setHeader] = useState([]);
+  const [rows, setRows] = useState([]);
+
+  const handleFile=(event) => {
+    const file = event.target.files[0];
+    ExcelRenderer(file,(err,response)=>{
+      if(err){
+        console.log(err)
+      }else {
+        setHeader(response.rows[0])
+        setCols(response.rows)
+
+      }
+    })
+
+
+  }
+
+  return (
     <MainCard title="Information">
-      <Panel header="Information" toggleable>
-        <Grid>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <strong>Name:</strong>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              ""
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} className="mt-0.5">
-            <Grid item xs={12} sm={6}>
-              <strong>Images:</strong>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              ""
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} className="mt-0.5">
-            <Grid item xs={12} sm={6}>
-              <strong>Created at:</strong>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              ""
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} className="mt-0.5">
-            <Grid item xs={12} sm={6}>
-              <strong>Description:</strong>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              ""
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} className="mt-0.5">
-            <Grid item xs={12} sm={6}>
-              <strong>Header:</strong>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              "Header"
-            </Grid>
-          </Grid>
+      <input type="file" onChange={handleFile}></input>
+      <br/>
+      <table>
+        <DataTable value={rows}>
+          {header.map((h, i) => (
+            <Column key={i} field={h} header={h} />
+          ))}
+        </DataTable>
+      </table>
 
-        </Grid>
-      </Panel>
     </MainCard>
   );
 }
