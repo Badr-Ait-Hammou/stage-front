@@ -14,18 +14,28 @@ import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
+import { InputText } from 'primereact/inputtext';
+import { Box } from '@mui/system';
 
 export default function ProjectDetailDoc() {
-    const [project, setProject] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0);
-    const cardsPerPage = 3;
-    const toast = useRef(null);
-    const { id } = useParams();
+  const [project, setProject] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const cardsPerPage = 3;
+  const toast = useRef(null);
+  const { id } = useParams();
+  const [templateFields, setTemplateFields] = useState([]);
+  const [savedFieldValues, setSavedFieldValues] = useState([]);
+  const [fetchedFieldValues, setFetchedFieldValues] = useState([]);
+  const [data, setData] = useState([{}]);
+  const [fields, setFields] = useState([]);
 
     useEffect(() => {
         axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
             setProject(response.data);
         });
+      axios.get(`http://localhost:8080/api/field/result/${id}`).then((response) => {
+        setTemplateFields(response.data);
+      });
     }, [id]);
 
     if (!project.commentList) {
@@ -36,8 +46,6 @@ export default function ProjectDetailDoc() {
         const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
         setProject(res.data);
     }
-
-
 
 
     const header = (
@@ -202,6 +210,76 @@ export default function ProjectDetailDoc() {
         }
     };
 
+  const loadFields = async (projectId) => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
+      setFields(res.data);
+      console.log("fetched fields",res.data);
+
+      setFetchedFieldValues(res.data);
+    } catch (error) {
+      console.error("Error loading fields:", error);
+    }
+  };
+
+
+  const handleSaveAll = () => {
+    const savePromises = data.flatMap((row) =>
+      project.result.fieldList.map((field) => {
+        const value = row[field?.namef?.toLowerCase()];
+        console.log(`Saving ${field.namef}: ${value}`);
+        return axios.post("http://localhost:8080/api/fieldvalue/save", {
+          value: value,
+          field: {
+            id: field.id,
+          },
+        });
+      })
+    );
+
+    Promise.all(savePromises)
+      .then((responses) => {
+        console.log("Saved all field values:", responses);
+        // Handle success
+      })
+      .catch((error) => {
+        console.error("Error while saving field values:", error);
+        // Handle error
+      });
+  };
+
+
+  const handleInputChange = (rowData, fieldId, value) => {
+    // Find the existing saved value for the field
+    const existingSavedValue = savedFieldValues.find(
+      (savedValue) => savedValue.field.id === fieldId
+    );
+
+    // Update the existing saved value or create a new one
+    if (existingSavedValue) {
+      existingSavedValue.value = value;
+    } else {
+      const newSavedValue = {
+        value: value,
+        field: { id: fieldId },
+      };
+      setSavedFieldValues([...savedFieldValues, newSavedValue]);
+    }
+  };
+
+
+
+
+  const getSavedValue = (fieldId) => {
+    const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
+
+    if (fieldValue && fieldValue.fieldValueList && fieldValue.fieldValueList.length > 0) {
+      return fieldValue.fieldValueList.map(item => item.value).join(', ');
+    } else {
+      return '';
+    }
+  };
+
     return (
         <>
             <Toast ref={toast} />
@@ -220,6 +298,41 @@ export default function ProjectDetailDoc() {
                         </DataTable>
                     </div>
                 </div>
+              <div>
+
+                {project.result.fieldList.map((field) => (
+                  <Card key={field.id} className="p-mb-3">
+                    <Box  className="card flex flex-column md:flex-row gap-3 mt-5" >
+                    <div className="p-inputgroup flex-1">
+                                    <span className="p-inputgroup-addon">
+                                        <i >{field.namef}</i>
+                                    </span>
+                      <InputText
+                        placeholder={field.namef}
+                        value={data[field.namef.toLowerCase()]}
+                        onChange={(e) => {
+                          handleInputChange(field.id, e.target.value);
+                        }}
+                      />
+
+                    </div>
+                    <div className="p-inputgroup flex-1">
+                                    <span className="p-inputgroup-addon">
+                                        <i >{field.fieldid}</i>
+                                    </span>
+
+                      <span className="p-inputgroup-addon">
+                                        <i >{field.type}</i>
+                                    </span>
+
+                    </div>
+                    </Box>
+                  </Card>
+                ))}
+                <div className="p-inputgroup flex-1">
+                <Button  onClick={handleSaveAll}>Save all</Button>
+                </div>
+              </div>
             </MainCard>
 
             <MainCard className="mt-5" title="Comments">
