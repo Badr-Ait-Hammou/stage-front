@@ -119,35 +119,35 @@ export default function ProjectDetailsCsv() {
         }
 
         const savePromises = project.result.fieldList.map((field) =>
-          axios.post("http://localhost:8080/api/fieldvalue/save", {
-              value: lastRowValues[field.namef.toLowerCase()],
-              field: {
-                  id: field.id,
-              },
-          })
+            axios.post("http://localhost:8080/api/fieldvalue/save", {
+                value: lastRowValues[field.namef.toLowerCase()],
+                field: {
+                    id: field.id,
+                },
+            })
         );
 
         Promise.all(savePromises)
-          .then((responses) => {
-              console.log("Saved all field values:", responses);
-              const newRow = {};
-              project.result.fieldList.forEach((field) => {
-                  newRow[field.namef.toLowerCase()] = '';
-              });
-              const newData = [...data];
-              newData[newData.length - 1] = newRow;
-              setData(newData);
-              loadFields(project.result.id);
-              setShowSaveAllButton(false);
-              showusave();
+            .then((responses) => {
+                console.log("Saved all field values:", responses);
+                const newRow = {};
+                project.result.fieldList.forEach((field) => {
+                    newRow[field.namef.toLowerCase()] = '';
+                });
+                const newData = [...data];
+                newData[newData.length - 1] = newRow;
+                setData(newData);
+                loadFields(project.result.id);
+                setShowSaveAllButton(false);
+                showusave();
 
 
 
-          })
-          .catch((error) => {
-              console.error("Error while saving field values:", error);
-              // Handle error
-          });
+            })
+            .catch((error) => {
+                console.error("Error while saving field values:", error);
+                // Handle error
+            });
     };
 
 
@@ -166,7 +166,7 @@ export default function ProjectDetailsCsv() {
                     const fieldValue = rowData[field.namef.toLowerCase()];
                     if (fieldValue !== undefined) {
                         const fieldValueId = field.fieldValueList.find(
-                          (value) => value.value === fieldValue
+                            (value) => value.value === fieldValue
                         )?.id;
 
                         if (fieldValueId) {
@@ -201,56 +201,56 @@ export default function ProjectDetailsCsv() {
 
     const leftToolbarTemplate = () => {
         return (
-          <div className="flex flex-wrap gap-2">
-              <Button   label="New" icon="pi pi-plus" severity="success" onClick={handleAddRow} />
-          </div>
+            <div className="flex flex-wrap gap-2">
+                <Button   label="New" icon="pi pi-plus" severity="success" onClick={handleAddRow} />
+            </div>
         );
     };
 
 
     const actionBodyTemplate = (rowData, rowIndex) => {
         return (
-          <React.Fragment>
-              {showSaveAllButton && rowIndex === data.length - 1 && (
+            <React.Fragment>
+                {showSaveAllButton && rowIndex === data.length - 1 && (
+                    <Button
+                        icon="pi pi-check"
+                        rounded
+                        outlined
+                        style={{ marginRight: '4px' }}
+                        onClick={handleSaveAll}
+                    />
+                )}
                 <Button
-                  icon="pi pi-check"
-                  rounded
-                  outlined
-                  style={{ marginRight: '4px' }}
-                  onClick={handleSaveAll}
+                    icon="pi pi-trash"
+                    rounded
+                    outlined
+                    severity="danger"
+                    onClick={() => handleDeleteRow(rowData)}
                 />
-              )}
-              <Button
-                icon="pi pi-trash"
-                rounded
-                outlined
-                severity="danger"
-                onClick={() => handleDeleteRow(rowData)}
-              />
-          </React.Fragment>
+            </React.Fragment>
         );
     };
 
     const footer = (
-      <div >
-          <p>
-              In total there is 1 Template on the{" "}
-              {project.name} project.
-          </p>
-      </div>
+        <div >
+            <p>
+                In total there is 1 Template on the{" "}
+                {project.name} project.
+            </p>
+        </div>
     );
 
 
 
 
     const header = (
-      <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+        <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Search..."
                 />
             </span>
-      </div>
+        </div>
     );
 
     const exportCSV = () => {
@@ -258,10 +258,10 @@ export default function ProjectDetailsCsv() {
     };
     const rightToolbarTemplate = () => {
         return (
-          <div>
-              <Button label="Export" icon="pi pi-upload" className="p-button-help" style={{marginRight:"5px"}} onClick={exportCSV} />
-              <Button label="Export PDF" icon="pi pi-file-pdf" className="p-button-danger "  onClick={handleExportPDF} />
-          </div>
+            <div>
+        <Button label="Export" icon="pi pi-upload" className="p-button-help" style={{marginRight:"5px"}} onClick={exportCSV} />
+        <Button label="Export PDF" icon="pi pi-file-pdf" className="p-button-danger "  onClick={handleExportPDF} />
+        </div>
         );
     };
 
@@ -288,7 +288,7 @@ export default function ProjectDetailsCsv() {
 
     const handleInputChange = (rowData, fieldId, value) => {
         const existingSavedValueIndex = savedFieldValues.findIndex(
-          (savedValue) => savedValue.field.id === fieldId
+            (savedValue) => savedValue.field.id === fieldId
         );
 
         if (existingSavedValueIndex !== -1) {
@@ -319,59 +319,59 @@ export default function ProjectDetailsCsv() {
     };
 
     const displayComments = project.commentList
-      .slice(currentPage * cardsPerPage, (currentPage + 1) * cardsPerPage)
-      .map((comment) => (
-        <Card
-          key={comment.id}
-          className="mt-5"
-          style={{
-              backgroundColor: 'rgb(236, 230, 245)',
-              padding: '20px',
-              borderRadius: '10px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              position: 'relative',
-          }}
-        >
-            {comment.status === 'read' && (
-              <Tag value="You Read This" severity="success"></Tag>
-            )}
-            {comment.status === 'unread' && (
-              <Tag value="confirm reading comment" severity="warning"></Tag>
-            )}
-            {/*<Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />*/}
-            <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
-            <p style={{ fontSize: '15px', marginTop: '10px' }}>
-                {formatDateTime(comment.commentDate)}
-            </p>
-            <div
-              style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  display: 'flex',
-              }}
+        .slice(currentPage * cardsPerPage, (currentPage + 1) * cardsPerPage)
+        .map((comment) => (
+            <Card
+                key={comment.id}
+                className="mt-5"
+                style={{
+                    backgroundColor: 'rgb(236, 230, 245)',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                }}
             >
+                {comment.status === 'read' && (
+                    <Tag value="You Read This" severity="success"></Tag>
+                )}
+                {comment.status === 'unread' && (
+                    <Tag value="confirm reading comment" severity="warning"></Tag>
+                )}
+                {/*<Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />*/}
+                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                <p style={{ fontSize: '15px', marginTop: '10px' }}>
+                    {formatDateTime(comment.commentDate)}
+                </p>
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        display: 'flex',
+                    }}
+                >
 
-                <Button
-                  icon="pi pi-trash"
-                  rounded
-                  outlined
-                  severity="danger"
-                  style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
-                  onClick={() => handleDeleteComment(comment.id)}
-                /> {!comment.status || comment.status === 'unread' ? (
-              <Button
-                icon="pi pi-eye"
-                rounded
-                outlined
-                severity="success"
-                style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
-                onClick={() => handleMarkAsRead(comment.id)}
-              />
-            ) : null}
-            </div>
-        </Card>
-      ));
+                    <Button
+                        icon="pi pi-trash"
+                        rounded
+                        outlined
+                        severity="danger"
+                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                        onClick={() => handleDeleteComment(comment.id)}
+                    /> {!comment.status || comment.status === 'unread' ? (
+                    <Button
+                        icon="pi pi-eye"
+                        rounded
+                        outlined
+                        severity="success"
+                        style={{ marginRight: '4px', padding: '8px', fontSize: '12px' }}
+                        onClick={() => handleMarkAsRead(comment.id)}
+                    />
+                ) : null}
+                </div>
+            </Card>
+        ));
     /************************************* Date format **************************************/
 
     function formatDateTime(dateTime) {
@@ -386,19 +386,19 @@ export default function ProjectDetailsCsv() {
     const handleDeleteComment = (commentId) => {
         const confirmDelete = () => {
             axios.delete(`http://localhost:8080/api/comment/${commentId}`)
-              .then((response) => {
-                  console.log("Comment deleted:", response.data);
-                  toast.current.show({
-                      severity: 'success',
-                      summary: 'Done',
-                      detail: 'Comment deleted successfully',
-                      life: 3000
-                  });
-                  loadComments();
-              })
-              .catch((error) => {
-                  console.error("Error while deleting comment:", error);
-              });
+                .then((response) => {
+                    console.log("Comment deleted:", response.data);
+                    toast.current.show({
+                        severity: 'success',
+                        summary: 'Done',
+                        detail: 'Comment deleted successfully',
+                        life: 3000
+                    });
+                    loadComments();
+                })
+                .catch((error) => {
+                    console.error("Error while deleting comment:", error);
+                });
         }
         confirmDialog({
             message: 'Are you sure you want to Delete this Comment ?',
@@ -417,21 +417,21 @@ export default function ProjectDetailsCsv() {
         axios.put(`http://localhost:8080/api/comment/read/${commentId}`, {
             status: "read",
         })
-          .then(() => {
-              const updatedComments = project.commentList.map((comment) =>
-                comment.id === commentId ? { ...comment, status: "read" } : comment
-              );
-              setProject({ ...project, commentList: updatedComments });
-              toast.current.show({
-                  severity: 'info',
-                  summary: 'Done',
-                  detail: 'Comment marked as read',
-                  life: 3000
-              });
-          })
-          .catch((error) => {
-              console.error(error);
-          });
+            .then(() => {
+                const updatedComments = project.commentList.map((comment) =>
+                    comment.id === commentId ? { ...comment, status: "read" } : comment
+                );
+                setProject({ ...project, commentList: updatedComments });
+                toast.current.show({
+                    severity: 'info',
+                    summary: 'Done',
+                    detail: 'Comment marked as read',
+                    life: 3000
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
 
@@ -439,18 +439,18 @@ export default function ProjectDetailsCsv() {
     const resultFileBodyTemplate = () => {
         if (project.result && project.result.file && project.result.type ==="doc") {
             return (
-              <a href={project.result.file} download>
+                <a href={project.result.file} download>
 
-                  <img  src={Doc} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
-              </a>
+                    <img  src={Doc} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
+                </a>
             )
 
         }else{
             return(
-              <a href={project.result.file} download>
+                <a href={project.result.file} download>
 
-                  <img  src={Csv} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
-              </a>
+                    <img  src={Csv} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
+                </a>
             )
         }
 
@@ -495,113 +495,113 @@ export default function ProjectDetailsCsv() {
 
 
     return (
-      <>
-          <Toast ref={toast} />
-          <ConfirmDialog />
-          <MainCard>
-              <div className="card">
-                  <Toolbar className="mb-2"  center={header}/>
-                  <div style={{ borderRadius: '10px', overflow: 'hidden' }}>
-                      <DataTable value={[project.result]} footer={footer} tableStyle={{ minWidth: '30rem' }}>
+        <>
+            <Toast ref={toast} />
+            <ConfirmDialog />
+            <MainCard>
+                <div className="card">
+                    <Toolbar className="mb-2"  center={header}/>
+                    <div style={{ borderRadius: '10px', overflow: 'hidden' }}>
+                        <DataTable value={[project.result]} footer={footer} tableStyle={{ minWidth: '30rem' }}>
 
-                          <Column field="id" header="ID"></Column>
-                          <Column field="name" header="Name"></Column>
-                          <Column header="Template File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
-                          <Column field="description" header="Description"></Column>
-                          <Column field="type" header="Type"></Column>
-                      </DataTable>
-                  </div>
-              </div>
-          </MainCard>
-
-
-
-          <div className="mt-5">
-              <MainCard>
-                  <Toolbar className="mb-2"  center={<strong>Manage Csv</strong>} start={leftToolbarTemplate} end={rightToolbarTemplate} />
+                            <Column field="id" header="ID"></Column>
+                            <Column field="name" header="Name"></Column>
+                            <Column header="Template File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
+                            <Column field="description" header="Description"></Column>
+                            <Column field="type" header="Type"></Column>
+                        </DataTable>
+                    </div>
+                </div>
+            </MainCard>
 
 
-                  <DataTable
-                    ref={dt}
-                    value={data}
-                    dataKey={(rowData, index) => index}
-                    paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter}  header={header}
-                  >
+
+            <div className="mt-5">
+                <MainCard>
+                    <Toolbar className="mb-2"  center={<strong>Manage Csv</strong>} start={leftToolbarTemplate} end={rightToolbarTemplate} />
 
 
-                      {project.result.fieldList.map((field) => (
-                        <Column
+                    <DataTable
+                        ref={dt}
+                        value={data}
+                        dataKey={(rowData, index) => index}
+                        paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter}  header={header}
+                    >
 
-                          key={`input-${field.id}`}
 
-                          header={field.namef}
-                          field={field.namef.toLowerCase()}
-                          style={{ minWidth: '7rem' }}
-                          body={(rowData) => (
-                            <InputText
-                              style={{
-                                  border: 'none',
-                                  background: 'none',
-                                  outline: 'none',
-                                  boxShadow: 'none',
-                                  fontSize: 'inherit',
-                                  color: 'inherit',
-                                  width: '100%',
-                                  textAlign: 'left',
-                              }}
-                              type="text"
-                              //key={`input-${field.id}-${rowData.id}`} // Unique key for each input
-                              value={rowData[field.namef.toLowerCase()]}
-                              onChange={(e) =>
-                                handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
-                              }
+                        {project.result.fieldList.map((field) => (
+                            <Column
+
+                                key={`input-${field.id}`}
+
+                                header={field.namef}
+                                field={field.namef.toLowerCase()}
+                                style={{ minWidth: '7rem' }}
+                                body={(rowData) => (
+                                    <InputText
+                                        style={{
+                                            border: 'none',
+                                            background: 'none',
+                                            outline: 'none',
+                                            boxShadow: 'none',
+                                            fontSize: 'inherit',
+                                            color: 'inherit',
+                                            width: '100%',
+                                            textAlign: 'left',
+                                        }}
+                                        type="text"
+                                        //key={`input-${field.id}-${rowData.id}`} // Unique key for each input
+                                        value={rowData[field.namef.toLowerCase()]}
+                                        onChange={(e) =>
+                                            handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
+                                        }
+                                    />
+                                )}
+
                             />
-                          )}
-
+                        ))}
+                        <Column
+                            key="save"
+                            header="Action"
+                            body={(rowData) => actionBodyTemplate(rowData, data.indexOf(rowData))}
+                            style={{ minWidth: '12rem' }}
                         />
-                      ))}
-                      <Column
-                        key="save"
-                        header="Action"
-                        body={(rowData) => actionBodyTemplate(rowData, data.indexOf(rowData))}
-                        style={{ minWidth: '12rem' }}
-                      />
 
 
-                  </DataTable>
-              </MainCard>
-          </div>
+                    </DataTable>
+                </MainCard>
+            </div>
 
-          <MainCard className="mt-5" title="Comments">
-              {project.commentList.length > 0 ? (
-                <div>
-                    {displayComments}
-                    <Paginator
-                      first={currentPage * cardsPerPage}
-                      rows={cardsPerPage}
-                      totalRecords={project.commentList.length}
-                      onPageChange={handlePageChange}
-                    />
-                </div>
-              ) : (
-                <div className="text-center">
-                    <Card
-                      className="mt-5"
-                      style={{
-                          backgroundColor: "rgba(252,67,67,0.18)",
-                          padding: "20px",
-                          borderRadius: "10px",
-                          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          position: "relative",
-                      }}
-                    >     <strong>No comments available for this project.</strong>
-                    </Card>
-                </div>
-              )}
-          </MainCard>
+            <MainCard className="mt-5" title="Comments">
+                {project.commentList.length > 0 ? (
+                    <div>
+                        {displayComments}
+                        <Paginator
+                            first={currentPage * cardsPerPage}
+                            rows={cardsPerPage}
+                            totalRecords={project.commentList.length}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        <Card
+                            className="mt-5"
+                            style={{
+                                backgroundColor: "rgba(252,67,67,0.18)",
+                                padding: "20px",
+                                borderRadius: "10px",
+                                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                                position: "relative",
+                            }}
+                        >     <strong>No comments available for this project.</strong>
+                        </Card>
+                    </div>
+                )}
+            </MainCard>
 
-      </>
+        </>
     );
 }
