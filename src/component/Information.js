@@ -1,58 +1,336 @@
-import React from "react"
+import React, {useState,useEffect,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
-import { Panel } from 'primereact/panel';
-import {Grid} from "@mui/material";
-export default function Information(){
+import { Button } from 'primereact/button';
+import { Box } from "@mui/system";
+import { InputText } from "primereact/inputtext";
+import axios from "axios";
+import {Toast} from "primereact/toast";
+
+export default function Information() {
+
+    const [name,setName]=useState("");
+    const [address,setAddress]=useState("");
+    const [phone,setPhone]=useState("");
+    const [fax,setFax]=useState("");
+    const [webSite,setWebSite]=useState("");
+    const [logo, setLogo] = useState("");
+    const [valIds,setValIds]=useState("");
+    const [valRc,setValRc]=useState("");
+    const [valPatente,setValPatente]=useState("");
+    const [valIf,setvalIf]=useState("");
+    const [valCnss,setValcnss]=useState("");
+    const [valIce,setValIce]=useState("");
+    const [company,setCompany]=useState([]);
+    const toast = useRef(null);
 
 
-    return(
 
+    useEffect(() => {
+        axios.get(`http://localhost:8080/api/company/1`).then((response) => {
+            const companyData = response.data;
+            setCompany(companyData);
+
+
+
+            if (!name && companyData) setName(companyData.name);
+            if (!address && companyData) setAddress(companyData.address);
+            if (!phone && companyData) setPhone(companyData.phone);
+            if (!fax && companyData) setFax(companyData.fax);
+            if (!webSite && companyData) setWebSite(companyData.webSite);
+            if (!logo && companyData) setLogo(companyData.logo);
+            if (!valIds && companyData) setValIds(companyData.valIds);
+            if (!valRc && companyData) setValRc(companyData.valRc);
+            if (!valPatente && companyData) setValPatente(companyData.valPatente);
+            if (!valCnss && companyData) setValcnss(companyData.valCnss);
+            if (!valIf && companyData) setvalIf(companyData.valIf);
+            if (!valIce && companyData) setValIce(companyData.valIce);
+        });
+    }, []);
+
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (name.trim() === '' || phone.trim() === '' || valCnss.trim() === '' || address.trim() === '' || valRc.trim() === '' || valPatente.trim() === '' || valIds.trim() === '') {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
+            return;
+        }
+
+        const requestData = {
+            id:1,
+            name,
+            address,
+            phone,
+            fax,
+            webSite,
+            logo,
+            valIds,
+            valRc,
+            valPatente,
+            valCnss,
+            valIf,
+            valIce
+        };
+
+        axios.post("http://localhost:8080/api/company/", requestData)
+            .then((response) => {
+                console.log("API Response:", response.data);
+
+                loadCompany();
+                showusave();
+            })
+            .catch((error) => {
+                console.error("Error while saving project:", error);
+            });
+    };
+
+
+    const handleUpdate = (event) => {
+        event.preventDefault();
+
+        const requestData = {
+            id:1,
+            name :name,
+            address :address,
+            phone :phone,
+            fax :fax,
+            webSite :webSite,
+            logo: logo,
+            valIds :valIds,
+            valRc :valRc,
+            valPatente :valPatente,
+            valCnss :valCnss,
+            valIf :valIf,
+            valIce :valIce,
+        };
+
+        axios.post("http://localhost:8080/api/company/", requestData)
+            .then((response) => {
+                console.log("API Response:", response.data);
+
+                loadCompany();
+                showupdate();
+            })
+            .catch((error) => {
+                console.error("Error while saving project:", error);
+            });
+    };
+
+    /***********************Toasts **************/
+
+    const showupdate = () => {
+        toast.current.show({severity:'info', summary: 'success', detail:'info updated successfully', life: 3000});
+    }
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'success', detail:'item added successfully', life: 3000});
+    }
+
+
+
+    const loadCompany = async () => {
+        axios.get(`http://localhost:8080/api/company/1`).then((response) => {
+            const companyData = response.data;
+            setCompany(companyData);
+
+
+            if (!name && companyData) setName(companyData.name);
+            if (!address && companyData) setAddress(companyData.address);
+            if (!phone && companyData) setPhone(companyData.phone);
+            if (!fax && companyData) setFax(companyData.fax);
+            if (!webSite && companyData) setWebSite(companyData.webSite);
+            if (!logo && companyData) setLogo(companyData.logo);
+            if (!valIds && companyData) setValIds(companyData.valIds);
+            if (!valRc && companyData) setValRc(companyData.valRc);
+            if (!valPatente && companyData) setValPatente(companyData.valPatente);
+            if (!valCnss && companyData) setValcnss(companyData.valCnss);
+            if (!valIf && companyData) setvalIf(companyData.valIf);
+            if (!valIce && companyData) setValIce(companyData.valIce);
+        });
+    };
+
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setLogo(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+            return (
         <MainCard title="Information">
-            <Panel header="Information" toggleable>
-                <Grid>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <strong>Name:</strong>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            ""
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} className="mt-0.5">
-                        <Grid item xs={12} sm={6}>
-                            <strong>Images:</strong>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            ""
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} className="mt-0.5">
-                        <Grid item xs={12} sm={6}>
-                            <strong>Created at:</strong>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            ""
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} className="mt-0.5">
-                        <Grid item xs={12} sm={6}>
-                            <strong>Description:</strong>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            ""
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} className="mt-0.5">
-                        <Grid item xs={12} sm={6}>
-                            <strong>Header:</strong>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            "Header"
-                        </Grid>
-                    </Grid>
+            <Toast ref={toast} />
 
-                </Grid>
-            </Panel>
+
+            <Box className="card   md:flex-row ">
+                            <Box className="card mb-4">
+                                <Box className=" text-center">
+                                    <label htmlFor="uploadImage">
+                                        <Box style={{ alignItems: "center", justifyContent: 'center', display: "flex" }}>
+                                            {company && company.logo ? (
+                                                <img src={company.logo} alt="avatar" className="rounded-circle img-fluid" style={{ width: '150px', cursor: 'pointer' }} />
+                                            ) : (
+                                                <div>No logo available</div>
+                                            )}
+                                        </Box>
+                                    </label>
+                                    <input type="file" id="uploadImage" style={{ display: 'none' }} onChange={handleImageUpload} />
+                                    <h5 className="my-3">{ company ? company.name || 'name' : 'Name'}</h5>
+                                    <strong className="text-muted mb-1">{ company ? company.phone || 'phone' : 'Phone'}</strong>
+                                    <p className="text-muted mb-4">{ company ? company.webSite || 'website' : 'WEBSITE'}</p>
+                                    <Box className="card">
+                                        <div className="d-flex justify-content-center mb-2">
+                                            {company && company.id  ? (
+                                                <>
+                                                    <Button label="Update" severity="info" raised onClick={handleUpdate} />
+                                                </>
+                                            ) : (
+                                                <Button label="Save" severity="success" raised onClick={handleSubmit} />
+                                            )}
+                                        </div>
+                                    </Box>
+                                </Box>
+                            </Box>
+                </Box>
+
+            <Box className="card flex flex-column md:flex-row gap-3">
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i >Name</i>
+                </span>
+                    <InputText placeholder={company ? company.name ||'name' : 'NAME'}
+                               value={name}
+                               onChange={(e) => setName(e.target.value)}
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >Address</i>
+                    </span>
+                    <InputText placeholder={ company ? company.address ||'address' : 'ADDRESS'}
+                               value={address}
+                               onChange={(e) => setAddress(e.target.value)}
+                    />
+                </div>
+
+            </Box>
+
+
+
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >WebSite</i>
+                    </span>
+                    <InputText placeholder={ company ? company.webSite || 'website' : 'WEBSITE'}
+                               value={webSite}
+                               onChange={(e) => setWebSite(e.target.value)}
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i >Phone</i>
+                </span>
+                    <InputText placeholder={ company ? company.phone || 'phone' : 'PHONE'}
+                               value={phone}
+                               onChange={(e) => setPhone(e.target.value)}
+                    />
+                </div>
+
+            </Box>
+
+
+
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >Fax</i>
+                    </span>
+                    <InputText placeholder={ company ? company.fax || 'fax' : 'FAX'}
+                               value={fax}
+                               onChange={(e) => setFax(e.target.value)}
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >I.C.E</i>
+                    </span>
+                    <InputText placeholder={company ? company.valIce || 'valIce' : 'I.C.E'}
+                               value={valIce}
+                               onChange={(e) => setValIce(e.target.value)}
+                    />
+                </div>
+            </Box>
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i >I.F</i>
+                </span>
+                    <InputText placeholder={ company ? company.valIf || 'if' : 'I.F'}
+                               value={valIf }
+                               onChange={(e) => setvalIf(e.target.value)}
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >Cnss</i>
+                    </span>
+                    <InputText placeholder={company ? company.valCnss || 'val cnss': 'CNSS'}
+                               value={valCnss}
+                               onChange={(e) => setValcnss(e.target.value)}
+                    />
+                </div>
+
+            </Box>
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+                <div className="p-inputgroup flex-1">
+                <span className="p-inputgroup-addon">
+                    <i >R.C</i>
+                </span>
+                    <InputText placeholder={company ? company.valRc || 'valRc': 'R.C'}
+                               value={valRc}
+                               onChange={(e) => setValRc(e.target.value)}
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >I.D.S</i>
+
+                    </span>
+                    <InputText placeholder={ company ? company.valIds || 'valIds' : 'I.D.S'}
+                               value={valIds}
+                               onChange={(e) => setValIds(e.target.value)}
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <span className="p-inputgroup-addon">
+                        <i >Patente</i>
+                    </span>
+                    <InputText placeholder={ company ? company.valPatente || 'patente' : 'PATENTE'}
+                               value={valPatente}
+                               onChange={(e) => setValPatente(e.target.value)}
+                    />
+                </div>
+            </Box>
+
+
+
         </MainCard>
     );
 }
