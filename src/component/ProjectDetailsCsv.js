@@ -18,7 +18,16 @@ import {InputText} from "primereact/inputtext";
 import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { Dialog } from "primereact/dialog";
 import Pdftemplate from "../assets/images/pdftemplate7.png"
+import Pdftemplate2 from "../assets/images/pdftemplate18.png"
+import Pdftemplate3 from "../assets/images/pdftemplate21.png"
+import Pdftemplate4 from "../assets/images/pdftemplatesimple11.png"
+import Pdftemplate5 from "../assets/images/pdftemplatesimple12.png"
+import Pdftemplate6 from "../assets/images/pdftemplate13.png"
+import Pdftemplate7 from "../assets/images/pdftemplate19.png"
+import Pdftemplate8 from "../assets/images/pdftemplate15.png"
+import Pdftemplate9 from "../assets/images/pdftemplate16.png"
 
 
 export default function ProjectDetailsCsv() {
@@ -33,8 +42,41 @@ export default function ProjectDetailsCsv() {
     const [savedFieldValues, setSavedFieldValues] = useState([]);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [showSaveAllButton, setShowSaveAllButton] = useState(false);
+    const [displayDialog, setDisplayDialog] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const showImageSelectionDialog = () => {
+        setDisplayDialog(true);
+    };
+
+    const hideImageSelectionDialog = () => {
+        setDisplayDialog(false);
+    };
+
+    const handleImageClick = (imageSrc) => {
+        setSelectedImage(imageSrc);
+    };
+
+    const confirmImageSelection = () => {
+        hideImageSelectionDialog();
+        if (selectedImage) {
+            handleExportPDF(selectedImage);
+        }
+    };
 
 
+
+    const images = [
+        { id: 1, src: Pdftemplate },
+        { id: 2, src: Pdftemplate2 },
+        { id: 3, src: Pdftemplate3 },
+        { id: 4, src: Pdftemplate4 },
+        { id: 5, src: Pdftemplate5 },
+        { id: 6, src: Pdftemplate6 },
+        { id: 7, src: Pdftemplate7 },
+        { id: 8, src: Pdftemplate8 },
+        { id: 9, src: Pdftemplate9 },
+    ];
 
     /******************************************** Load  *******************************************/
 
@@ -267,7 +309,7 @@ export default function ProjectDetailsCsv() {
         return (
             <div>
         <Button label="Export" icon="pi pi-upload" className="p-button-help" style={{marginRight:"5px"}} onClick={exportCSV} />
-        <Button label="Export PDF" icon="pi pi-file-pdf" className="p-button-danger "  onClick={handleExportPDF} />
+        <Button label="Export PDF" icon="pi pi-file-pdf" className="p-button-danger "  onClick={showImageSelectionDialog} />
         </div>
         );
     };
@@ -468,18 +510,18 @@ export default function ProjectDetailsCsv() {
 
 
 
-    const handleExportPDF = () => {
+    const handleExportPDF = (backgroundImage) => {
         const doc = new jsPDF();
 
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
-        doc.addImage(Pdftemplate, 'JPEG', 0, 0, pageWidth, pageHeight);
+        doc.addImage(backgroundImage, 'JPEG', 0, 0, pageWidth, pageHeight);
 
         // Company Logo
         const imgData = company ? company.logo : "no logo";
         const logoWidth = 25;
         const logoHeight = 25;
-        const logoX = 10; // Adjust this value to position the logo on the left
+        const logoX = 10;
         const logoY = 10;
 
         doc.addImage(imgData, 'JPEG', logoX, logoY, logoWidth, logoHeight);
@@ -516,7 +558,7 @@ export default function ProjectDetailsCsv() {
             `${company.phone}`,
             `${company.email}`,
             `${company.webSite}`,
-            ...addressLines, // Use the split address lines
+            ...addressLines,
 
         ];
 
@@ -714,6 +756,25 @@ export default function ProjectDetailsCsv() {
                 )}
             </MainCard>
 
+
+
+
+            <Dialog visible={displayDialog} onHide={hideImageSelectionDialog}  style={{ width: '30rem' }}
+                     header="Select theme">
+                <div  style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', justifyContent: 'center',marginTop:"20px",marginBottom:"20px" }}>
+                    {images.map(image => (
+                        <img
+                            key={image.id}
+                            src={image.src}
+                            alt={`Image ${image.id}`}
+                            style={{ width: '90%',height:"auto" }} // Adjust image sizing
+                            className={`image-item-small ${selectedImage === image.src ? "selected" : ""}`}
+                            onClick={() => handleImageClick(image.src)}
+                        />
+                    ))}
+                </div>
+                <Button  label="Confirm" className="p-button-success mt-5" onClick={confirmImageSelection} />
+            </Dialog>
         </>
     );
 }
