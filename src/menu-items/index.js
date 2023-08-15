@@ -17,7 +17,7 @@ import pdf from './pdf';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [project,image,template,excel,pdf,annotation,information, utilities]
+  items: [project,image,template,annotation,information, utilities]
 };
 
 export default menuItems;
