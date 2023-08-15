@@ -1,10 +1,21 @@
 import React, {useState,useEffect,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import { Button } from 'primereact/button';
-import { Box } from "@mui/system";
+import {Box} from "@mui/system";
 import { InputText } from "primereact/inputtext";
 import axios from "axios";
 import {Toast} from "primereact/toast";
+import {styled} from "@mui/material/styles";
+import Badge from "@mui/material/Badge";
+import Avatar from "@mui/material/Avatar";
+
+
+const SmallAvatar = styled(Avatar)(({ theme }) => ({
+    width: 22,
+    height: 22,
+    border: `2px solid ${theme.palette.background.paper}`,
+}));
+
 
 export default function Information() {
 
@@ -25,11 +36,11 @@ export default function Information() {
 
 
 
+
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/company/1`).then((response) => {
+        axios.get(`http://localhost:8080/api/company/getfirst`).then((response) => {
             const companyData = response.data;
             setCompany(companyData);
-
 
 
             if (!name && companyData) setName(companyData.name);
@@ -89,7 +100,7 @@ export default function Information() {
         event.preventDefault();
 
         const requestData = {
-            id:1,
+            id:company.id,
             name :name,
             address :address,
             phone :phone,
@@ -128,7 +139,7 @@ export default function Information() {
 
 
     const loadCompany = async () => {
-        axios.get(`http://localhost:8080/api/company/1`).then((response) => {
+        axios.get(`http://localhost:8080/api/company/getfirst`).then((response) => {
             const companyData = response.data;
             setCompany(companyData);
 
@@ -159,41 +170,50 @@ export default function Information() {
         }
     };
 
-            return (
+    return (
         <MainCard title="Information">
             <Toast ref={toast} />
 
 
             <Box className="card   md:flex-row ">
-                            <Box className="card mb-4">
-                                <Box className=" text-center">
-                                    <label htmlFor="uploadImage">
-                                        <Box style={{ alignItems: "center", justifyContent: 'center', display: "flex" }}>
-                                            {company && company.logo ? (
-                                                <img src={company.logo} alt="avatar" className="rounded-circle img-fluid" style={{ width: '150px', cursor: 'pointer' }} />
-                                            ) : (
-                                                <div>No logo available</div>
-                                            )}
-                                        </Box>
-                                    </label>
-                                    <input type="file" id="uploadImage" style={{ display: 'none' }} onChange={handleImageUpload} />
-                                    <h5 className="my-3">{ company ? company.name || 'name' : 'Name'}</h5>
-                                    <strong className="text-muted mb-1">{ company ? company.phone || 'phone' : 'Phone'}</strong>
-                                    <p className="text-muted mb-4">{ company ? company.webSite || 'website' : 'WEBSITE'}</p>
-                                    <Box className="card">
-                                        <div className="d-flex justify-content-center mb-2">
-                                            {company && company.id  ? (
-                                                <>
-                                                    <Button label="Update" severity="info" raised onClick={handleUpdate} />
-                                                </>
-                                            ) : (
-                                                <Button label="Save" severity="success" raised onClick={handleSubmit} />
-                                            )}
-                                        </div>
-                                    </Box>
-                                </Box>
+                <Box className="card mb-4">
+                    <Box className=" text-center">
+                        <label htmlFor="uploadImage">
+                            <Box style={{ alignItems: "center", justifyContent: 'center', display: "flex" }}>
+                                {company && company.logo ? (
+                                    <Badge
+
+                                        overlap="circular"
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                        badgeContent={
+                                            <SmallAvatar  alt="Remy Sharp" src='/static/images/avatar/1.jpg'  />
+                                        }
+                                    >
+                                        <Avatar alt="AH" src={company.logo} style={{ width: '150px',height:'150px', cursor: 'pointer' }}  />
+                                    </Badge>
+                                ) : (
+                                    <div>No logo available</div>
+                                )}
                             </Box>
+                        </label>
+                        <input type="file" id="uploadImage" style={{ display: 'none' }} onChange={handleImageUpload} />
+                        <h5 className="my-3">{ company ? company.name || 'name' : 'Name'}</h5>
+                        <strong className="text-muted mb-1">{ company ? company.phone || 'phone' : 'Phone'}</strong>
+                        <p className="text-muted mb-4">{ company ? company.webSite || 'website' : 'WEBSITE'}</p>
+                        <Box className="card">
+                            <div className="d-flex justify-content-center mb-2">
+                                {company && company.id ? (
+                                    <>
+                                        <Button label="Update" severity="info" raised onClick={handleUpdate} />
+                                    </>
+                                ) : (
+                                    <Button label="Save" severity="success" raised onClick={handleSubmit} />
+                                )}
+                            </div>
+                        </Box>
+                    </Box>
                 </Box>
+            </Box>
 
             <Box className="card flex flex-column md:flex-row gap-3">
                 <div className="p-inputgroup flex-1">
