@@ -11,6 +11,8 @@ import {Button} from "primereact/button";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import {Tag} from "primereact/tag";
+import { ProgressBar } from 'primereact/progressbar';
+
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
@@ -44,6 +46,9 @@ export default function ProjectDetailsCsv() {
     const [showSaveAllButton, setShowSaveAllButton] = useState(false);
     const [displayDialog, setDisplayDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [displayProgressBar, setDisplayProgressBar] = useState(false);
+
+
 
     const showImageSelectionDialog = () => {
         setDisplayDialog(true);
@@ -57,10 +62,12 @@ export default function ProjectDetailsCsv() {
         setSelectedImage(imageSrc);
     };
 
-    const confirmImageSelection = () => {
+    const confirmImageSelection = async () => {
         hideImageSelectionDialog();
         if (selectedImage) {
-            handleExportPDF(selectedImage);
+            setDisplayProgressBar(true);
+            await handleExportPDF(selectedImage);
+            setDisplayProgressBar(false);
         }
     };
 
@@ -510,7 +517,9 @@ export default function ProjectDetailsCsv() {
 
 
 
-    const handleExportPDF = (backgroundImage) => {
+    const handleExportPDF = async (backgroundImage) => {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         const doc = new jsPDF();
 
         const pageWidth = doc.internal.pageSize.width;
@@ -527,7 +536,7 @@ export default function ProjectDetailsCsv() {
         doc.addImage(imgData, 'JPEG', logoX, logoY, logoWidth, logoHeight);
 
         // Company Name
-        const nameX = logoX +6 ;
+        const nameX = logoX + 6;
         const nameY = logoY + logoHeight + 4;
         doc.setFontSize(10);
         doc.text(company.name, nameX, nameY);
@@ -568,19 +577,19 @@ export default function ProjectDetailsCsv() {
 
         for (let j = 0; j < companyInfo.length; j++) {
             const lineY = contactInfoY + (lineHeight * j);
-            doc.text(companyInfo[j], contactInfoX, lineY, { align: 'left' });
+            doc.text(companyInfo[j], contactInfoX, lineY, {align: 'left'});
         }
         // Title
         doc.setFontSize(10);
         const titleX = doc.internal.pageSize.width / 2;
         doc.setFontSize(16);
-        doc.text(` ${company.name} - Company`, titleX, 60, { align: 'center' });
+        doc.text(` ${company.name} - Company`, titleX, 60, {align: 'center'});
 
 
         const currentDate = new Date();
         const dateTimeString = currentDate.toLocaleString();
         doc.setFontSize(8);
-        doc.text(` ${dateTimeString}`, titleX, 65, { align: 'center' });
+        doc.text(` ${dateTimeString}`, titleX, 65, {align: 'center'});
 
 
         const columns = project.result.fieldList.map((field) => field.namef);
@@ -595,7 +604,7 @@ export default function ProjectDetailsCsv() {
                 fontSize: 10,
                 halign: 'center',
                 valign: 'middle',
-                cellPadding:3 ,
+                cellPadding: 3,
             },
             headStyles: {
                 fillColor: [75, 76, 88],
@@ -604,13 +613,12 @@ export default function ProjectDetailsCsv() {
             },
 
             columnStyles: {
-                cellWidth: 20 ,
+                cellWidth: 20,
             },
             alternateRowStyles: {
                 fillColor: [245, 245, 245],
             },
         });
-
 
 
         const pageCount = doc.internal.getNumberOfPages();
@@ -619,13 +627,12 @@ export default function ProjectDetailsCsv() {
             const footerX = doc.internal.pageSize.width / 2;
             const footerY = doc.internal.pageSize.height - 10;
 
-            doc.text(`Page ${i + 1} of ${pageCount}`, footerX, footerY, { align: 'center' });
+            doc.text(`Page ${i + 1} of ${pageCount}`, footerX, footerY, {align: 'center'});
 
             const companyInfo = [
                 `I.D.S: ${company.valIds}   | R.C: ${company.valRc}  | WEBSITE :${company.webSite}`,
-                `CNSS: ${company.valCnss}   | I.C.E: ${company.valIce}  |  I.F: ${company.valIf} ` ,
+                `CNSS: ${company.valCnss}   | I.C.E: ${company.valIce}  |  I.F: ${company.valIf} `,
                 `PHONE: ${company.phone}   | ADDRESS: ${company.address}  |  FAX: ${company.fax}`,
-
 
 
             ];
@@ -636,7 +643,7 @@ export default function ProjectDetailsCsv() {
 
             for (let j = 0; j < companyInfo.length; j++) {
                 const lineY = footerY - (lineHeight * (j + 1));
-                doc.text(companyInfo[j], footerX, lineY, { align: 'center' });
+                doc.text(companyInfo[j], footerX, lineY, {align: 'center'});
             }
         }
 
@@ -652,6 +659,7 @@ export default function ProjectDetailsCsv() {
         <>
             <Toast ref={toast} />
             <ConfirmDialog />
+
             <MainCard>
                 <div className="card">
                     <Toolbar className="mb-2"  center={header}/>
@@ -775,6 +783,14 @@ export default function ProjectDetailsCsv() {
                 </div>
                 <Button  label="Confirm" className="p-button-success mt-5" onClick={confirmImageSelection} />
             </Dialog>
+
+            <Dialog visible={displayProgressBar} onHide={() => {}} closable={false} showHeader={false} style={{ width: '30rem' }} modal>
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                    <ProgressBar mode="indeterminate"  />
+                    <p>Working on it ...</p>
+                </div>
+            </Dialog>
+
         </>
     );
 }
