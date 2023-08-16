@@ -105,6 +105,7 @@ export default function ProjectDetailsCsv() {
             }
 
             setData(newData);
+           // handleAddRow();
         } catch (error) {
             console.error("Error loading fields:", error);
         }
@@ -524,6 +525,7 @@ export default function ProjectDetailsCsv() {
 
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
+
         doc.addImage(backgroundImage, 'JPEG', 0, 0, pageWidth, pageHeight);
 
         // Company Logo
@@ -595,60 +597,143 @@ export default function ProjectDetailsCsv() {
         const columns = project.result.fieldList.map((field) => field.namef);
         const rows = data.map((rowData) => project.result.fieldList.map((field) => rowData[field.namef.toLowerCase()]));
 
-        doc.autoTable({
-            head: [columns],
-            body: rows,
-            startY: 80,
-            theme: 'grid',
-            styles: {
-                fontSize: 10,
-                halign: 'center',
-                valign: 'middle',
-                cellPadding: 3,
-            },
-            headStyles: {
-                fillColor: [75, 76, 88],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-            },
+        const rowsPerPage = 15;
+        const totalPageCount = Math.ceil(rows.length / rowsPerPage);
 
-            columnStyles: {
-                cellWidth: 20,
-            },
-            alternateRowStyles: {
-                fillColor: [245, 245, 245],
-            },
-        });
+        let currentPage = 0;
 
+        while (currentPage * rowsPerPage < rows.length) {
+            if (currentPage > 0) {
+                doc.addPage();
+                doc.addImage(backgroundImage, 'JPEG', 0, 0, pageWidth, pageHeight); // Add background image
 
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 0; i < pageCount; i++) {
-            doc.setPage(i);
-            const footerX = doc.internal.pageSize.width / 2;
-            const footerY = doc.internal.pageSize.height - 10;
+            }
 
-            doc.text(`Page ${i + 1} of ${pageCount}`, footerX, footerY, {align: 'center'});
+            // Company Logo
+            const imgData = company ? company.logo : "no logo";
+            const logoWidth = 25;
+            const logoHeight = 25;
+            const logoX = 10;
+            const logoY = 10;
+
+            doc.addImage(imgData, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+
+            // Company Name
+            const nameX = logoX + 6;
+            const nameY = logoY + logoHeight + 4;
+            doc.setFontSize(10);
+            doc.text(company.name, nameX, nameY);
+
+            const maxAddressLength = 30;
+
+            const splitAddress = (address) => {
+                const lines = [];
+                let currentLine = '';
+
+                for (let i = 0; i < address.length; i++) {
+                    currentLine += address[i];
+                    if (currentLine.length >= maxAddressLength || i === address.length - 1) {
+                        lines.push(currentLine);
+                        currentLine = '';
+                    }
+                }
+
+                return lines;
+            };
+
+            const contactInfoX = doc.internal.pageSize.width - 48;
+            const contactInfoY = 16;
+
+            const addressLines = splitAddress(company.address);
 
             const companyInfo = [
-                `I.D.S: ${company.valIds}   | R.C: ${company.valRc}  | WEBSITE :${company.webSite}`,
-                `CNSS: ${company.valCnss}   | I.C.E: ${company.valIce}  |  I.F: ${company.valIf} `,
-                `PHONE: ${company.phone}   | ADDRESS: ${company.address}  |  FAX: ${company.fax}`,
-
+                `${company.phone}`,
+                `${company.email}`,
+                `${company.webSite}`,
+                ...addressLines,
 
             ];
 
-            const lineHeight = 5;
+            const lineHeight = 6;
             const infoFontSize = 8;
             doc.setFontSize(infoFontSize);
 
             for (let j = 0; j < companyInfo.length; j++) {
-                const lineY = footerY - (lineHeight * (j + 1));
-                doc.text(companyInfo[j], footerX, lineY, {align: 'center'});
+                const lineY = contactInfoY + (lineHeight * j);
+                doc.text(companyInfo[j], contactInfoX, lineY, {align: 'left'});
             }
+            // Title
+            doc.setFontSize(10);
+            const titleX = doc.internal.pageSize.width / 2;
+            doc.setFontSize(16);
+            doc.text(` ${company.name} - Company`, titleX, 60, {align: 'center'});
+
+
+            const currentDate = new Date();
+            const dateTimeString = currentDate.toLocaleString();
+            doc.setFontSize(8);
+            doc.text(` ${dateTimeString}`, titleX, 65, {align: 'center'});
+
+
+
+            const startRow = currentPage * rowsPerPage;
+            const endRow = Math.min((currentPage + 1) * rowsPerPage, rows.length);
+
+
+            doc.autoTable({
+                head: [columns],
+                body: rows.slice(startRow, endRow),
+                startY: 80,
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    halign: 'center',
+                    valign: 'middle',
+                    cellPadding: 3,
+                },
+                headStyles: {
+                    fillColor: [75, 76, 88],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                },
+                columnStyles: {
+                    cellWidth: 20,
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245],
+                },
+            });
+
+
+
+
+            for (let i = 0; i < totalPageCount; i++) {
+                doc.setPage(i);
+                const footerX = doc.internal.pageSize.width / 2;
+                const footerY = doc.internal.pageSize.height - 10;
+                doc.text(`Page ${i + 1} of ${totalPageCount}`, footerX, footerY, { align: 'center' });
+
+                const pageCompanyInfo = [
+                    `EMAIL: ${company.email}   | R.C: ${company.valRc}  | WEBSITE :${company.webSite}`,
+                    `CNSS: ${company.valCnss}   | I.C.E: ${company.valIce}  |  I.F: ${company.valIf} `,
+                    `PHONE: ${company.phone}   | ADDRESS: ${company.address}  |  FAX: ${company.fax}`,
+                ];
+
+                const lineHeight = 5;
+                const infoFontSize = 8;
+                doc.setFontSize(infoFontSize);
+
+                for (let j = 0; j < pageCompanyInfo.length; j++) {
+                    const lineY = footerY - (lineHeight * (j + 1));
+                    doc.text(pageCompanyInfo[j], footerX, lineY, { align: 'center' });
+                }
+            }
+
+
+            currentPage++;
         }
 
-
-        doc.save('datatable-export.pdf');
+            doc.save('datatable-export.pdf');
     };
 
 
@@ -767,9 +852,9 @@ export default function ProjectDetailsCsv() {
 
 
 
-            <Dialog visible={displayDialog} onHide={hideImageSelectionDialog}  style={{ width: '30rem' }}
+            <Dialog visible={displayDialog} onHide={hideImageSelectionDialog}  style={{ width: '40rem' }}
                      header="Select theme">
-                <div  style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', justifyContent: 'center',marginTop:"20px",marginBottom:"20px" }}>
+                <div  style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '10px', justifyContent: 'center',marginTop:"20px",marginBottom:"20px" }}>
                     {images.map(image => (
                         <img
                             key={image.id}
@@ -784,7 +869,7 @@ export default function ProjectDetailsCsv() {
                 <Button  label="Confirm" className="p-button-success mt-5" onClick={confirmImageSelection} />
             </Dialog>
 
-            <Dialog visible={displayProgressBar} onHide={() => {}} closable={false} showHeader={false} style={{ width: '30rem' }} modal>
+            <Dialog visible={displayProgressBar} onHide={() => {}} closable={false} showHeader={false} style={{ width: '30rem',borderRadius:"10px" }} modal>
                 <div style={{ textAlign: 'center', padding: '20px' }}>
                     <ProgressBar mode="indeterminate"  />
                     <p>Working on it ...</p>
