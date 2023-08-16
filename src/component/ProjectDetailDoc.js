@@ -88,34 +88,56 @@ export default function ProjectDetailDoc() {
     const handleGeneratePDF2 = () => {
 
         const modifiedContent = extractedContent.replace(/%%([^%]+)%%/g, (match, variableName) => {
-            return inputValues[variableName] || '';
+            const replacement = inputValues[variableName] || '';
+            return replacement + '\n'; // Add a newline after replacement
         });
+
 
         const pdf = new jsPDF();
         pdf.setFontSize(12);
         pdf.setFont('helvetica');
+        const maxWidth = 90;
+        const lineHeight = 12;
+        const maxLinesPerPage = Math.floor(pdf.internal.pageSize.height / lineHeight) - 1;
 
-        const lines = formatTextIntoLines(modifiedContent, 90);
+        let currentLineIndex = 0;
+        let currentPage = 1;
+
+        const lines = formatTextIntoLines(modifiedContent, maxWidth);
 
         lines.forEach((line, index) => {
-            pdf.text(line, 10, 10 + index * 12);
-        });
+            if (currentLineIndex >= maxLinesPerPage) {
+                pdf.addPage();
+                currentPage++;
+                currentLineIndex = 0;
+            }
 
+            pdf.text(line, 10, 10 + currentLineIndex * lineHeight);
+            currentLineIndex++;
+        });
 
         pdf.save('generated.pdf');
     };
 
     const formatTextIntoLines = (text, maxWidth) => {
-        const words = text.split(/\s+/);
         const lines = [];
         let currentLine = '';
 
-        words.forEach(word => {
-            if (currentLine.length + word.length + 1 <= maxWidth) {
-                currentLine += (currentLine === '' ? '' : ' ') + word;
-            } else {
+        text.split('\n').forEach(line => {
+            const words = line.split(/\s+/);
+
+            words.forEach(word => {
+                if (currentLine.length + word.length + 1 <= maxWidth) {
+                    currentLine += (currentLine === '' ? '' : ' ') + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            });
+
+            if (currentLine !== '') {
                 lines.push(currentLine);
-                currentLine = word;
+                currentLine = '';
             }
         });
 
