@@ -16,6 +16,11 @@ import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 import { InputText } from 'primereact/inputtext';
 import { Box } from '@mui/system';
+import PizZip from 'pizzip';
+import Docxtemplater from 'docxtemplater';
+import { jsPDF } from 'jspdf';
+
+
 
 export default function ProjectDetailDoc() {
   const [project, setProject] = useState([]);
@@ -23,20 +28,99 @@ export default function ProjectDetailDoc() {
   const cardsPerPage = 3;
   const toast = useRef(null);
   const { id } = useParams();
-  const [templateFields, setTemplateFields] = useState([]);
-  const [savedFieldValues, setSavedFieldValues] = useState([]);
-  const [fetchedFieldValues, setFetchedFieldValues] = useState([]);
-  const [data, setData] = useState([{}]);
-  const [fields, setFields] = useState([]);
+
+    const [inputValues, setInputValues] = useState({});
+    const [extractedContent, setExtractedContent] = useState('');
+
+    const handleInputChange = (namef, value) => {
+        setInputValues(prevValues => ({
+            ...prevValues,
+            [namef]: value,
+        }));
+    };
+
+    const handleExtractContent = () => {
+        const content = atob(project.result.file.split(',')[1]);
+        const zip = new PizZip(content);
+        const doc = new Docxtemplater(zip);
+
+        try {
+            doc.render();
+            const extractedContent = doc.getFullText();
+            setExtractedContent(extractedContent);
+
+            const variables = {};
+            const variablePattern = /%%(.*?)%%/g;
+            const matches = extractedContent.match(variablePattern);
+
+            if (matches) {
+                matches.forEach(match => {
+                    const variableName = match.replace(/%%/g, '');
+                    variables[variableName] = '';
+                });
+
+                setInputValues(variables);
+            }
+        } catch (error) {
+            console.error('Error extracting content:', error);
+        }
+    };
+
+
+    const handleGeneratePDF2 = () => {
+
+        const modifiedContent = extractedContent.replace(/%%([^%]+)%%/g, (match, variableName) => {
+            return inputValues[variableName] || '';
+        });
+
+        // Create a new PDF document using jsPDF
+        const pdf = new jsPDF();
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica');
+
+        const lines = formatTextIntoLines(modifiedContent, 100); // Format content into lines
+
+        lines.forEach((line, index) => {
+            pdf.text(line, 10, 10 + index * 12);
+        });
+
+        // Save the PDF using file-saver
+        pdf.save('generated.pdf');
+    };
+
+    const formatTextIntoLines = (text, maxWidth) => {
+        const words = text.split(/\s+/);
+        const lines = [];
+        let currentLine = '';
+
+        words.forEach(word => {
+            if (currentLine.length + word.length + 1 <= maxWidth) {
+                currentLine += (currentLine === '' ? '' : ' ') + word;
+            } else {
+                lines.push(currentLine);
+                currentLine = word;
+            }
+        });
+
+        if (currentLine !== '') {
+            lines.push(currentLine);
+        }
+
+        return lines;
+    };
+
+
+
+
+
 
     useEffect(() => {
         axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
             setProject(response.data);
         });
-      axios.get(`http://localhost:8080/api/field/result/${id}`).then((response) => {
-        setTemplateFields(response.data);
-      });
     }, [id]);
+
+
 
     if (!project.commentList) {
         return <div>Loading...</div>;
@@ -210,75 +294,33 @@ export default function ProjectDetailDoc() {
         }
     };
 
-  const loadFields = async (projectId) => {
-    try {
-      const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
-      setFields(res.data);
-      console.log("fetched fields",res.data);
 
-      setFetchedFieldValues(res.data);
-    } catch (error) {
-      console.error("Error loading fields:", error);
-    }
-  };
-
-
-  const handleSaveAll = () => {
-    const savePromises = data.flatMap((row) =>
-      project.result.fieldList.map((field) => {
-        const value = row[field?.namef?.toLowerCase()];
-        console.log(`Saving ${field.namef}: ${value}`);
-        return axios.post("http://localhost:8080/api/fieldvalue/save", {
-          value: value,
-          field: {
-            id: field.id,
-          },
-        });
-      })
-    );
-
-    Promise.all(savePromises)
-      .then((responses) => {
-        console.log("Saved all field values:", responses);
-        // Handle success
-      })
-      .catch((error) => {
-        console.error("Error while saving field values:", error);
-        // Handle error
-      });
-  };
-
-
-  const handleInputChange = (rowData, fieldId, value) => {
-    // Find the existing saved value for the field
-    const existingSavedValue = savedFieldValues.find(
-      (savedValue) => savedValue.field.id === fieldId
-    );
-
-    // Update the existing saved value or create a new one
-    if (existingSavedValue) {
-      existingSavedValue.value = value;
-    } else {
-      const newSavedValue = {
-        value: value,
-        field: { id: fieldId },
-      };
-      setSavedFieldValues([...savedFieldValues, newSavedValue]);
-    }
-  };
+    const fieldInputs = project.result.fieldList.map((field) => (
+        <Card key={field.id} className="p-mb-3">
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
+                <div className="p-inputgroup flex-1">
+          <span className="p-inputgroup-addon">
+            <i>{field.namef}</i>
+          </span>
+                    <InputText
+                        placeholder={`Enter the value to change ${field.namef} on the Word file`}
+                        value={inputValues[field.namef] || ''}
+                        onChange={(e) => handleInputChange(field.namef, e.target.value)}
+                    />
+                </div>
+            </Box>
+        </Card>
+    ));
 
 
 
 
-  const getSavedValue = (fieldId) => {
-    const fieldValue = fetchedFieldValues.find(field => field.id === fieldId);
 
-    if (fieldValue && fieldValue.fieldValueList && fieldValue.fieldValueList.length > 0) {
-      return fieldValue.fieldValueList.map(item => item.value).join(', ');
-    } else {
-      return '';
-    }
-  };
+
+
+
+
+
 
     return (
         <>
@@ -300,38 +342,17 @@ export default function ProjectDetailDoc() {
                 </div>
               <div>
 
-                {project.result.fieldList.map((field) => (
-                  <Card key={field.id} className="p-mb-3">
-                    <Box  className="card flex flex-column md:flex-row gap-3 mt-5" >
-                    <div className="p-inputgroup flex-1">
-                                    <span className="p-inputgroup-addon">
-                                        <i >{field.namef}</i>
-                                    </span>
-                      <InputText
-                        placeholder={field.namef}
-                        value={data[field.namef.toLowerCase()]}
-                        onChange={(e) => {
-                          handleInputChange(field.id, e.target.value);
-                        }}
-                      />
-
-                    </div>
-                    <div className="p-inputgroup flex-1">
-                                    <span className="p-inputgroup-addon">
-                                        <i >{field.fieldid}</i>
-                                    </span>
-
-                      <span className="p-inputgroup-addon">
-                                        <i >{field.type}</i>
-                                    </span>
-
-                    </div>
-                    </Box>
-                  </Card>
-                ))}
-                <div className="p-inputgroup flex-1">
-                <Button  onClick={handleSaveAll}>Save all</Button>
-                </div>
+                  <div>
+                      <div>
+                          {fieldInputs}
+                          <div className="p-inputgroup flex-1">
+                              <Button onClick={handleGeneratePDF2}>Generate PDF</Button>
+                          </div>
+                          <Button onClick={() => handleExtractContent()}>
+                              Extract DOCX Content
+                          </Button>
+                      </div>
+                  </div>
               </div>
             </MainCard>
 
@@ -361,6 +382,8 @@ export default function ProjectDetailDoc() {
                         </Card>
                     </div>
                 )}
+
+
             </MainCard>
 
         </>
