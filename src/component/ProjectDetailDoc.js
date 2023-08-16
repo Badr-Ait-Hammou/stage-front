@@ -14,6 +14,8 @@ import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
+
 import { InputText } from 'primereact/inputtext';
 import { Box } from '@mui/system';
 import PizZip from 'pizzip';
@@ -38,9 +40,6 @@ export default function ProjectDetailDoc() {
             setProject(response.data);
         });
     }, [id]);
-
-
-
 
 
     const handleInputChange = (namef, value) => {
@@ -74,7 +73,6 @@ export default function ProjectDetailDoc() {
                 setExtractedContent(extractedContent);
                 setInputValues(variables);
             }
-
             console.log(extractedContent);
 
 
@@ -97,7 +95,7 @@ export default function ProjectDetailDoc() {
         pdf.setFontSize(12);
         pdf.setFont('helvetica');
 
-        const lines = formatTextIntoLines(modifiedContent, 100);
+        const lines = formatTextIntoLines(modifiedContent, 90);
 
         lines.forEach((line, index) => {
             pdf.text(line, 10, 10 + index * 12);
@@ -133,8 +131,8 @@ export default function ProjectDetailDoc() {
 
 
 
-    if (!project.commentList) {
-        return <div>Loading...</div>;
+    if (!project.commentList || !project.result) {
+        return <PopularCart/>;
     }
 
     const loadComments=async ()=>{
