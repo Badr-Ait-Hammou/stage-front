@@ -89,14 +89,14 @@ export default function ProjectDetailDoc() {
 
         const modifiedContent = extractedContent.replace(/%%([^%]+)%%/g, (match, variableName) => {
             const replacement = inputValues[variableName] || '';
-            return replacement + '\n'; // Add a newline after replacement
+            return replacement + '\n';
         });
 
 
         const pdf = new jsPDF();
         pdf.setFontSize(12);
         pdf.setFont('helvetica');
-        const maxWidth = 90;
+        const maxWidth = 100;
         const lineHeight = 12;
         const maxLinesPerPage = Math.floor(pdf.internal.pageSize.height / lineHeight) - 1;
 
