@@ -73,18 +73,17 @@ export default function ProjectDetailDoc() {
             return inputValues[variableName] || '';
         });
 
-        // Create a new PDF document using jsPDF
         const pdf = new jsPDF();
         pdf.setFontSize(12);
         pdf.setFont('helvetica');
 
-        const lines = formatTextIntoLines(modifiedContent, 100); // Format content into lines
+        const lines = formatTextIntoLines(modifiedContent, 100);
 
         lines.forEach((line, index) => {
             pdf.text(line, 10, 10 + index * 12);
         });
 
-        // Save the PDF using file-saver
+
         pdf.save('generated.pdf');
     };
 
@@ -311,14 +310,6 @@ export default function ProjectDetailDoc() {
             </Box>
         </Card>
     ));
-
-
-
-
-
-
-
-
 
 
 
