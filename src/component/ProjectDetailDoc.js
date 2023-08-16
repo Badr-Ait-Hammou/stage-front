@@ -22,15 +22,26 @@ import { jsPDF } from 'jspdf';
 
 
 
+
 export default function ProjectDetailDoc() {
   const [project, setProject] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const cardsPerPage = 3;
   const toast = useRef(null);
   const { id } = useParams();
+  const [inputValues, setInputValues] = useState({});
+  const [extractedContent, setExtractedContent] = useState('');
 
-    const [inputValues, setInputValues] = useState({});
-    const [extractedContent, setExtractedContent] = useState('');
+
+    useEffect(() => {
+        axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
+            setProject(response.data);
+        });
+    }, [id]);
+
+
+
+
 
     const handleInputChange = (namef, value) => {
         setInputValues(prevValues => ({
@@ -39,7 +50,8 @@ export default function ProjectDetailDoc() {
         }));
     };
 
-    const handleExtractContent = () => {
+
+    const handleExtractContent = async () => {
         const content = atob(project.result.file.split(',')[1]);
         const zip = new PizZip(content);
         const doc = new Docxtemplater(zip);
@@ -59,12 +71,20 @@ export default function ProjectDetailDoc() {
                     variables[variableName] = '';
                 });
 
+                setExtractedContent(extractedContent);
                 setInputValues(variables);
             }
+
+            console.log(extractedContent);
+
+
+
         } catch (error) {
             console.error('Error extracting content:', error);
         }
     };
+
+
 
 
     const handleGeneratePDF2 = () => {
@@ -110,14 +130,6 @@ export default function ProjectDetailDoc() {
 
 
 
-
-
-
-    useEffect(() => {
-        axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
-            setProject(response.data);
-        });
-    }, [id]);
 
 
 
@@ -295,20 +307,20 @@ export default function ProjectDetailDoc() {
 
 
     const fieldInputs = project.result.fieldList.map((field) => (
-        <Card key={field.id} className="p-mb-3">
-            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
+
+            <Box key={field.id} className="card flex flex-column md:flex-row gap-3 mt-5">
                 <div className="p-inputgroup flex-1">
-          <span className="p-inputgroup-addon">
-            <i>{field.namef}</i>
-          </span>
+                    <span className="p-inputgroup-addon">
+                        <i>{field.namef}</i>
+                    </span>
                     <InputText
-                        placeholder={`Enter the value to change ${field.namef} on the Word file`}
+                        placeholder={`Enter the value to change ${field.namef} on the Docx file`}
                         value={inputValues[field.namef] || ''}
                         onChange={(e) => handleInputChange(field.namef, e.target.value)}
                     />
                 </div>
             </Box>
-        </Card>
+
     ));
 
 
@@ -331,21 +343,26 @@ export default function ProjectDetailDoc() {
                         </DataTable>
                     </div>
                 </div>
-              <div>
-
-                  <div>
-                      <div>
-                          {fieldInputs}
-                          <div className="p-inputgroup flex-1">
-                              <Button onClick={handleGeneratePDF2}>Generate PDF</Button>
-                          </div>
-                          <Button onClick={() => handleExtractContent()}>
-                              Extract DOCX Content
-                          </Button>
-                      </div>
-                  </div>
-              </div>
             </MainCard>
+
+            <div className="mt-5">
+            <MainCard  title="Fields" >
+
+                <div>
+
+                    <div>
+                        <div>
+                            {fieldInputs}
+                            <div className="  mt-5">
+                                <Button label="Generate PDF"  icon="pi pi-file-pdf" severity="danger" style={{marginRight:"5px"}} onClick={handleGeneratePDF2}/>
+                                <Button label=" Extract DOCX Content" icon="pi pi-angle-double-up" severity="success"  onClick={() => handleExtractContent()}/>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </MainCard>
+            </div>
 
             <MainCard className="mt-5" title="Comments">
                 {project.commentList.length > 0 ? (
