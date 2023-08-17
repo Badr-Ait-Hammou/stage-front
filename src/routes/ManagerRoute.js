@@ -37,8 +37,8 @@ import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
 
 // ==============================|| MAIN ROUTING ||============================== //
 
-const MainRoutes = {
-  path: '/',
+const ManagerRoute = {
+  path: "admin",
   element: <MainLayout />,
   children: [
     {
@@ -66,10 +66,6 @@ const MainRoutes = {
     {
       path: 'client_projects',
       element: <ProjectClient />
-    },
-    {
-      path: 'addUser',
-      element: <Adduser />
     },
     {
       path: 'addClient',
@@ -205,4 +201,4 @@ const MainRoutes = {
   ]
 };
 
-export default MainRoutes;
+export default ManagerRoute;
