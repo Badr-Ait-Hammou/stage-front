@@ -50,12 +50,7 @@ export default function AddUser() {
     const dt = useRef(null);
     const [passwordVisibility, setPasswordVisibility] = useState({});
 
-    const handleTogglePasswordVisibility = (rowData) => {
-        setPasswordVisibility((prevState) => ({
-            ...prevState,
-            [rowData.id]: !prevState[rowData.id]
-        }));
-    };
+
 
 
 
@@ -73,13 +68,7 @@ export default function AddUser() {
     }
 
 
-    const handleGeneratePassword = () => {
-        const generatedPassword = generateRandomPassword();
-        setpassword(generatedPassword);
-        const temp = strengthIndicator(generatedPassword);
-        setStrength(temp);
-        setLevel(strengthColor(temp));
-    };
+
 
     /*************************************************** Auto Generate pwd *************************************************/
 
@@ -96,6 +85,22 @@ export default function AddUser() {
 
         return password;
     };
+    const handleGeneratePassword = () => {
+        const generatedPassword = generateRandomPassword();
+        setpassword(generatedPassword);
+        const temp = strengthIndicator(generatedPassword);
+        setStrength(temp);
+        setLevel(strengthColor(temp));
+    };
+
+    const handleTogglePasswordVisibility = (rowData) => {
+        setPasswordVisibility((prevState) => ({
+            ...prevState,
+            [rowData.id]: !prevState[rowData.id]
+        }));
+    };
+
+    /*************************************************** Save *************************************************/
 
 
     const handleSubmit = (event) => {
@@ -115,7 +120,6 @@ export default function AddUser() {
                 detail: 'Please enter a valid phone number (8 to 15 digits)',
                 life: 3000
             });
-            return;
         } else if (!isValidEmail(email)) {
             toast.current.show({
                 severity: 'error',
@@ -123,7 +127,6 @@ export default function AddUser() {
                 detail: 'Please enter a valid email address',
                 life: 3000
             });
-            return;
         } else if (!isValidPassword(password)) {
             toast.current.show({
                 severity: 'error',
@@ -131,7 +134,6 @@ export default function AddUser() {
                 detail: 'Please generate a stronger password.',
                 life: 3000
             });
-            return;
         } else if (role.trim() === '') {
             toast.current.show({
                 severity: 'error',
@@ -139,9 +141,9 @@ export default function AddUser() {
                 detail: 'please select a Role',
                 life: 3000
             })
-            return;
+        }else{
 
-    }
+
 
         axios.post("/api/auth/register", {
             username,
@@ -170,9 +172,12 @@ export default function AddUser() {
             .catch((error) => {
                 console.error("Error while saving project:", error);
             });
+        }
     };
 
 
+
+    /*************************************************** Tooltip *************************************************/
 
 
     const ArrowTooltip = styled(({ className, ...props }) => (
@@ -189,16 +194,7 @@ export default function AddUser() {
 
 
 
-
-    const leftToolbarTemplate = () => {
-        return (
-            <div className="flex flex-wrap gap-2">
-                <Button label="Add" icon="pi pi-plus" severity="success" onClick={openDialog}/>
-            </div>
-        );
-    };
-
-    /************************************ Dialog open/close *****************************/
+    /************************************ Dialog open/close ***************************************/
 
     const openDialog = () => {
         setEmail("");
@@ -214,7 +210,7 @@ export default function AddUser() {
         setUserDialog(false);
     };
 
-    /************************************ password check  *****************************/
+    /*************************************************** password check  ************************************************/
 
 
     const changePassword = (value) => {
@@ -234,7 +230,17 @@ export default function AddUser() {
         changePassword('123456');
     }, []);
 
-    /************************************ Toolbar table component *****************************/
+    /*************************************************** Datatable component *************************************************/
+
+
+
+    const leftToolbarTemplate = () => {
+        return (
+            <div className="flex flex-wrap gap-2">
+                <Button label="Add" icon="pi pi-plus" severity="success" onClick={openDialog}/>
+            </div>
+        );
+    };
 
 
     const exportCSV = () => {
@@ -260,7 +266,7 @@ export default function AddUser() {
                     </span>
                 <Tooltip title="Click here to show password" enterDelay={50} leaveDelay={20}>
                     <span style={{ cursor: "pointer" }}
-                    onClick={() => handleTogglePasswordVisibility(rowData)}>
+                          onClick={() => handleTogglePasswordVisibility(rowData)}>
                         {isPasswordVisible ? <VisibilityOff /> : <Visibility />}
                     </span>
                 </Tooltip>
@@ -278,6 +284,7 @@ export default function AddUser() {
                     raised onClick={(e) => handleSubmit(e)}/>
         </React.Fragment>
     );
+
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
@@ -375,7 +382,7 @@ export default function AddUser() {
                                 <OutlinedInput
                                     style={{padding: "5px"}}
                                     type="text"
-                                    
+
                                     value={firstname} onChange={(e) => setFirstName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -389,7 +396,7 @@ export default function AddUser() {
                                     style={{padding: "5px"}}
                                     margin="none"
                                     type="text"
-                                    
+
                                     value={lastname} onChange={(e) => setLastName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -403,7 +410,7 @@ export default function AddUser() {
                                     style={{padding: "5px"}}
                                     margin="none"
                                     type="text"
-                                    
+
                                     value={username} onChange={(e) => setUserName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -417,7 +424,7 @@ export default function AddUser() {
                                     style={{padding: "5px"}}
                                     margin="none"
                                     type="text"
-                                    
+
                                     value={tel} onChange={(e) => settel(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -458,17 +465,17 @@ export default function AddUser() {
                                 <InputAdornment position="end">
 
 
-                                        <IconButton
-                                            aria-label="toggle password generator"
-                                            onClick={handleGeneratePassword}
-                                            edge="end"
-                                            size="medium"
-                                        >
-                                            <ArrowTooltip title="Click here to Generate password" placement="bottom">
+                                    <IconButton
+                                        aria-label="toggle password generator"
+                                        onClick={handleGeneratePassword}
+                                        edge="end"
+                                        size="medium"
+                                    >
+                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
                                             <SyncLockIcon />
-                                            </ArrowTooltip>
+                                        </ArrowTooltip>
 
-                                        </IconButton>
+                                    </IconButton>
 
                                     <IconButton
                                         aria-label="toggle password visibility"
