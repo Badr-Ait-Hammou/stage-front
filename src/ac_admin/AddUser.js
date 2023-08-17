@@ -10,9 +10,13 @@ import {
     useMediaQuery
 } from "@mui/material";
 import {Dialog} from 'primereact/dialog';
+
 import {Button} from 'primereact/button';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import SyncLockIcon from '@mui/icons-material/SyncLock';
 import {strengthColor, strengthIndicator} from 'utils/password-strength';
 import axios from "../utils/axios";
 import {Toast} from "primereact/toast";
@@ -20,6 +24,11 @@ import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
+
+
 
 
 export default function AddUser() {
@@ -41,11 +50,17 @@ export default function AddUser() {
     const [level, setLevel] = useState();
     const toast = useRef(null);
     const dt = useRef(null);
+    const [passwordVisibility, setPasswordVisibility] = useState({});
+
+
+
+
 
 
     useEffect(() => {
         axios.get("/api/users/").then((response) => {
             setUsers(response.data);
+            console.log("users",response.data)
         });
     }, []);
 
@@ -55,10 +70,45 @@ export default function AddUser() {
     }
 
 
+
+
+    /*************************************************** Auto Generate pwd *************************************************/
+
+    const generateRandomPassword = () => {
+
+        const passwordLength = 12;
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()_+';
+        let password = '';
+
+        for (let i = 0; i < passwordLength; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            password += characters.charAt(randomIndex);
+        }
+
+        return password;
+    };
+    const handleGeneratePassword = () => {
+        const generatedPassword = generateRandomPassword();
+        setpassword(generatedPassword);
+        const temp = strengthIndicator(generatedPassword);
+        setStrength(temp);
+        setLevel(strengthColor(temp));
+    };
+
+    const handleTogglePasswordVisibility = (rowData) => {
+        setPasswordVisibility((prevState) => ({
+            ...prevState,
+            [rowData.id]: !prevState[rowData.id]
+        }));
+    };
+
+    /*************************************************** Save *************************************************/
+
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '' || password.trim() === '') {
+        if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '' ) {
             toast.current.show({
                 severity: 'error',
                 summary: 'Warning',
@@ -72,7 +122,6 @@ export default function AddUser() {
                 detail: 'Please enter a valid phone number (8 to 15 digits)',
                 life: 3000
             });
-            return;
         } else if (!isValidEmail(email)) {
             toast.current.show({
                 severity: 'error',
@@ -80,7 +129,13 @@ export default function AddUser() {
                 detail: 'Please enter a valid email address',
                 life: 3000
             });
-            return;
+        } else if (!isValidPassword(password)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Password Not Strong Enough',
+                detail: 'Please generate a stronger password.',
+                life: 3000
+            });
         } else if (role.trim() === '') {
             toast.current.show({
                 severity: 'error',
@@ -88,8 +143,9 @@ export default function AddUser() {
                 detail: 'please select a Role',
                 life: 3000
             })
-            return;
-        }
+        }else{
+
+
 
         axios.post("/api/auth/register", {
             username,
@@ -112,22 +168,62 @@ export default function AddUser() {
                 setRole("");
                 setUserDialog(false);
                 loadUsers();
+                showusave();
 
             })
             .catch((error) => {
                 console.error("Error while saving project:", error);
             });
+        }
     };
 
-    const leftToolbarTemplate = () => {
-        return (
-            <div className="flex flex-wrap gap-2">
-                <Button label="Add" icon="pi pi-plus" severity="success" onClick={openDialog}/>
-            </div>
-        );
+    /************************************ Delete ***************************************/
+
+
+    const deleteUser = (id) => {
+        const confirmDelete = () => {
+            axios.delete(`/api/users/${id}`)
+                .then((response) => {
+                    console.log("API Response:", response.data);
+                    loadUsers();
+                    showudelete();
+                })
+                .catch((error) => {
+                    console.error("Error while deleting user:", error);
+                });
+        };
+
+        confirmDialog({
+            message: 'Are you sure you want to delete this User?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete
+        });
     };
 
-    /************************************ Dialog open/close *****************************/
+
+
+    /*************************************************** Tooltip *************************************************/
+
+
+    const ArrowTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} arrow classes={{ popper: className }} />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.arrow}`]: {
+            color: theme.palette.common.black,
+        },
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: theme.palette.common.black,
+        },
+    }));
+
+
+
+
+    /************************************ Dialog open/close ***************************************/
 
     const openDialog = () => {
         setEmail("");
@@ -135,6 +231,7 @@ export default function AddUser() {
         setUserName("");
         setRole("");
         setFirstName("");
+        setpassword("");
         setLastName("");
         setUserDialog(true);
     };
@@ -142,7 +239,18 @@ export default function AddUser() {
         setUserDialog(false);
     };
 
-    /************************************ password check  *****************************/
+    const openEditDialog = (user) => {
+        setEditingUser(user);
+        setFirstName(user.firstname);
+        setLastName(user.lastname);
+        setEmail(user.email);
+        setUserName(user.username);
+        settel(user.tel);
+        setRole(user.role);
+        setUserDialog(true);
+    };
+
+    /*************************************************** password check  ************************************************/
 
 
     const changePassword = (value) => {
@@ -162,7 +270,17 @@ export default function AddUser() {
         changePassword('123456');
     }, []);
 
-    /************************************ Toolbar table component *****************************/
+    /*************************************************** Datatable component *************************************************/
+
+
+
+    const leftToolbarTemplate = () => {
+        return (
+            <div className="flex flex-wrap gap-2">
+                <Button label="Add" icon="pi pi-plus" severity="success" onClick={openDialog}/>
+            </div>
+        );
+    };
 
 
     const exportCSV = () => {
@@ -178,6 +296,25 @@ export default function AddUser() {
         </div>;
     };
 
+    const passwordBodyTemplate = (rowData) => {
+        const isPasswordVisible = passwordVisibility[rowData.id];
+
+        return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ marginRight: "4px" }}>
+                        {isPasswordVisible ? rowData.password : "********"}
+                    </span>
+                <Tooltip title="Click here to show password" enterDelay={50} leaveDelay={20}>
+                    <span style={{ cursor: "pointer" }}
+                          onClick={() => handleTogglePasswordVisibility(rowData)}>
+                        {isPasswordVisible ? <VisibilityOff /> : <Visibility />}
+                    </span>
+                </Tooltip>
+            </div>
+        );
+    };
+
+
 
     const userDialogFooter = (
         <React.Fragment>
@@ -187,11 +324,12 @@ export default function AddUser() {
                     raised onClick={(e) => handleSubmit(e)}/>
         </React.Fragment>
     );
+
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" rounded outlined style={{marginRight: "4px"}}/>
-                <Button icon="pi pi-trash" rounded outlined severity="danger"/>
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => deleteUser(rowData.id)}/>
             </React.Fragment>
         );
     };
@@ -213,13 +351,46 @@ export default function AddUser() {
         return emailPattern.test(email);
     };
 
+    const isValidPassword = (password) => {
+        const minLength = 8;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasDigit = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+[\]{};':"\\|,.<>?/]+/.test(password);
+
+        return (
+            password.length >= minLength &&
+            hasUppercase &&
+            hasLowercase &&
+            hasDigit &&
+            hasSpecialChar
+        );
+    };
+
     const isValidPhoneNumber = (phoneNumber) => {
         const phoneNumberPattern = /^\d{8,15}$/;
         return phoneNumberPattern.test(phoneNumber);
     };
 
+    /********************************************** load ***********************************************/
+
+    if (users.length === 0) {
+        return <PopularCart />
+    }
+
+    /********************************************Toasts *************************/
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
+    }
+    const showudelete = () => {
+        toast.current.show({severity:'error', summary: 'done', detail:'User deleted successfully', life: 3000});
+    }
+
+
+
     return (
         <>
+            <ConfirmDialog />
             <Toast ref={toast}/>
             <div>
                 <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate}
@@ -228,20 +399,17 @@ export default function AddUser() {
                 <DataTable ref={dt} value={users}
                            dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Users"
                            globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{minWidth: '7rem'}}></Column>
-                    <Column field="firstName" header="FirstName" filter filterPlaceholder="Search Name ..." sortable
-                            style={{minWidth: '10rem'}}></Column>
-                    <Column field="lastName" header="LastName" filter filterPlaceholder="Search Name ..." sortable
-                            style={{minWidth: '10rem'}}></Column>
+                    <Column field="firstName" header="FirstName" filter filterPlaceholder="Search firstName ..." sortable style={{minWidth: '10rem'}}></Column>
+                    <Column field="lastName" header="LastName" filter filterPlaceholder="Search lastName ..." sortable style={{minWidth: '10rem'}}></Column>
                     <Column field="email" header="Email" sortable style={{minWidth: '10em'}}></Column>
-                    <Column field="role" header="Role" filter filterPlaceholder="Search Name ..." sortable
-                            style={{minWidth: '10rem'}}></Column>
-                    <Column field="tel" header="Phone" sortable sortField="dateCreation"
-                            style={{minWidth: "10rem"}}></Column>
-                    <Column header="Action" body={actionBodyTemplate} exportable={false}
-                            style={{minWidth: '12rem'}}></Column>
+                    <Column field="username" header="UserName" sortable sortField="username" style={{minWidth: "10rem"}}></Column>
+                    <Column field="tel" header="Phone" sortable sortField="tel" style={{minWidth: "10rem"}}></Column>
+                    <Column field="role" header="Role" filter filterPlaceholder="Search role ..." sortable style={{minWidth: '10rem'}}></Column>
+                    <Column field="password" header="Password" filter filterPlaceholder="Search password ..." style={{minWidth: '10rem'}} sortable  body={passwordBodyTemplate}></Column>
+                    <Column header="Action" body={actionBodyTemplate} exportable={false} style={{minWidth: '12rem'}}></Column>
                 </DataTable>
             </div>
 
@@ -258,7 +426,7 @@ export default function AddUser() {
                                 <OutlinedInput
                                     style={{padding: "5px"}}
                                     type="text"
-                                    defaultValue=""
+
                                     value={firstname} onChange={(e) => setFirstName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -270,9 +438,9 @@ export default function AddUser() {
                                 </InputLabel>
                                 <OutlinedInput
                                     style={{padding: "5px"}}
-                                    margin="normal"
+                                    margin="none"
                                     type="text"
-                                    defaultValue=""
+
                                     value={lastname} onChange={(e) => setLastName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -284,9 +452,9 @@ export default function AddUser() {
                                 </InputLabel>
                                 <OutlinedInput
                                     style={{padding: "5px"}}
-                                    margin="normal"
+                                    margin="none"
                                     type="text"
-                                    defaultValue=""
+
                                     value={username} onChange={(e) => setUserName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -298,9 +466,9 @@ export default function AddUser() {
                                 </InputLabel>
                                 <OutlinedInput
                                     style={{padding: "5px"}}
-                                    margin="normal"
+                                    margin="none"
                                     type="text"
-                                    defaultValue=""
+
                                     value={tel} onChange={(e) => settel(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -339,6 +507,20 @@ export default function AddUser() {
                             label="Password"
                             endAdornment={
                                 <InputAdornment position="end">
+
+
+                                    <IconButton
+                                        aria-label="toggle password generator"
+                                        onClick={handleGeneratePassword}
+                                        edge="end"
+                                        size="medium"
+                                    >
+                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
+                                            <SyncLockIcon />
+                                        </ArrowTooltip>
+
+                                    </IconButton>
+
                                     <IconButton
                                         aria-label="toggle password visibility"
                                         onClick={handleClickShowPassword}
@@ -348,6 +530,8 @@ export default function AddUser() {
                                     >
                                         {showPassword ? <Visibility/> : <VisibilityOff/>}
                                     </IconButton>
+
+
                                 </InputAdornment>
                             }
                         />

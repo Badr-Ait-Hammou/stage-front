@@ -14,7 +14,7 @@ const excel = {
       id: 'excel',
       title: 'Excel File',
       type: 'item',
-      url: '/excel',
+      url: '/app/excel',
       icon: icons.IconFileSpreadsheet,
       breadcrumbs: false
     }

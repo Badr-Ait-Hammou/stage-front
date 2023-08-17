@@ -22,8 +22,6 @@ import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
 import Template from "../component/Template"
-import ExcelFile from '../component/ExcelFile';
-import PdfFile from '../component/PdfFile';
 import Profile from '../component/Profile';
 import Adduser from "../ac_admin/AddUser"
 import AddClient from "../ac_manager/AddClient"
@@ -38,11 +36,11 @@ import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
-  path: '/',
+  path: '/app',
   element: <MainLayout />,
   children: [
     {
-      path: '/',
+      path: '',
       element: <Projects />
       // element: <DashboardDefault />
     },
