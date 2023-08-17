@@ -507,16 +507,11 @@ export default function Projects() {
         }
 
     };
-    /*
-    const actionPhotoBodyTemplate = (rowData) => {
-        return (
-            <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined style={{marginRight:"4px"}} onClick={() => handlePhotoupdate(rowData)} />
-                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => handleDelete(rowData.id)} />
-            </React.Fragment>
-        );
-    };
-*/
+
+
+    if (project.length === 0) {
+        return <PopularCart />
+    }
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">

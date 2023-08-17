@@ -348,6 +348,10 @@ export default function ProjectDetailDoc() {
 
 
 
+    if (project.length === 0) {
+        return <PopularCart />
+    }
+
     return (
         <>
             <Toast ref={toast} />

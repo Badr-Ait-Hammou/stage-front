@@ -12,6 +12,8 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
+
 
 export default function ProjectDetails() {
     const [project, setProject] = useState([]);
@@ -27,7 +29,7 @@ export default function ProjectDetails() {
     }, [id]);
 
     if (!project.commentList) {
-        return <div>Loading...</div>;
+        return <PopularCart/>;
     }
 
     const loadComments=async ()=>{
