@@ -3,7 +3,7 @@ import MainCard from "../ui-component/cards/MainCard";
 import { Button } from 'primereact/button';
 import {Box} from "@mui/system";
 import { InputText } from "primereact/inputtext";
-import axios from "axios";
+import axios from "../utils/axios";
 import {Toast} from "primereact/toast";
 import {styled} from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
@@ -40,7 +40,7 @@ export default function Information() {
 
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/company/getfirst`).then((response) => {
+        axios.get(`/api/company/getfirst`).then((response) => {
             const companyData = response.data;
             setCompany(companyData);
 
@@ -85,7 +85,7 @@ export default function Information() {
             valIce
         };
 
-        axios.post("http://localhost:8080/api/company/", requestData)
+        axios.post("/api/company/", requestData)
             .then((response) => {
                 console.log("API Response:", response.data);
 
@@ -117,7 +117,7 @@ export default function Information() {
             valIce :valIce,
         };
 
-        axios.post("http://localhost:8080/api/company/", requestData)
+        axios.post("/api/company/", requestData)
             .then((response) => {
                 console.log("API Response:", response.data);
 
@@ -141,7 +141,7 @@ export default function Information() {
 
 
     const loadCompany = async () => {
-        axios.get(`http://localhost:8080/api/company/getfirst`).then((response) => {
+        axios.get(`/api/company/getfirst`).then((response) => {
             const companyData = response.data;
             setCompany(companyData);
 

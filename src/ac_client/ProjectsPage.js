@@ -1,6 +1,6 @@
 import React, { useEffect, useState,useRef } from "react";
 import MainCard from "../ui-component/cards/MainCard";
-import axios from "axios";
+import axios from "../utils/axios";
 import { Toolbar } from "primereact/toolbar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -21,7 +21,7 @@ export default function ProjectPage() {
 
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/users/1").then((response) => {
+        axios.get("/api/users/1").then((response) => {
             setClient(response.data);
         });
     }, []);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "../utils/axios";
 import { Button } from "primereact/button";
 import {Card, CardContent, Grid,} from '@mui/material';
 
@@ -22,7 +22,6 @@ export default function TemplateDetails() {
     const [type, setType] = useState('');
     const toast = useRef(null);
     const [fields, setFields] = useState([]);
-    //const [namef, setNamef] = useState("");
 
 
 
@@ -34,7 +33,7 @@ export default function TemplateDetails() {
 
     useEffect(() => {
         axios
-            .get(`http://localhost:8080/api/result/${id}`)
+            .get(`/api/result/${id}`)
             .then((response) => {
                 setResult(response.data);
                 setName(response.data.name);
@@ -49,12 +48,12 @@ export default function TemplateDetails() {
     }, [id]);
 
     const loadResult = async () => {
-        const res = await axios.get(`http://localhost:8080/api/result/${id}`);
+        const res = await axios.get(`/api/result/${id}`);
         setResult(res.data);
     }
 
     const loadFields = async () => {
-        const res = await axios.get(`http://localhost:8080/api/field/result/${id}`);
+        const res = await axios.get(`/api/field/result/${id}`);
         setFields(res.data);
     }
 
@@ -65,7 +64,7 @@ export default function TemplateDetails() {
 
 
     const handleDeleteField = (fieldId) => {
-        axios.delete(`http://localhost:8080/api/field/${fieldId}`)
+        axios.delete(`/api/field/${fieldId}`)
             .then(() => {
                 loadFields();
             })
@@ -85,7 +84,7 @@ export default function TemplateDetails() {
                 type,
 
             };
-            const response = await axios.put(`http://localhost:8080/api/result/${id}`, updatedProject);
+            const response = await axios.put(`/api/result/${id}`, updatedProject);
 
             setResult(response.data);
 
@@ -104,10 +103,10 @@ export default function TemplateDetails() {
         const confirmDelete = async () => {
             try {
 
-                await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)));
+                await Promise.all(fields.map((field) => axios.delete(`/api/field/${field.id}`)));
 
 
-                await axios.delete(`http://localhost:8080/api/result/${id}`);
+                await axios.delete(`/api/result/${id}`);
 
 
                 setFields([]);
@@ -167,7 +166,7 @@ export default function TemplateDetails() {
 
                 try {
 
-                    await Promise.all(fields.map((field) => axios.delete(`http://localhost:8080/api/field/${field.id}`)))
+                    await Promise.all(fields.map((field) => axios.delete(`/api/field/${field.id}`)))
                         .then(() => {
                             console.log("Old fields deleted successfully.");
                         })
@@ -181,7 +180,7 @@ export default function TemplateDetails() {
                             ...result,
                             file: fileContent,
                         };
-                        await axios.put(`http://localhost:8080/api/result/${id}`, updatedResult);
+                        await axios.put(`/api/result/${id}`, updatedResult);
                         setResult(updatedResult);
                     } else {
 
@@ -192,7 +191,7 @@ export default function TemplateDetails() {
                             description: description,
                             type: "excel",
                         };
-                        const resultResponse = await axios.post("http://localhost:8080/api/result/save", newResult);
+                        const resultResponse = await axios.post("/api/result/save", newResult);
                         setResult(resultResponse.data);
                     }
 
@@ -206,7 +205,7 @@ export default function TemplateDetails() {
                             type: "text",
                             result: { id: resultId },
                         };
-                        await axios.post("http://localhost:8080/api/field/save", fieldToSave);
+                        await axios.post("/api/field/save", fieldToSave);
                     }
 
                     showNewFileU();

@@ -11,7 +11,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
-import axios from "axios";
+import axios from "../utils/axios";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Grid} from "@mui/material";
 import {Box} from "@mui/system";
@@ -70,10 +70,10 @@ export default function Image() {
 
     const fetchData = async () => {
         try {
-            const projetResponse = await axios.get('http://localhost:8080/api/projet/all');
+            const projetResponse = await axios.get('/api/projet/all');
             setProjet(projetResponse.data);
 
-            const imageResponse = await axios.get('http://localhost:8080/api/image/all');
+            const imageResponse = await axios.get('/api/image/all');
             setImages(imageResponse.data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -82,7 +82,7 @@ export default function Image() {
 
     const handleSubmit = (event) => {
         event?.preventDefault();
-        axios.post("http://localhost:8080/api/image/save", {
+        axios.post("/api/image/save", {
             name,
             photo,
             description,
@@ -129,7 +129,7 @@ export default function Image() {
 
     /********************************************Load image *************************/
     const loadImage=async ()=>{
-        const res=await axios.get(`http://localhost:8080/api/image/all`);
+        const res=await axios.get(`/api/image/all`);
         setImages(res.data);
     }
 
@@ -141,7 +141,7 @@ export default function Image() {
 
     const handleDelete = (id) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/image/${id}`)
+            axios.delete(`/api/image/${id}`)
                 .then(() => {
                     setImages(image.filter((rowData) => rowData.id !== id));
                     toast.current.show({severity:'success', summary: 'Done', detail:'Image deleted successfully', life: 3000});
@@ -211,7 +211,7 @@ export default function Image() {
 
     const handleEdit = async (projectToUpdate) => {
         try {
-            const response = await axios.put(`http://localhost:8080/api/image/${projectToUpdate.id}`, {
+            const response = await axios.put(`/api/image/${projectToUpdate.id}`, {
                 name:name,
                 photo:photo,
                 description:description,

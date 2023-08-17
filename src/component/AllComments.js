@@ -1,6 +1,6 @@
 import React, {useState, useEffect,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
-import axios from "axios";
+import axios from "../utils/axios";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {Button} from 'primereact/button';
@@ -39,7 +39,7 @@ export default function AllComments() {
 
 
     const loadComments = async () => {
-        const res = await axios.get("http://localhost:8080/api/comment/all");
+        const res = await axios.get("/api/comment/all");
         setComment(res.data);
     };
 
@@ -61,7 +61,7 @@ export default function AllComments() {
 
     const handleDeleteComment = (id) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/comment/${id}`)
+            axios.delete(`/api/comment/${id}`)
                 .then(() => {
                     setComment(comment.filter((rowData) => rowData.id !== id));
                     toast.current.show({
@@ -95,7 +95,7 @@ export default function AllComments() {
 
     const handleMarkAsRead = (commentId) => {
         axios
-            .put(`http://localhost:8080/api/comment/read/${commentId}`, {
+            .put(`/api/comment/read/${commentId}`, {
                 status: "read",
             })
             .then(() => {

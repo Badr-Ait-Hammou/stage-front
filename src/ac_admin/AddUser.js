@@ -14,7 +14,7 @@ import {Button} from 'primereact/button';
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {strengthColor, strengthIndicator} from 'utils/password-strength';
-import axios from "axios";
+import axios from "../utils/axios";
 import {Toast} from "primereact/toast";
 import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
@@ -44,13 +44,13 @@ export default function AddUser() {
 
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/users/").then((response) => {
+        axios.get("/api/users/").then((response) => {
             setUsers(response.data);
         });
     }, []);
 
     const loadUsers = async () => {
-        const res = await axios.get(`http://localhost:8080/api/users/`);
+        const res = await axios.get(`/api/users/`);
         setUsers(res.data);
     }
 
@@ -91,7 +91,7 @@ export default function AddUser() {
             return;
         }
 
-        axios.post("http://localhost:8080/api/auth/register", {
+        axios.post("/api/auth/register", {
             username,
             firstname,
             lastname,

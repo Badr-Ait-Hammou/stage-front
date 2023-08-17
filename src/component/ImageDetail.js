@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "../utils/axios";
 import { Button } from "primereact/button";
 import MainCard from "../ui-component/cards/MainCard";
 import {IoAddOutline, IoRefreshOutline, IoRemoveOutline} from "react-icons/io5";
@@ -13,7 +13,7 @@ export default function ImageDetail() {
 
     useEffect(() => {
         axios
-            .get(`http://localhost:8080/api/image/${id}`)
+            .get(`/api/image/${id}`)
             .then((response) => {
                 setImage(response.data);
             })

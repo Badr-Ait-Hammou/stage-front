@@ -1,7 +1,7 @@
 import React, {useEffect, useState,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import {Dropdown} from "primereact/dropdown";
-import axios from "axios";
+import axios from "../utils/axios";
 import "../style/annotation_img.css"
 import {Calendar} from "primereact/calendar";
 import {format} from "date-fns";
@@ -37,7 +37,7 @@ export default function Annotation() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:8080/api/projet/all")
+            .get("/api/projet/all")
             .then((response) => {
                 setProjects(response.data);
                 const allImages = response.data.reduce((images, project) => {
@@ -53,7 +53,7 @@ export default function Annotation() {
     useEffect(() => {
         if (selectedProject) {
             axios
-                .get(`http://localhost:8080/api/projet/${selectedProject.id}`)
+                .get(`/api/projet/${selectedProject.id}`)
                 .then((response) => setFilteredImages(response.data.images))
                 .catch((error) => console.error("Error fetching images:", error));
         }
@@ -80,7 +80,7 @@ export default function Annotation() {
                 const formattedStartDate = format(startDate, 'yyyy-MM-dd');
                 const formattedEndDate = format(endDate, 'yyyy-MM-dd');
                 axios
-                    .get(`http://localhost:8080/api/projet/between/${formattedStartDate}/${formattedEndDate}`)
+                    .get(`/api/projet/between/${formattedStartDate}/${formattedEndDate}`)
                     .then((response) => {
                         console.log("API response:", response.data);
                         setFilteredProjects(response.data);

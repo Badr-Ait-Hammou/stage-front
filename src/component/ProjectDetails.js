@@ -1,7 +1,7 @@
 import "../style/project_details.css"
 import React, { useState, useEffect,useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
-import axios from "axios";
+import axios from "../utils/axios";
 import MainCard from "../ui-component/cards/MainCard";
 import {useParams} from "react-router-dom";
 import {Column} from "primereact/column";
@@ -23,7 +23,7 @@ export default function ProjectDetails() {
     const { id } = useParams();
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
+        axios.get(`/api/projet/${id}`).then((response) => {
             setProject(response.data);
         });
     }, [id]);
@@ -33,7 +33,7 @@ export default function ProjectDetails() {
     }
 
     const loadComments=async ()=>{
-        const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
+        const res=await axios.get(`/api/projet/${id}`);
         setProject(res.data);
     }
 
@@ -134,7 +134,7 @@ export default function ProjectDetails() {
 
     const handleDeleteComment = (commentId) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/comment/${commentId}`)
+            axios.delete(`/api/comment/${commentId}`)
                 .then((response) => {
                     console.log("Comment deleted:", response.data);
                     toast.current.show({
@@ -163,7 +163,7 @@ export default function ProjectDetails() {
 
 
     const handleMarkAsRead = (commentId) => {
-        axios.put(`http://localhost:8080/api/comment/read/${commentId}`, {
+        axios.put(`/api/comment/read/${commentId}`, {
             status: "read",
         })
             .then(() => {

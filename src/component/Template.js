@@ -9,7 +9,7 @@ import {InputTextarea} from 'primereact/inputtextarea';
 import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext';
 import 'primeicons/primeicons.css';
-import axios from "axios";
+import axios from "../utils/axios";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {Grid,} from '@mui/material';
 import {Box} from "@mui/system";
@@ -66,7 +66,7 @@ export default function Template() {
 
     const fetchData = async () => {
         try {
-            const resultResponse = await axios.get('http://localhost:8080/api/result/all');
+            const resultResponse = await axios.get('/api/result/all');
             setResult(resultResponse.data);
             handleDataTableLoad();
         } catch (error) {
@@ -76,7 +76,7 @@ export default function Template() {
 
     const loadFields = async () => {
         if (selectedResult) {
-            const res = await axios.get(`http://localhost:8080/api/field/result/${selectedResult.id}`);
+            const res = await axios.get(`/api/field/result/${selectedResult.id}`);
             setFields(res.data);
         }
     };
@@ -91,7 +91,7 @@ export default function Template() {
             return;
         }
 
-        axios.post("http://localhost:8080/api/result/save", {
+        axios.post("/api/result/save", {
             name,
             description,
             file,
@@ -134,7 +134,7 @@ const handleEdit = async () => {
             type,
 
         };
-        const response = await axios.put(`http://localhost:8080/api/result/${selectedResult.id}`, updatedProject);
+        const response = await axios.put(`/api/result/${selectedResult.id}`, updatedProject);
 
         const updatedProjects = result.map((result) =>
             result.id === response.data.id ? response.data : result
@@ -179,7 +179,7 @@ const saveAllFieldsWithResult = async () => {
     try {
         const csvDataUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(file)}`;
 
-        const resultResponse = await axios.post("http://localhost:8080/api/result/save", {
+        const resultResponse = await axios.post("/api/result/save", {
             name,
             description,
             type,
@@ -201,7 +201,7 @@ const saveAllFieldsWithResult = async () => {
                     result: {id: resultId},
                 };
 
-                await axios.post("http://localhost:8080/api/field/save", fieldToSave);
+                await axios.post("/api/field/save", fieldToSave);
             }
         }
         showusave();
@@ -253,7 +253,7 @@ const handlefileChange2 = (event) => {
 
 /********************************************Load Result *************************/
 const loadResult = async () => {
-    const res = await axios.get(`http://localhost:8080/api/result/all`);
+    const res = await axios.get(`/api/result/all`);
     setImages(res.data);
 }
 
@@ -263,7 +263,7 @@ const loadResult = async () => {
 
 const handleDelete = (id) => {
     const confirmDelete = () => {
-        axios.delete(`http://localhost:8080/api/result/${id}`)
+        axios.delete(`/api/result/${id}`)
             .then(() => {
                 setResult(result.filter((rowData) => rowData.id !== id));
                 toast.current.show({
@@ -457,7 +457,7 @@ const handlefileChange3 = async (event) => {
             try {
 
                 const deletePromises = fields.map((field) =>
-                    axios.delete(`http://localhost:8080/api/field/${field.id}`)
+                    axios.delete(`/api/field/${field.id}`)
                 );
 
                 await Promise.all(deletePromises);
@@ -473,7 +473,7 @@ const handlefileChange3 = async (event) => {
                         file: csvDataUrl,
                     };
 
-                    await axios.put(`http://localhost:8080/api/result/${selectedResult.id}`, updatedResult);
+                    await axios.put(`/api/result/${selectedResult.id}`, updatedResult);
                     setResult(updatedResult);
                 } else {
                     const newResult = {
@@ -482,7 +482,7 @@ const handlefileChange3 = async (event) => {
                         description: description,
                         type: 'excel',
                     };
-                    const resultResponse = await axios.post('http://localhost:8080/api/result/save', newResult);
+                    const resultResponse = await axios.post('/api/result/save', newResult);
                     setResult(resultResponse.data);
                 }
 
@@ -494,7 +494,7 @@ const handlefileChange3 = async (event) => {
                         type: 'text',
                         result: {id: resultId},
                     };
-                    await axios.post('http://localhost:8080/api/field/save', fieldToSave);
+                    await axios.post('/api/field/save', fieldToSave);
                 }
 
                 loadResult();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "../utils/axios";
 import { Button } from "primereact/button";
 import {Card, CardContent, Grid,} from '@mui/material';
 
@@ -61,7 +61,7 @@ export default function TemplateDetails() {
 
     useEffect(() => {
         axios
-            .get(`http://localhost:8080/api/result/${id}`)
+            .get(`/api/result/${id}`)
             .then((response) => {
                 setResult(response.data);
                 setName(response.data.name);
@@ -76,12 +76,12 @@ export default function TemplateDetails() {
     }, [id]);
 
     const loadResult = async () => {
-        const res = await axios.get(`http://localhost:8080/api/result/${id}`);
+        const res = await axios.get(`/api/result/${id}`);
         setResult(res.data);
     }
 
     const loadFields = async () => {
-        const res = await axios.get(`http://localhost:8080/api/field/result/${id}`);
+        const res = await axios.get(`/api/field/result/${id}`);
         setFields(res.data);
     }
 
@@ -99,7 +99,7 @@ export default function TemplateDetails() {
         }
 
         const savePromises = cards.map((card) =>
-            axios.post("http://localhost:8080/api/field/save", {
+            axios.post("/api/field/save", {
                 namef: card.fname,
                 fieldid: card.fieldid,
                 type: card.ftype,
@@ -131,7 +131,7 @@ export default function TemplateDetails() {
 
 
     const handleDeleteField = (fieldId) => {
-        axios.delete(`http://localhost:8080/api/field/${fieldId}`)
+        axios.delete(`/api/field/${fieldId}`)
             .then(() => {
                 loadFields();
             })
@@ -150,7 +150,7 @@ export default function TemplateDetails() {
                 type,
 
             };
-            const response = await axios.put(`http://localhost:8080/api/result/${id}`, updatedProject);
+            const response = await axios.put(`/api/result/${id}`, updatedProject);
 
             setResult(response.data);
 
@@ -164,7 +164,7 @@ export default function TemplateDetails() {
 
     const handleDelete = (id) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/result/${id}`)
+            axios.delete(`/api/result/${id}`)
                 .then(() => {
                     setResult(result.id !== id);
                     toast.current.show({severity:'success', summary: 'Done', detail:'Template deleted successfully', life: 3000});

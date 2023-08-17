@@ -2,7 +2,7 @@ import "../style/project_details.css"
 import React, {useState, useEffect,useRef} from 'react';
 import {Toolbar} from 'primereact/toolbar';
 import { Toast } from 'primereact/toast';
-import axios from "axios";
+import axios from "../utils/axios";
 import MainCard from "../ui-component/cards/MainCard";
 import {useParams} from "react-router-dom";
 import {Column} from "primereact/column";
@@ -28,13 +28,13 @@ export default function ProjectComment() {
 
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
+        axios.get(`/api/projet/${id}`).then((response) => {
             setProject(response.data);
         });
     }, []);
 
     const loadComments=async ()=>{
-        const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
+        const res=await axios.get(`/api/projet/${id}`);
         setProject(res.data);
     }
 
@@ -58,7 +58,7 @@ export default function ProjectComment() {
         }
 
 
-        axios.post("http://localhost:8080/api/comment/save", {
+        axios.post("/api/comment/save", {
             note,
             rate ,
             status:"unread",
@@ -88,7 +88,7 @@ export default function ProjectComment() {
 
     const handleDeleteComment = (commentId) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/comment/${commentId}`)
+            axios.delete(`/api/comment/${commentId}`)
                 .then((response) => {
                     console.log("Comment deleted:", response.data);
                     toast.current.show({
@@ -167,7 +167,7 @@ export default function ProjectComment() {
         }
 
         try {
-            const response = await axios.put(`http://localhost:8080/api/comment/${selectedComment}`, {
+            const response = await axios.put(`/api/comment/${selectedComment}`, {
                 note: note,
                 rate: rate,
                 status:"unread",

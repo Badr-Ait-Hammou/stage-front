@@ -14,7 +14,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import axios from "axios";
+import axios from "../utils/axios";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
@@ -80,7 +80,7 @@ export default function Projects() {
 
 
     const loadProjects = async () => {
-        const res = await axios.get("http://localhost:8080/api/projet/role/CLIENT");
+        const res = await axios.get("/api/projet/role/CLIENT");
         setProjects(res.data);
     };
 
@@ -110,7 +110,7 @@ export default function Projects() {
     useEffect(() => {
         const loadProjectsAndUnreadCounts = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/api/projet/role/CLIENT");
+                const res = await axios.get("/api/projet/role/CLIENT");
                 setProjects(res.data);
 
                 const unreadCounts = {};
@@ -132,7 +132,7 @@ export default function Projects() {
                 setSelectedPageComments([]);
                 setSelectedProjectId(null);
             } else {
-                const res = await axios.get(`http://localhost:8080/api/comment/projet/${projectId}`);
+                const res = await axios.get(`/api/comment/projet/${projectId}`);
                 setSelectedProjectComments(res.data);
                 setSelectedPageComments(res.data.slice(0, cardsPerPage));
                 setSelectedProjectId(projectId);
@@ -157,7 +157,7 @@ export default function Projects() {
 
     const handleDeleteComment = (commentId) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/comment/${commentId}`)
+            axios.delete(`/api/comment/${commentId}`)
                 .then((response) => {
                     console.log("Comment deleted:", response.data);
                     toast.current.show({
@@ -195,7 +195,7 @@ export default function Projects() {
 
     const handleMarkAsRead = (commentId) => {
         axios
-            .put(`http://localhost:8080/api/comment/read/${commentId}`, {
+            .put(`/api/comment/read/${commentId}`, {
                 status: "read",
             })
             .then(() => {
@@ -282,20 +282,20 @@ export default function Projects() {
     };
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/projet/all").then((response) => {
+        axios.get("/api/projet/all").then((response) => {
             setProjects(response.data);
             handleDataTableLoad();
         });
     }, []);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/users/role/CLIENT").then((response) => {
+        axios.get("/api/users/role/CLIENT").then((response) => {
             setClient(response.data);
         });
     }, []);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/result/all").then((response) => {
+        axios.get("/api/result/all").then((response) => {
             setResults(response.data);
         });
     }, []);
@@ -331,7 +331,7 @@ export default function Projects() {
             };
         }
 
-        axios.post("http://localhost:8080/api/projet/save", requestData)
+        axios.post("/api/projet/save", requestData)
             .then((response) => {
                 console.log("API Response:", response.data);
                 setName("");
@@ -352,7 +352,7 @@ export default function Projects() {
 
     const handleDelete = (id) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/projet/${id}`)
+            axios.delete(`/api/projet/${id}`)
                 .then(() => {
                     setProjects(project.filter((rowData) => rowData.id !== id));
                     toast.current.show({severity:'success', summary: 'Done', detail:'Project deleted successfully', life: 3000});
@@ -435,7 +435,7 @@ export default function Projects() {
                 };
             }
 
-            const response = await axios.put(`http://localhost:8080/api/projet/${selectedProject.id}`, updatedProject);
+            const response = await axios.put(`/api/projet/${selectedProject.id}`, updatedProject);
 
             const updatedProjects = project.map((proj) =>
                 proj.id === response.data.id ? response.data : proj

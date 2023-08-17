@@ -1,7 +1,7 @@
 import "../style/project_details.css"
 import React, { useState, useEffect,useRef } from 'react';
 import { Toolbar } from 'primereact/toolbar';
-import axios from "axios";
+import axios from "../utils/axios";
 import MainCard from "../ui-component/cards/MainCard";
 import { useParams} from "react-router-dom";
 import {Column} from "primereact/column";
@@ -91,7 +91,7 @@ export default function ProjectDetailsCsv() {
 
     const loadFields = async (projectId) => {
         try {
-            const res = await axios.get(`http://localhost:8080/api/field/result/${projectId}`);
+            const res = await axios.get(`/api/field/result/${projectId}`);
             const newData = [];
 
             for (let i = 0; i < res.data.length; i++) {
@@ -115,14 +115,14 @@ export default function ProjectDetailsCsv() {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://localhost:8080/api/projet/${id}`).then((response) => {
+            axios.get(`/api/projet/${id}`).then((response) => {
                 setProject(response.data);
                 if (response.data.result && response.data.result.id) {
                     loadFields(response.data.result.id);
                 }
             });
         }
-        axios.get(`http://localhost:8080/api/company/getfirst`).then((response) => {
+        axios.get(`/api/company/getfirst`).then((response) => {
             const companyData = response.data;
             setCompany(companyData);
         });
@@ -133,7 +133,7 @@ export default function ProjectDetailsCsv() {
     }
 
     const loadComments=async ()=>{
-        const res=await axios.get(`http://localhost:8080/api/projet/${id}`);
+        const res=await axios.get(`/api/projet/${id}`);
         setProject(res.data);
     }
 
@@ -177,7 +177,7 @@ export default function ProjectDetailsCsv() {
         }
 
         const savePromises = project.result.fieldList.map((field) =>
-            axios.post("http://localhost:8080/api/fieldvalue/save", {
+            axios.post("/api/fieldvalue/save", {
                 value: lastRowValues[field.namef.toLowerCase()],
                 field: {
                     id: field.id,
@@ -227,7 +227,7 @@ export default function ProjectDetailsCsv() {
                         )?.id;
 
                         if (fieldValueId) {
-                            await axios.delete(`http://localhost:8080/api/fieldvalue/${fieldValueId}`);
+                            await axios.delete(`/api/fieldvalue/${fieldValueId}`);
                         }
                     }
                 }
@@ -442,7 +442,7 @@ export default function ProjectDetailsCsv() {
 
     const handleDeleteComment = (commentId) => {
         const confirmDelete = () => {
-            axios.delete(`http://localhost:8080/api/comment/${commentId}`)
+            axios.delete(`/api/comment/${commentId}`)
                 .then((response) => {
                     console.log("Comment deleted:", response.data);
                     toast.current.show({
@@ -471,7 +471,7 @@ export default function ProjectDetailsCsv() {
 
 
     const handleMarkAsRead = (commentId) => {
-        axios.put(`http://localhost:8080/api/comment/read/${commentId}`, {
+        axios.put(`/api/comment/read/${commentId}`, {
             status: "read",
         })
             .then(() => {
