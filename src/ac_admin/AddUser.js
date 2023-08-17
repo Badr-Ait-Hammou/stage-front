@@ -42,6 +42,7 @@ export default function AddUser() {
     const [role, setRole] = useState('');
     const [users, setUsers] = useState([]);
     const [userDialog, setUserDialog] = useState(false);
+    const [userEditDialog, setUserEditDialog] = useState(false);
     const theme = useTheme();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const [showPassword, setShowPassword] = useState(false);
@@ -51,6 +52,8 @@ export default function AddUser() {
     const toast = useRef(null);
     const dt = useRef(null);
     const [passwordVisibility, setPasswordVisibility] = useState({});
+    const [selectedUser, setSelectedUser] = useState(null);
+
 
 
 
@@ -237,18 +240,54 @@ export default function AddUser() {
     };
     const hideDialog = () => {
         setUserDialog(false);
+        setUserEditDialog(false);
     };
 
-    const openEditDialog = (user) => {
-        setEditingUser(user);
-        setFirstName(user.firstname);
-        setLastName(user.lastname);
-        setEmail(user.email);
-        setUserName(user.username);
-        settel(user.tel);
-        setRole(user.role);
-        setUserDialog(true);
+    const handleupdate = (rowData) => {
+        setSelectedUser(rowData);
+        setFirstName(rowData.firstName);
+        setLastName(rowData.lastName);
+        setEmail(rowData.email);
+        setUserName(rowData.username);
+        settel(rowData.tel);
+        setRole(rowData.role);
+        setUserEditDialog(true);
     };
+
+
+
+    const handleEdit = async () => {
+        try {
+            const updatedUser = {
+                id: selectedUser.id,
+                username,
+                firstName:firstname,
+                lastName:lastname,
+                tel,
+                password,
+                role,
+            };
+
+
+
+            const response = await axios.put(`/api/users/${selectedUser.id}`, updatedUser);
+
+            const updatedUsers = users.map((user) =>
+                user.id === response.data.id ? response.data : user
+            );
+
+            setUsers(updatedUsers);
+            setUserEditDialog(false);
+            loadUsers();
+            showupdate();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+
+
 
     /*************************************************** password check  ************************************************/
 
@@ -296,6 +335,7 @@ export default function AddUser() {
         </div>;
     };
 
+
     const passwordBodyTemplate = (rowData) => {
         const isPasswordVisible = passwordVisibility[rowData.id];
 
@@ -319,16 +359,25 @@ export default function AddUser() {
     const userDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
-            <Button label="save"
+            <Button label="Save"
                     severity="success"
                     raised onClick={(e) => handleSubmit(e)}/>
+        </React.Fragment>
+    );
+
+    const userEditDialogFooter = (
+        <React.Fragment>
+            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
+            <Button label="Update"
+                    severity="info"
+                    raised onClick={(e) => handleEdit(selectedUser)}/>
         </React.Fragment>
     );
 
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined style={{marginRight: "4px"}}/>
+                <Button icon="pi pi-pencil" rounded outlined style={{marginRight: "4px"}} onClick={() => handleupdate(rowData)}/>
                 <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => deleteUser(rowData.id)}/>
             </React.Fragment>
         );
@@ -384,6 +433,9 @@ export default function AddUser() {
     }
     const showudelete = () => {
         toast.current.show({severity:'error', summary: 'done', detail:'User deleted successfully', life: 3000});
+    }
+    const showupdate = () => {
+        toast.current.show({severity:'info', summary: 'done', detail:'User updated successfully', life: 3000});
     }
 
 
@@ -573,12 +625,196 @@ export default function AddUser() {
                             <FormControlLabel
                                 control={
                                     <Switch
-                                        checked={role === 'GESTIONNAIRE'}
-                                        onChange={() => setRole('GESTIONNAIRE')}
-                                        value="GESTIONNAIRE"
+                                        checked={role === 'MANAGER'}
+                                        onChange={() => setRole('MANAGER')}
+                                        value="MANAGER"
                                     />
                                 }
-                                label="Gestionnaire"
+                                label="MANAGER"
+                            /> <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={role === 'CLIENT'}
+                                    onChange={() => setRole('CLIENT')}
+                                    value="CLIENT"
+                                />
+                            }
+                            label="Client"
+                        />
+                        </div>
+                    </FormControl>
+
+
+                </form>
+
+            </Dialog>
+
+
+            <Dialog visible={userEditDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
+                    header="Update User" modal className="p-fluid" footer={userEditDialogFooter} onHide={hideDialog}>
+                <form noValidate>
+                    <Grid container spacing={matchDownSM ? 0 : 1}>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: 1}}>
+                                <InputLabel>
+                                    FirstName
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding: "5px"}}
+                                    type="text"
+
+                                    value={firstname} onChange={(e) => setFirstName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: 1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register">LastName
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding: "5px"}}
+                                    margin="none"
+                                    type="text"
+
+                                    value={lastname} onChange={(e) => setLastName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: -1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register">Username
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding: "5px"}}
+                                    margin="none"
+                                    type="text"
+
+                                    value={username} onChange={(e) => setUserName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput, mt: -1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register">Phone
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding: "5px"}}
+                                    margin="none"
+                                    type="text"
+
+                                    value={tel} onChange={(e) => settel(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+
+                    <FormControl fullWidth sx={{...theme.typography.customInput, mt: 1}}>
+                        <InputLabel htmlFor="outlined-adornment-email-register">Email Address
+                        </InputLabel>
+                        <OutlinedInput
+                            style={{padding: "10px"}}
+                            id="outlined-adornment-email-register"
+                            type="email"
+                            value={email} onChange={(e) => {
+                            setEmail(e.target.value);
+                        }}
+                            name="email"
+
+                        />
+
+                    </FormControl>
+
+
+                    <FormControl fullWidth sx={{...theme.typography.customInput}}>
+                        <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+                        <OutlinedInput
+                            id="outlined-adornment-password-register"
+                            type={showPassword ? 'text' : 'password'}
+                            style={{padding: "10px"}}
+                            value={password} onChange={(e) => {
+                            setpassword(e.target.value);
+                            changePassword(e.target.value);
+                        }}
+                            name="password"
+                            label="Password"
+                            endAdornment={
+                                <InputAdornment position="end">
+
+
+                                    <IconButton
+                                        aria-label="toggle password generator"
+                                        onClick={handleGeneratePassword}
+                                        edge="end"
+                                        size="medium"
+                                    >
+                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
+                                            <SyncLockIcon />
+                                        </ArrowTooltip>
+
+                                    </IconButton>
+
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                        size="large"
+                                    >
+                                        {showPassword ? <Visibility/> : <VisibilityOff/>}
+                                    </IconButton>
+
+
+                                </InputAdornment>
+                            }
+                        />
+
+                    </FormControl>
+
+
+                    {strength !== 0 && (
+                        <FormControl fullWidth>
+                            <Box sx={{mb: 2}}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item>
+                                        <Box style={{backgroundColor: level?.color}}
+                                             sx={{width: 85, height: 8, borderRadius: '7px'}}/>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" fontSize="0.75rem">
+                                            {level?.label}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </FormControl>
+                    )}
+
+
+                    <FormControl component="fieldset">
+                        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={role === 'ADMIN'}
+                                        onChange={() => setRole('ADMIN')}
+                                        value="ADMIN"
+                                    />
+                                }
+                                label="Admin"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={role === 'MANAGER'}
+                                        onChange={() => setRole('MANAGER')}
+                                        value="MANAGER"
+                                    />
+                                }
+                                label="MANAGER"
                             /> <FormControlLabel
                             control={
                                 <Switch
