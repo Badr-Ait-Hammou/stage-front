@@ -37,8 +37,8 @@ import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
 
 // ==============================|| MAIN ROUTING ||============================== //
 
-const MainRoutes = {
-  path: '/',
+const AdminRoute = {
+ path: "admin",
   element: <MainLayout />,
   children: [
     {
@@ -205,4 +205,4 @@ const MainRoutes = {
   ]
 };
 
-export default MainRoutes;
+export default AdminRoute;
