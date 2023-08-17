@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -24,6 +24,8 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import AuthService from '../../../../routes/AuthService';
+import { useNavigate } from 'react-router-dom';
 
 
 // ============================|| FIREBASE - LOGIN ||============================ //
@@ -32,8 +34,27 @@ const FirebaseLogin = ({ ...others }) => {
   const theme = useTheme();
   const scriptedRef = useScriptRef();
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const toast = useRef(null);
 
+  const navigate = useNavigate();
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const user = await AuthService.login(email, password);
+      console.log(user);
+      navigate('/');
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const showerror = () => {
+    toast.current.show({severity:'info', summary: 'Warning!', detail:'username or password doesnt match', life: 3000});
+  }
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
@@ -43,6 +64,7 @@ const FirebaseLogin = ({ ...others }) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
 
   return (
     <>
@@ -72,17 +94,17 @@ const FirebaseLogin = ({ ...others }) => {
           }
         }}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-          <form noValidate onSubmit={handleSubmit} {...others}>
+        {({ errors, handleBlur, handleChange, isSubmitting, touched, values }) => (
+          <form noValidate  {...others}>
             <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
               <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 type="email"
-                value={values.email}
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 name="email"
                 onBlur={handleBlur}
-                onChange={handleChange}
                 label="Email Address / Username"
                 inputProps={{}}
               />
@@ -98,10 +120,10 @@ const FirebaseLogin = ({ ...others }) => {
               <OutlinedInput
                 id="outlined-adornment-password-login"
                 type={showPassword ? 'text' : 'password'}
-                value={values.password}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 name="password"
                 onBlur={handleBlur}
-                onChange={handleChange}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -129,7 +151,7 @@ const FirebaseLogin = ({ ...others }) => {
                 justifyContent: 'center',
                 alignItems: 'center'}}>
               <AnimateButton>
-                <Button disabled={isSubmitting} variant="outlined" disableElevation color="secondary"  >
+                <Button disabled={isSubmitting} variant="outlined" disableElevation color="secondary" onClick={handleSubmit}  >
                   Sign in
                 </Button>
               </AnimateButton>
