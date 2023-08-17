@@ -14,7 +14,7 @@ const project = {
             id: 'projects',
             title: 'Projects',
             type: 'item',
-            url: '/projects',
+            url: '/app/projects',
             icon: icons.IconBrandMiniprogram,
             breadcrumbs: false
         }

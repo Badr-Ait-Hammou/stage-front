@@ -14,7 +14,7 @@ const image = {
             id: 'image',
             title: 'Images',
             type: 'item',
-            url: '/image',
+            url: '/app/image',
             icon: icons.IconPhoto,
             breadcrumbs: false
         }

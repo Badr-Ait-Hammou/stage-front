@@ -14,7 +14,7 @@ const pdf = {
       id: 'pdf',
       title: 'Pdf File',
       type: 'item',
-      url: '/pdf',
+      url: '/app/pdf',
       icon: icons.IconFileDescription,
       breadcrumbs: false
     }

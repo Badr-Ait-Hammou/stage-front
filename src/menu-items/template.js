@@ -14,7 +14,7 @@ const annotation = {
             id: 'template',
             title: 'Template',
             type: 'item',
-            url: '/template',
+            url: '/app/template',
             icon: icons.IconTemplate,
             breadcrumbs: false
         }
