@@ -14,6 +14,8 @@ import {Tag} from "primereact/tag";
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
+
 import { InputText } from 'primereact/inputtext';
 import { Box } from '@mui/system';
 import PizZip from 'pizzip';
@@ -38,9 +40,6 @@ export default function ProjectDetailDoc() {
             setProject(response.data);
         });
     }, [id]);
-
-
-
 
 
     const handleInputChange = (namef, value) => {
@@ -74,7 +73,6 @@ export default function ProjectDetailDoc() {
                 setExtractedContent(extractedContent);
                 setInputValues(variables);
             }
-
             console.log(extractedContent);
 
 
@@ -87,37 +85,62 @@ export default function ProjectDetailDoc() {
 
 
 
-    const handleGeneratePDF2 = () => {
+    const handleGeneratePDF2 = async () => {
+
+        //await handleExtractContent(); // Execute content extraction first
+
 
         const modifiedContent = extractedContent.replace(/%%([^%]+)%%/g, (match, variableName) => {
-            return inputValues[variableName] || '';
+            const replacement = inputValues[variableName] || '';
+            return replacement + '\n';
         });
+
 
         const pdf = new jsPDF();
         pdf.setFontSize(12);
         pdf.setFont('helvetica');
+        const maxWidth = 100;
+        const lineHeight = 12;
+        const maxLinesPerPage = Math.floor(pdf.internal.pageSize.height / lineHeight) - 1;
 
-        const lines = formatTextIntoLines(modifiedContent, 100);
+        let currentLineIndex = 0;
+        let currentPage = 1;
+
+        const lines = formatTextIntoLines(modifiedContent, maxWidth);
 
         lines.forEach((line, index) => {
-            pdf.text(line, 10, 10 + index * 12);
-        });
+            if (currentLineIndex >= maxLinesPerPage) {
+                pdf.addPage();
+                currentPage++;
+                currentLineIndex = 0;
+            }
 
+            pdf.text(line, 10, 10 + currentLineIndex * lineHeight);
+            currentLineIndex++;
+        });
 
         pdf.save('generated.pdf');
     };
 
     const formatTextIntoLines = (text, maxWidth) => {
-        const words = text.split(/\s+/);
         const lines = [];
         let currentLine = '';
 
-        words.forEach(word => {
-            if (currentLine.length + word.length + 1 <= maxWidth) {
-                currentLine += (currentLine === '' ? '' : ' ') + word;
-            } else {
+        text.split('\n').forEach(line => {
+            const words = line.split(/\s+/);
+
+            words.forEach(word => {
+                if (currentLine.length + word.length + 1 <= maxWidth) {
+                    currentLine += (currentLine === '' ? '' : ' ') + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            });
+
+            if (currentLine !== '') {
                 lines.push(currentLine);
-                currentLine = word;
+                currentLine = '';
             }
         });
 
@@ -133,8 +156,8 @@ export default function ProjectDetailDoc() {
 
 
 
-    if (!project.commentList) {
-        return <div>Loading...</div>;
+    if (!project.commentList || !project.result) {
+        return <PopularCart/>;
     }
 
     const loadComments=async ()=>{
@@ -356,6 +379,16 @@ export default function ProjectDetailDoc() {
                             <div className="  mt-5">
                                 <Button label="Generate PDF"  icon="pi pi-file-pdf" severity="danger" style={{marginRight:"5px"}} onClick={handleGeneratePDF2}/>
                                 <Button label=" Extract DOCX Content" icon="pi pi-angle-double-up" severity="success"  onClick={() => handleExtractContent()}/>
+                                {/* <Button
+                                    label="Extract Content & Generate PDF"
+                                    icon="pi pi-angle-double-up pi-file-pdf"
+                                    severity="success"
+                                    onClick={async () => {
+                                        await handleExtractContent();
+                                        handleGeneratePDF2();
+                                    }}
+                                />
+                                */}
                             </div>
 
                         </div>

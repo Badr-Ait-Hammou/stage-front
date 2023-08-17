@@ -601,12 +601,10 @@ export default function ProjectDetailsCsv() {
         const totalPageCount = Math.ceil(rows.length / rowsPerPage);
 
         let currentPage = 0;
-
         while (currentPage * rowsPerPage < rows.length) {
             if (currentPage > 0) {
                 doc.addPage();
                 doc.addImage(backgroundImage, 'JPEG', 0, 0, pageWidth, pageHeight); // Add background image
-
             }
 
             // Company Logo
@@ -674,8 +672,7 @@ export default function ProjectDetailsCsv() {
             doc.setFontSize(8);
             doc.text(` ${dateTimeString}`, titleX, 65, {align: 'center'});
 
-
-
+            // Adding the table and other content
             const startRow = currentPage * rowsPerPage;
             const endRow = Math.min((currentPage + 1) * rowsPerPage, rows.length);
 
@@ -704,38 +701,36 @@ export default function ProjectDetailsCsv() {
                 },
             });
 
+            currentPage++;
+
+        }
 
 
+        for (let i = 0; i < totalPageCount; i++) {
+            doc.setPage(i);
+            const footerX = doc.internal.pageSize.width / 2;
+            const footerY = doc.internal.pageSize.height - 10;
+           // doc.text(`Page ${i + 1} of ${totalPageCount}`, footerX, footerY, { align: 'center' });
 
-            for (let i = 0; i < totalPageCount; i++) {
-                doc.setPage(i);
-                const footerX = doc.internal.pageSize.width / 2;
-                const footerY = doc.internal.pageSize.height - 10;
-                doc.text(`Page ${i + 1} of ${totalPageCount}`, footerX, footerY, { align: 'center' });
-
-                const pageCompanyInfo = [
+            const pageCompanyInfo = [
                     `EMAIL: ${company.email}   | R.C: ${company.valRc}  | WEBSITE :${company.webSite}`,
                     `CNSS: ${company.valCnss}   | I.C.E: ${company.valIce}  |  I.F: ${company.valIf} `,
                     `PHONE: ${company.phone}   | ADDRESS: ${company.address}  |  FAX: ${company.fax}`,
                 ];
 
-                const lineHeight = 5;
-                const infoFontSize = 8;
-                doc.setFontSize(infoFontSize);
+            const lineHeight = 5;
+            const infoFontSize = 8;
+            doc.setFontSize(infoFontSize);
 
-                for (let j = 0; j < pageCompanyInfo.length; j++) {
-                    const lineY = footerY - (lineHeight * (j + 1));
-                    doc.text(pageCompanyInfo[j], footerX, lineY, { align: 'center' });
-                }
+            for (let j = 0; j < pageCompanyInfo.length; j++) {
+                const lineY = footerY - (lineHeight * (j + 1));
+                doc.text(pageCompanyInfo[j], footerX, lineY, { align: 'center' });
             }
-
-
-            currentPage++;
         }
 
-            doc.save('datatable-export.pdf');
+        // Save the PDF with the given name
+        doc.save('datatable-export.pdf');
     };
-
 
 
 
@@ -774,7 +769,7 @@ export default function ProjectDetailsCsv() {
                         dataKey={(rowData, index) => index}
                         paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter}  header={header}
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Csv rows" globalFilter={globalFilter}  header={header}
                     >
 
 
@@ -853,7 +848,7 @@ export default function ProjectDetailsCsv() {
 
 
             <Dialog visible={displayDialog} onHide={hideImageSelectionDialog}  style={{ width: '40rem' }}
-                     header="Select theme">
+                     header="Select a theme">
                 <div  style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '10px', justifyContent: 'center',marginTop:"20px",marginBottom:"20px" }}>
                     {images.map(image => (
                         <img
