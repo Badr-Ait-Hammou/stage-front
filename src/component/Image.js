@@ -80,6 +80,9 @@ export default function Image() {
         }
     };
 
+    /********************************************Save image *************************/
+
+
     const handleSubmit = (event) => {
         event?.preventDefault();
         axios.post("/api/image/save", {
@@ -193,7 +196,6 @@ export default function Image() {
         seteditProductDialog(false);
     };
     const hideeditDialog = () => {
-        // setSubmitted(false);
         seteditProductDialog(false);
     };
 
@@ -397,6 +399,7 @@ export default function Image() {
 
     return (
         <div>
+
             <Toast ref={toast} />
             <ConfirmDialog />
 

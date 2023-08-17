@@ -19,6 +19,7 @@ import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
+import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
 
 
 export default function AddClient() {
@@ -102,6 +103,7 @@ export default function AddClient() {
                 setpassword("");
                 setUserDialog(false);
                 loadClients();
+                showusave();
 
             })
             .catch((error) => {
@@ -208,6 +210,19 @@ export default function AddClient() {
         return phoneNumberPattern.test(phoneNumber);
     };
 
+
+    /********************************************** load ***********************************************/
+
+    if (users.length === 0) {
+        return <PopularCart />
+    }
+
+    /********************************************Toasts *************************/
+
+    const showusave = () => {
+        toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
+    }
+
     return (
         <>
             <Toast ref={toast}/>
@@ -221,17 +236,13 @@ export default function AddClient() {
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                            globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{minWidth: '7rem'}}></Column>
-                    <Column field="firstName" header="FirstName" filter filterPlaceholder="Search Name ..." sortable
-                            style={{minWidth: '10rem'}}></Column>
-                    <Column field="lastName" header="LastName" filter filterPlaceholder="Search Name ..." sortable
-                            style={{minWidth: '10rem'}}></Column>
+                    <Column field="firstName" header="FirstName" filter filterPlaceholder="Search FirstName ..." sortable style={{minWidth: '10rem'}}></Column>
+                    <Column field="lastName" header="LastName" filter filterPlaceholder="Search LastName ..." sortable style={{minWidth: '10rem'}}></Column>
                     <Column field="email" header="Email" sortable style={{minWidth: '10em'}}></Column>
-                    <Column field="role" header="Role" filter filterPlaceholder="Search Name ..." sortable
-                            style={{minWidth: '10rem'}}></Column>
-                    <Column field="tel" header="Phone" sortable sortField="dateCreation"
-                            style={{minWidth: "10rem"}}></Column>
-                    <Column header="Action" body={actionBodyTemplate} exportable={false}
-                            style={{minWidth: '12rem'}}></Column>
+                    <Column field="username" header="UserName" sortable style={{minWidth: '10em'}}></Column>
+                    <Column field="role" header="Role" filter filterPlaceholder="Search Name ..." sortable style={{minWidth: '10rem'}}></Column>
+                    <Column field="tel" header="Phone" sortable sortField="dateCreation" style={{minWidth: "10rem"}}></Column>
+                    <Column header="Action" body={actionBodyTemplate} exportable={false} style={{minWidth: '12rem'}}></Column>
                 </DataTable>
             </div>
 
@@ -248,7 +259,7 @@ export default function AddClient() {
                                 <OutlinedInput
                                     style={{padding:"5px"}}
                                     type="text"
-                                    defaultValue=""
+                                    
                                     value={firstname} onChange={(e) => setFirstName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -260,9 +271,9 @@ export default function AddClient() {
                                 </InputLabel>
                                 <OutlinedInput
                                     style={{padding:"5px"}}
-                                    margin="normal"
+                                    margin="none"
                                     type="text"
-                                    defaultValue=""
+                                    
                                     value={lastname} onChange={(e) => setLastName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -274,9 +285,9 @@ export default function AddClient() {
                                 </InputLabel>
                                 <OutlinedInput
                                     style={{padding:"5px"}}
-                                    margin="normal"
+                                    margin="none"
                                     type="text"
-                                    defaultValue=""
+                                    
                                     value={username} onChange={(e) => setUserName(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
@@ -288,9 +299,9 @@ export default function AddClient() {
                                 </InputLabel>
                                 <OutlinedInput
                                     style={{padding:"5px"}}
-                                    margin="normal"
+                                    margin="none"
                                     type="text"
-                                    defaultValue=""
+                                    
                                     value={tel} onChange={(e) => settel(e.target.value)}
                                     sx={{...theme.typography.customInput}}
                                 />
