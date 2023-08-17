@@ -12,6 +12,8 @@ import {
 import {Dialog} from 'primereact/dialog';
 
 import {Button} from 'primereact/button';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SyncLockIcon from '@mui/icons-material/SyncLock';
@@ -175,6 +177,33 @@ export default function AddUser() {
         }
     };
 
+    /************************************ Delete ***************************************/
+
+
+    const deleteUser = (id) => {
+        const confirmDelete = () => {
+            axios.delete(`/api/users/${id}`)
+                .then((response) => {
+                    console.log("API Response:", response.data);
+                    loadUsers();
+                    showudelete();
+                })
+                .catch((error) => {
+                    console.error("Error while deleting user:", error);
+                });
+        };
+
+        confirmDialog({
+            message: 'Are you sure you want to delete this User?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete
+        });
+    };
+
 
 
     /*************************************************** Tooltip *************************************************/
@@ -208,6 +237,17 @@ export default function AddUser() {
     };
     const hideDialog = () => {
         setUserDialog(false);
+    };
+
+    const openEditDialog = (user) => {
+        setEditingUser(user);
+        setFirstName(user.firstname);
+        setLastName(user.lastname);
+        setEmail(user.email);
+        setUserName(user.username);
+        settel(user.tel);
+        setRole(user.role);
+        setUserDialog(true);
     };
 
     /*************************************************** password check  ************************************************/
@@ -289,7 +329,7 @@ export default function AddUser() {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" rounded outlined style={{marginRight: "4px"}}/>
-                <Button icon="pi pi-trash" rounded outlined severity="danger"/>
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => deleteUser(rowData.id)}/>
             </React.Fragment>
         );
     };
@@ -339,14 +379,18 @@ export default function AddUser() {
     }
 
     /********************************************Toasts *************************/
-
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
     }
+    const showudelete = () => {
+        toast.current.show({severity:'error', summary: 'done', detail:'User deleted successfully', life: 3000});
+    }
+
 
 
     return (
         <>
+            <ConfirmDialog />
             <Toast ref={toast}/>
             <div>
                 <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate}
