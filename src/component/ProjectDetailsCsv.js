@@ -769,7 +769,7 @@ export default function ProjectDetailsCsv() {
                         dataKey={(rowData, index) => index}
                         paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Images" globalFilter={globalFilter}  header={header}
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Csv rows" globalFilter={globalFilter}  header={header}
                     >
 
 
@@ -848,7 +848,7 @@ export default function ProjectDetailsCsv() {
 
 
             <Dialog visible={displayDialog} onHide={hideImageSelectionDialog}  style={{ width: '40rem' }}
-                     header="Select theme">
+                     header="Select a theme">
                 <div  style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '10px', justifyContent: 'center',marginTop:"20px",marginBottom:"20px" }}>
                     {images.map(image => (
                         <img
