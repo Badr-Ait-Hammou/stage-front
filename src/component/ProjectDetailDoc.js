@@ -85,7 +85,10 @@ export default function ProjectDetailDoc() {
 
 
 
-    const handleGeneratePDF2 = () => {
+    const handleGeneratePDF2 = async () => {
+
+        //await handleExtractContent(); // Execute content extraction first
+
 
         const modifiedContent = extractedContent.replace(/%%([^%]+)%%/g, (match, variableName) => {
             const replacement = inputValues[variableName] || '';
@@ -376,6 +379,16 @@ export default function ProjectDetailDoc() {
                             <div className="  mt-5">
                                 <Button label="Generate PDF"  icon="pi pi-file-pdf" severity="danger" style={{marginRight:"5px"}} onClick={handleGeneratePDF2}/>
                                 <Button label=" Extract DOCX Content" icon="pi pi-angle-double-up" severity="success"  onClick={() => handleExtractContent()}/>
+                                {/* <Button
+                                    label="Extract Content & Generate PDF"
+                                    icon="pi pi-angle-double-up pi-file-pdf"
+                                    severity="success"
+                                    onClick={async () => {
+                                        await handleExtractContent();
+                                        handleGeneratePDF2();
+                                    }}
+                                />
+                                */}
                             </div>
 
                         </div>
