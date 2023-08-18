@@ -204,8 +204,8 @@ const NotificationSection = () => {
           <Transitions position={matchesXs ? 'top' : 'top-right'} in={open} {...TransitionProps}>
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
-                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                  <Grid container direction="column" spacing={2}>
+                <MainCard  border={false}  elevation={16} content={false}  boxShadow shadow={theme.shadows[16]}>
+                  <Grid container  direction="column" spacing={2}>
                     <Grid item xs={12}>
                       <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 10 }}>
                         <Grid item>
@@ -257,11 +257,12 @@ const NotificationSection = () => {
                                     onClick={handleClose}
                                 >
 
-                                <List key={`list-${notification.id}`}
+                                <List  key={`list-${notification.id}`}
                                     sx={{
                                       width: '100%',
                                       maxWidth: 330,
                                       py: 0,
+
                                       borderRadius: '10px',
                                       [theme.breakpoints.down('md')]: {
                                         maxWidth: 300
@@ -282,22 +283,18 @@ const NotificationSection = () => {
 
 
 
-                                    <ListItem alignItems="center">
+                                    <ListItem>
                                     <ListItemAvatar>
                                       <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                     </ListItemAvatar>
 
-                                    <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.username}</Typography>} />
-                                    <ListItemSecondaryAction>
-                                      <Grid container justifyContent="flex-end">
-                                        <Grid item xs={12}>
-                                          <Typography variant="caption" display="block">
+                                      <ListItemText primary={<Typography variant="subtitle1">{notification.user.username.charAt(0).toUpperCase() + notification.user.username.slice(1)}</Typography>} />
+                                      <ListItemSecondaryAction>
+                                        <Grid item xs={12}  >
+                                          <Typography variant="subtitle2" >
                                             {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
                                           </Typography>
-                                          <Typography variant="caption" display="block">
-                                          </Typography>
                                         </Grid>
-                                      </Grid>
                                     </ListItemSecondaryAction>
                                   </ListItem>
 
@@ -308,7 +305,6 @@ const NotificationSection = () => {
                                     </Grid>
                                     <Grid item xs={12}>
                                       <Grid container>
-
                                         <Grid item>
                                           <Chip label={notification.status} sx={chipSuccessSX} />
                                         </Grid>
@@ -330,10 +326,7 @@ const NotificationSection = () => {
                                                  ? `project_detailsExcel/${notification.projet.id}`
                                                  : `project_details/${notification.projet.id}`}
                                          onClick={handleClose}
-
-
                                 >
-
                                 <List key={`list-${notification.id}`}
                                       sx={{
                                       width: '100%',
@@ -361,7 +354,7 @@ const NotificationSection = () => {
                                         <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                       </ListItemAvatar>
 
-                                      <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
+                                      <ListItemText primary={<Typography variant="subtitle1">{notification.user.username.charAt(0).toUpperCase() + notification.user.username.slice(1)}</Typography>} />
                                       <ListItemSecondaryAction>
                                         <Grid container justifyContent="flex-end">
                                           <Grid item xs={12}>
