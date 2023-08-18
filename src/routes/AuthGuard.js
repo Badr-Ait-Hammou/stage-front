@@ -13,7 +13,7 @@ const AuthGuard = ({children}) => {
   const managerRouting = useRoutes(ManagerRoute);
   useEffect(() => {
     if (auth.isLogged()) {
-      navigate("/login");
+      navigate("/");
     }
   }, [adminRouting, userRouting, managerRouting, navigate]);
 

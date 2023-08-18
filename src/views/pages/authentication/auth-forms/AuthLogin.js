@@ -53,8 +53,13 @@ const FirebaseLogin = ({ ...others }) => {
     try {
       const user = await AuthService.login(email, password);
       console.log(user);
-
-      navigate('/app');
+      if (user.role === 'CLIENT') {
+        console.log('Navigating to /app/client_projects');
+        navigate('/app/client_projects');
+      } else {
+        console.log('Navigating to /app');
+        navigate('/app');
+      }
     } catch (error) {
       console.error("An error occurred:", error);
       showerror();
