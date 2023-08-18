@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import axios from "utils/axios"
-
-// material-ui
 import {styled, useTheme} from '@mui/material/styles';
 import {
   Avatar,
@@ -24,20 +22,12 @@ import {
 
   List, ListItemSecondaryAction,
 } from '@mui/material';
-
-
-// third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-
-// assets
 import { IconBell } from '@tabler/icons';
-import User1 from "../../../../assets/images/users/user-round.svg";
 
-// styles
+
 const ListItemWrapper = styled('div')(({ theme }) => ({
   cursor: 'pointer',
   padding: 16,
@@ -104,6 +94,7 @@ const NotificationSection = () => {
   };
 
   const prevOpen = useRef(open);
+
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
@@ -226,7 +217,7 @@ const NotificationSection = () => {
 
                       </Grid>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} >
                       <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 205px)', overflowX: 'hidden' }}>
                         <Grid container direction="column" spacing={2}>
                           <Grid item xs={12}>
@@ -263,6 +254,7 @@ const NotificationSection = () => {
                                         `project_detailsDoc/${notification.projet.id}` : notification.projet.result && notification.projet.result.type==="excel"
                                             ? `project_detailsExcel/${notification.projet.id}`
                                             : `project_details/${notification.projet.id}`}
+                                    onClick={handleClose}
                                 >
 
                                 <List key={`list-${notification.id}`}
@@ -337,6 +329,9 @@ const NotificationSection = () => {
                                              : notification.projet.result && notification.projet.result.type==="excel"
                                                  ? `project_detailsExcel/${notification.projet.id}`
                                                  : `project_details/${notification.projet.id}`}
+                                         onClick={handleClose}
+
+
                                 >
 
                                 <List key={`list-${notification.id}`}
