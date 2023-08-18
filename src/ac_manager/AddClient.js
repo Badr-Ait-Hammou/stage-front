@@ -163,9 +163,13 @@ export default function AddClient() {
     ))(({ theme }) => ({
         [`& .${tooltipClasses.arrow}`]: {
             color: theme.palette.common.black,
+            zIndex: 1500,
+
         },
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: theme.palette.common.black,
+            zIndex: 1500,
+
         },
     }));
 

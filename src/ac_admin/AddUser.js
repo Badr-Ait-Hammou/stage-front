@@ -217,9 +217,13 @@ export default function AddUser() {
     ))(({ theme }) => ({
         [`& .${tooltipClasses.arrow}`]: {
             color: theme.palette.common.black,
+            zIndex: 1500,
+
         },
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: theme.palette.common.black,
+            zIndex: 1500,
+
         },
     }));
 
@@ -370,7 +374,7 @@ export default function AddUser() {
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
             <Button label="Update"
                     severity="info"
-                    raised onClick={(e) => handleEdit(selectedUser)}/>
+                    raised onClick={() => handleEdit(selectedUser)}/>
         </React.Fragment>
     );
 
@@ -564,7 +568,7 @@ export default function AddUser() {
                                         edge="end"
                                         size="medium"
                                     >
-                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
+                                        <ArrowTooltip title="Click here to Generate password"  classes={{ popper: 'my-tooltip' }} placement="bottom">
                                             <SyncLockIcon />
                                         </ArrowTooltip>
 
