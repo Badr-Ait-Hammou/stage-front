@@ -206,7 +206,7 @@ const saveAllFieldsWithResult = async () => {
         }
         showusave();
 
-        navigate(`/template/template_detailsExcel/${resultResponse.data.id}`);
+        navigate(`/app/template/template_detailsExcel/${resultResponse.data.id}`);
 
         console.log("Fields and result saved successfully!");
 

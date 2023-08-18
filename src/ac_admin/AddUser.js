@@ -24,7 +24,6 @@ import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
-import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 
@@ -383,6 +382,7 @@ export default function AddUser() {
         );
     };
 
+
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <span className="p-input-icon-left">
@@ -421,13 +421,10 @@ export default function AddUser() {
         return phoneNumberPattern.test(phoneNumber);
     };
 
-    /********************************************** load ***********************************************/
 
-    if (users.length === 0) {
-        return <PopularCart />
-    }
 
     /********************************************Toasts *************************/
+
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
     }
@@ -437,7 +434,6 @@ export default function AddUser() {
     const showupdate = () => {
         toast.current.show({severity:'info', summary: 'done', detail:'User updated successfully', life: 3000});
     }
-
 
 
     return (

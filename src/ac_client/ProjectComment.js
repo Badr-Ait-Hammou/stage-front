@@ -161,7 +161,7 @@ export default function ProjectComment() {
 
 
     const handleEdit = async () => {
-        if (note.trim() === '' || rate === null) {
+        if (note.trim() === '' ) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please provide both note and rating.', life: 3000 });
             return;
         }

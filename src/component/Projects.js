@@ -52,6 +52,8 @@ export default function Projects() {
     const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
     //const projectsWithPhotos = project.filter(rowData => rowData.images && rowData.images.length);
     //const projectsWithFiles = project.filter(rowData => rowData.result && rowData.result.file);
+    const [showDialog, setShowDialog] = useState(false);
+
 
     const [selectedProjectComments, setSelectedProjectComments] = useState([]);
     const [selectedPageComments, setSelectedPageComments] = useState([]);
@@ -509,9 +511,7 @@ export default function Projects() {
     };
 
 
-    if (project.length === 0) {
-        return <PopularCart />
-    }
+
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -568,9 +568,21 @@ export default function Projects() {
                         <Column field="name" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
                             <Link
                                 className="font-bold"
-                                to={rowData.images && rowData.images.length > 0  ? `project_details/${rowData.id}` : rowData.result.type === "excel"
-                                    ? `project_detailsExcel/${rowData.id}`
-                                    : `project_detailsDoc/${rowData.id}` }
+                                onClick={(e) => {
+                                    if (!(rowData.images && rowData.images.length > 0) && !(rowData.result && rowData.result.type === "excel") && !(rowData.result && rowData.result.type === "doc")) {
+                                        e.preventDefault();
+                                        setShowDialog(true);
+                                    }
+                                }}
+                                to={
+                                    rowData.images && rowData.images.length > 0
+                                        ? `project_details/${rowData.id}`
+                                        : rowData.result && rowData.result.type === "excel"
+                                            ? `project_detailsExcel/${rowData.id}`
+                                            : rowData.result && rowData.result.type === "doc"
+                                                ? `project_detailsDoc/${rowData.id}`
+                                                : ''
+                                }
                             >   {rowData.name}
                             </Link>)}></Column>
 
@@ -899,6 +911,13 @@ export default function Projects() {
             </div>
             */}
 
+            <Dialog
+                visible={showDialog}
+                onHide={() => setShowDialog(false)}
+                footer={<Button onClick={() => setShowDialog(false)} label="Close" />}
+            >
+                This is a pop-up message!
+            </Dialog>
 
 
             </>

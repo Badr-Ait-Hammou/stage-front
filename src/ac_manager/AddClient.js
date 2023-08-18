@@ -20,7 +20,6 @@ import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
-import PopularCart from "../ui-component/cards/Skeleton/PopularCard";
 import Tooltip, {tooltipClasses} from "@mui/material/Tooltip";
 import SyncLockIcon from "@mui/icons-material/SyncLock";
 
@@ -302,13 +301,6 @@ export default function AddClient() {
         return phoneNumberPattern.test(phoneNumber);
     };
 
-
-
-    /********************************************** load ***********************************************/
-
-    if (users.length === 0) {
-        return <PopularCart />
-    }
 
     /********************************************Toasts *************************/
 
