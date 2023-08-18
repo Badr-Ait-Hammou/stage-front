@@ -576,6 +576,8 @@ return (
                             onChange={(event) => setType(event.value)}
                             optionLabel="label"
                             optionValue="value"
+                            disabled={type !== '' && file.length > 0}
+
                         />
                     </Box>
                 </Grid>
@@ -599,12 +601,13 @@ return (
                         ref={fileUploadRef}
                         accept={type === 'excel' ? '.csv,.xlsx' : ''}
                         cancelLabel="Cancel"
+                        disabled={!type} // Disable file upload until a type is selected
+
 
                         onSelect={(e) => {
 
 
                             if (type === 'excel') {
-                                handlefileChange2(e);
                                 const selectedFileType = e.files[0].type;
                                 const allowedFileTypes = ['application/vnd.ms-excel', 'text/csv'];
 
@@ -615,12 +618,39 @@ return (
                                         detail: 'Selected file is not compatible with the chosen type.',
                                         life: 3000
                                     });
+                                    setFile('');
                                     fileUploadRef.current.clear(); // Clear the selected file
 
-                                    //clear the fileupload
+                                }else{
+                                    handlefileChange2(e);
+
+                                }
+                            } else if (type === 'doc') {
+                                // Handle docx file validation here
+                                const selectedFileType = e.files[0].type;
+                                const allowedFileTypes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+                                if (!allowedFileTypes.includes(selectedFileType)) {
+                                    toast.current.show({
+                                        severity: 'error',
+                                        summary: 'Info',
+                                        detail: 'Selected file is not compatible with the chosen type.',
+                                        life: 3000
+                                    });
+                                    setFile('');
+                                    fileUploadRef.current.clear();
+                                } else {
+                                    handlefileChange(e);
                                 }
                             } else {
-                                handlefileChange(e);
+                                toast.current.show({
+                                    severity: 'error',
+                                    summary: 'Info',
+                                    detail: 'file is not compatible with the chosen type.',
+                                    life: 3000
+                                });
+                                setFile('');
+                                fileUploadRef.current.clear();
                             }
                         }}
                     />
@@ -689,6 +719,12 @@ return (
                         name="file"
                         url={'/api/upload'}
                         maxFileSize={100000000}
+                        chooseLabel="Select File"
+                        uploadLabel="Upload"
+                        ref={fileUploadRef}
+                        accept={type === 'excel' ? '.csv,.xlsx' : ''}
+                        cancelLabel="Cancel"
+                        disabled={!type || type==="excel"}
                         emptyTemplate={
                             <div style={{
                                 display: 'flex',
@@ -706,19 +742,57 @@ return (
                                 )}
                             </div>
                         }
-                        chooseLabel="Select File"
-                        uploadLabel="Upload"
-                        cancelLabel="Cancel"
-                        disabled={type === 'excel'}
+
 
                         onSelect={(e) => {
-                            if (type === 'excel') {
-                                handlefileChange3(e);
-                            } else {
-                                handlefileChange(e);
-                            }
-                        }}/>
 
+
+                            if (type === 'excel') {
+                                const selectedFileType = e.files[0].type;
+                                const allowedFileTypes = ['application/vnd.ms-excel', 'text/csv'];
+
+                                if (!allowedFileTypes.includes(selectedFileType)) {
+                                    toast.current.show({
+                                        severity: 'error',
+                                        summary: 'Info',
+                                        detail: 'Selected file is not compatible with the chosen type.',
+                                        life: 3000
+                                    });
+                                    setFile('');
+                                    fileUploadRef.current.clear(); // Clear the selected file
+
+                                }else{
+                                    handlefileChange2(e);
+
+                                }
+                            } else if (type === 'doc') {
+                                const selectedFileType = e.files[0].type;
+                                const allowedFileTypes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+                                if (!allowedFileTypes.includes(selectedFileType)) {
+                                    toast.current.show({
+                                        severity: 'error',
+                                        summary: 'Info',
+                                        detail: 'Selected file is not compatible with the chosen type.',
+                                        life: 3000
+                                    });
+                                    setFile('');
+                                    fileUploadRef.current.clear();
+                                } else {
+                                    handlefileChange(e);
+                                }
+                            } else {
+                                toast.current.show({
+                                    severity: 'error',
+                                    summary: 'Info',
+                                    detail: 'file is not compatible with the chosen type.',
+                                    life: 3000
+                                });
+                                setFile('');
+                                fileUploadRef.current.clear();
+                            }
+                        }}
+                    />
                 </Box>
             </Grid>
             <Box className="field mt-2">

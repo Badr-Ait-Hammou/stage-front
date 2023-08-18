@@ -135,7 +135,6 @@ const NotificationSection = () => {
     try {
       const response = await axios.get('/api/comment/status/read');
       setReadNotifications(response.data);
-      //console.log(response.data);
     } catch (error) {
       console.error('Error fetching read notifications:', error);
     }
@@ -278,16 +277,11 @@ const NotificationSection = () => {
                                       }
                                     }}
                                 >
-
                                   <ListItemWrapper key={notification.id}>
-
-
-
                                     <ListItem>
                                     <ListItemAvatar>
                                       <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                     </ListItemAvatar>
-
                                       <ListItemText primary={<Typography variant="subtitle1">{notification.user.username.charAt(0).toUpperCase() + notification.user.username.slice(1)}</Typography>} />
                                       <ListItemSecondaryAction>
                                         <Grid item xs={12}  >
@@ -297,7 +291,6 @@ const NotificationSection = () => {
                                         </Grid>
                                     </ListItemSecondaryAction>
                                   </ListItem>
-
 
                                     <Grid container direction="column" className="list-container">
                                     <Grid item xs={12} sx={{ pb: 2 }}>
