@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import axios from "utils/axios"
 // material-ui
 import {styled, useTheme} from '@mui/material/styles';
 import {
@@ -126,38 +127,30 @@ const NotificationSection = () => {
 
   const fetchUnreadNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/comment/status/unread');
-      const data = await response.json();
-      setUnreadNotifications(data);
-
+      const response = await axios.get('/api/comment/status/unread');
+      setUnreadNotifications(response.data);
     } catch (error) {
       console.error('Error fetching unread notifications:', error);
     }
   };
 
-
-
-    const fetchUnreadNotificationCount = async () => {
-        try {
-            const response = await fetch('http://localhost:8080/api/comment/status/unread');
-            const data = await response.json();
-            setUnreadNotificationCount(data.length);
-        } catch (error) {
-            console.error('Error fetching unread notification count:', error);
-        }
-    };
-
+  const fetchUnreadNotificationCount = async () => {
+    try {
+      const response = await axios.get('/api/comment/status/unread');
+      setUnreadNotificationCount(response.data.length);
+    } catch (error) {
+      console.error('Error fetching unread notification count:', error);
+    }
+  };
 
   const fetchReadNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/comment/status/read');
-      const data = await response.json();
-      setReadNotifications(data);
+      const response = await axios.get('/api/comment/status/read');
+      setReadNotifications(response.data);
     } catch (error) {
       console.error('Error fetching read notifications:', error);
     }
   };
-
 
 
   return (
@@ -389,7 +382,7 @@ const NotificationSection = () => {
                   </Grid>
                   <Divider />
                   <CardActions sx={{ p: 1.25, justifyContent: 'center' }}>
-                    <Link to={`/all_comments`}>
+                    <Link to={`/app/all_comments`}>
                     <Button size="small" onClick={handleClose} disableElevation>
                       View All
                     </Button>

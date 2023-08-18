@@ -22,10 +22,7 @@ import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
 import Template from "../component/Template"
-import ExcelFile from '../component/ExcelFile';
-import PdfFile from '../component/PdfFile';
 import Profile from '../component/Profile';
-import Adduser from "../ac_admin/AddUser"
 import AddClient from "../ac_manager/AddClient"
 import ProjectClient from "../ac_client/ProjectsPage"
 import ProjectComment from "../ac_client/ProjectComment"
@@ -135,10 +132,12 @@ const ManagerRoute = {
     {
       path: 'information',
       element: <Information />
-    }, {
+    },
+    {
       path: 'projects',
       element: <Projects />
-    }, {
+    },
+    {
       path: 'storage',
       element: <Storage />
     },

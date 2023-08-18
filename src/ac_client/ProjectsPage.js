@@ -39,7 +39,7 @@ export default function ProjectPage() {
 
     const leftToolbarTemplate = () => {
         return <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0 font-bold">Hello {client.firstName}</h4>
+            <h4 className="m-0 font-bold">Hello {client && client.firstName}</h4>
         </div>;
     };
 
@@ -89,8 +89,8 @@ export default function ProjectPage() {
             <div className="card mb-2">
                 <Toolbar className="mb-4" start={leftToolbarTemplate}  end={rightToolbarTemplate}></Toolbar>
                 <div style={{ borderRadius: "10px", overflow: "hidden" }}>
-                    {client.projetList && client.projetList.length > 0 ? (
-                        <DataTable value={client.projetList.filter(project => project.images && project.images.length > 0)} ref={dt}
+                    { client && client.projetList && client.projetList.length > 0 ? (
+                        <DataTable value={ client.projetList.filter(project => project.images && project.images.length > 0)} ref={dt}
                                    dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image Projects" globalFilter={globalFilter} header={header}>
@@ -113,9 +113,9 @@ export default function ProjectPage() {
             <div className="mt-5">
             <MainCard>
                 <div style={{ borderRadius: "10px", overflow: "hidden" }} className="mt-2">
-                    {client.projetList && client.projetList.length > 0 ? (
+                    {client && client.projetList && client.projetList.length > 0 ? (
 
-                        <DataTable value={client.projetList.filter(project => project.result)} tableStyle={{ minWidth: '30rem' }}  dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                        <DataTable value={ client.projetList && client.projetList.filter(project => project.result)} tableStyle={{ minWidth: '30rem' }}  dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Template Projects" globalFilter={globalFilter} header={header}>
                             <Column field="name" header="Project Name" sortable filter style={{ minWidth: '10rem' }} body={(rowData) => (

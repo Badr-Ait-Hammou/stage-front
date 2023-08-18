@@ -390,9 +390,6 @@ export default function Image() {
     };
 
 
-    if (image.length === 0) {
-        return <PopularCart />
-    }
 
 
 

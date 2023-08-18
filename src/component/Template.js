@@ -112,9 +112,9 @@ export default function Template() {
             console.log("Navigation will be executed");
 
             if (response.data.type === "doc") {
-                navigate(`/template/template_details/${response.data.id}`);
+                navigate(`/app/template/template_details/${response.data.id}`);
             } else {
-                navigate(`/template/template_detailsExcel/${response.data.id}`);
+                navigate(`/app/template/template_detailsExcel/${response.data.id}`);
             }
         }).catch((error) => {
             console.error("Error while saving file:", error);
@@ -206,7 +206,7 @@ const saveAllFieldsWithResult = async () => {
         }
         showusave();
 
-        navigate(`/template/template_detailsExcel/${resultResponse.data.id}`);
+        navigate(`/app/template/template_detailsExcel/${resultResponse.data.id}`);
 
         console.log("Fields and result saved successfully!");
 
