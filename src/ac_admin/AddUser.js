@@ -107,59 +107,59 @@ export default function AddUser() {
     /*************************************************** Save *************************************************/
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '' ) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Warning',
-                detail: 'one of the fields is empty',
-                life: 3000
-            })
-        } else if (!isValidPhoneNumber(tel)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Invalid Phone Number',
-                detail: 'Please enter a valid phone number (8 to 15 digits)',
-                life: 3000
-            });
-        } else if (!isValidEmail(email)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Invalid Email',
-                detail: 'Please enter a valid email address',
-                life: 3000
-            });
-        } else if (!isValidPassword(password)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Password Not Strong Enough',
-                detail: 'Please generate a stronger password.',
-                life: 3000
-            });
-        } else if (role.trim() === '') {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Warning',
-                detail: 'please select a Role',
-                life: 3000
-            })
-        }else{
+        try {
+            if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '') {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Warning',
+                    detail: 'one of the fields is empty',
+                    life: 3000
+                })
+            } else if (!isValidPhoneNumber(tel)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Invalid Phone Number',
+                    detail: 'Please enter a valid phone number (8 to 15 digits)',
+                    life: 3000
+                });
+            } else if (!isValidEmail(email)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Invalid Email',
+                    detail: 'Please enter a valid email address',
+                    life: 3000
+                });
+            } else if (!isValidPassword(password)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Password Not Strong Enough',
+                    detail: 'Please generate a stronger password.',
+                    life: 3000
+                });
+            } else if (role.trim() === '') {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Warning',
+                    detail: 'please select a Role',
+                    life: 3000
+                })
+            } else {
 
 
+                const response = await axios.post("/api/auth/register", {
+                    username,
+                    firstname,
+                    lastname,
+                    email,
+                    tel,
+                    password,
+                    role,
 
-        axios.post("/api/auth/register", {
-            username,
-            firstname,
-            lastname,
-            email,
-            tel,
-            password,
-            role,
+                });
 
-        })
-            .then((response) => {
                 console.log("API Response:", response.data);
                 setEmail("");
                 setFirstName("");
@@ -172,12 +172,19 @@ export default function AddUser() {
                 loadUsers();
                 showusave();
 
-            })
-            .catch((error) => {
-                console.error("Error while saving project:", error);
-            });
+            }
+
+        } catch (error) {
+            console.error("Error while saving project:", error);
+            toast.current.show({ severity: 'error', summary: 'Email Already Used', detail: 'The email address is already registered.', life: 3000 });
         }
     };
+
+
+
+
+
+
 
     /************************************ Delete ***************************************/
 
