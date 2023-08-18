@@ -115,8 +115,24 @@ const MainRoutes = {
       element: <ProjectDetails />
     },
     {
+      path: 'project_details/:id',
+      element: <ProjectDetails />
+    },
+    {
       path: 'all_comments/project_detailsDoc/:id',
       element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'all_comments/project_detailsExcel/:id',
+      element: <ProjectDetailsCsv />
+    },
+    {
+      path: 'project_detailsExcel/:id',
+      element: <ProjectDetailsCsv />
     },
     {
       path: 'all_comments/project_details/:id',

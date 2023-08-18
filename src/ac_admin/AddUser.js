@@ -77,18 +77,23 @@ export default function AddUser() {
     /*************************************************** Auto Generate pwd *************************************************/
 
     const generateRandomPassword = () => {
-
-        const passwordLength = 12;
-        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()_+';
+        const passwordLength = 16;
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()[}]{|_+';
         let password = '';
 
+
+        const crypto = window.crypto || window.msCrypto;
+        const randomValues = new Uint32Array(passwordLength);
+        crypto.getRandomValues(randomValues);
+
         for (let i = 0; i < passwordLength; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
+            const randomIndex = randomValues[i] % characters.length;
             password += characters.charAt(randomIndex);
         }
 
         return password;
     };
+
     const handleGeneratePassword = () => {
         const generatedPassword = generateRandomPassword();
         setpassword(generatedPassword);
@@ -107,59 +112,55 @@ export default function AddUser() {
     /*************************************************** Save *************************************************/
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '' ) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Warning',
-                detail: 'one of the fields is empty',
-                life: 3000
-            })
-        } else if (!isValidPhoneNumber(tel)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Invalid Phone Number',
-                detail: 'Please enter a valid phone number (8 to 15 digits)',
-                life: 3000
-            });
-        } else if (!isValidEmail(email)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Invalid Email',
-                detail: 'Please enter a valid email address',
-                life: 3000
-            });
-        } else if (!isValidPassword(password)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Password Not Strong Enough',
-                detail: 'Please generate a stronger password.',
-                life: 3000
-            });
-        } else if (role.trim() === '') {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Warning',
-                detail: 'please select a Role',
-                life: 3000
-            })
-        }else{
-
-
-
-        axios.post("/api/auth/register", {
-            username,
-            firstname,
-            lastname,
-            email,
-            tel,
-            password,
-            role,
-
-        })
-            .then((response) => {
+        try {
+            if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '') {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Warning',
+                    detail: 'one of the fields is empty',
+                    life: 3000
+                })
+            } else if (!isValidPhoneNumber(tel)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Invalid Phone Number',
+                    detail: 'Please enter a valid phone number (8 to 15 digits)',
+                    life: 3000
+                });
+            } else if (!isValidEmail(email)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Invalid Email',
+                    detail: 'Please enter a valid email address',
+                    life: 3000
+                });
+            } else if (!isValidPassword(password)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Password Not Strong Enough',
+                    detail: 'Please generate a stronger password.',
+                    life: 3000
+                });
+            } else if (role.trim() === '') {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Warning',
+                    detail: 'please select a Role',
+                    life: 3000
+                })
+            } else {
+                const response = await axios.post("/api/auth/register", {
+                    username,
+                    firstname,
+                    lastname,
+                    email,
+                    tel,
+                    password,
+                    role,
+                });
                 console.log("API Response:", response.data);
                 setEmail("");
                 setFirstName("");
@@ -171,28 +172,30 @@ export default function AddUser() {
                 setUserDialog(false);
                 loadUsers();
                 showusave();
+            }
 
-            })
-            .catch((error) => {
-                console.error("Error while saving project:", error);
-            });
+        } catch (error) {
+            console.error("Error while saving project:", error);
+            toast.current.show({ severity: 'error', summary: 'Email Already Used', detail: 'The email address is already registered.', life: 3000 });
         }
     };
 
-    /************************************ Delete ***************************************/
+
+    /****************************************************** Delete ***************************************/
 
 
     const deleteUser = (id) => {
-        const confirmDelete = () => {
-            axios.delete(`/api/users/${id}`)
-                .then((response) => {
-                    console.log("API Response:", response.data);
-                    loadUsers();
-                    showudelete();
-                })
-                .catch((error) => {
-                    console.error("Error while deleting user:", error);
-                });
+        const confirmDelete = async () => {
+            try {
+                const response = await axios.delete(`/api/users/${id}`);
+                console.log("API Response:", response.data);
+                loadUsers();
+                showudelete();
+            } catch (error) {
+                console.error("Error while deleting user:", error);
+                toast.current.show({severity:'error', summary: 'Error', detail:'user has a project', life: 3000});
+
+            }
         };
 
         confirmDialog({
@@ -205,25 +208,6 @@ export default function AddUser() {
             accept: confirmDelete
         });
     };
-
-
-
-    /*************************************************** Tooltip *************************************************/
-
-
-    const ArrowTooltip = styled(({ className, ...props }) => (
-        <Tooltip {...props} arrow classes={{ popper: className }} />
-    ))(({ theme }) => ({
-        [`& .${tooltipClasses.arrow}`]: {
-            color: theme.palette.common.black,
-        },
-        [`& .${tooltipClasses.tooltip}`]: {
-            backgroundColor: theme.palette.common.black,
-        },
-    }));
-
-
-
 
     /************************************ Dialog open/close ***************************************/
 
@@ -253,6 +237,8 @@ export default function AddUser() {
         setUserEditDialog(true);
     };
 
+    /******************************************** update ****************************************************/
+
 
 
     const handleEdit = async () => {
@@ -266,9 +252,6 @@ export default function AddUser() {
                 password,
                 role,
             };
-
-
-
             const response = await axios.put(`/api/users/${selectedUser.id}`, updatedUser);
 
             const updatedUsers = users.map((user) =>
@@ -369,7 +352,7 @@ export default function AddUser() {
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
             <Button label="Update"
                     severity="info"
-                    raised onClick={(e) => handleEdit(selectedUser)}/>
+                    raised onClick={() => handleEdit(selectedUser)}/>
         </React.Fragment>
     );
 
@@ -423,7 +406,7 @@ export default function AddUser() {
 
 
 
-    /********************************************Toasts *************************/
+    /******************************************** Toasts ****************************************************/
 
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
@@ -563,9 +546,9 @@ export default function AddUser() {
                                         edge="end"
                                         size="medium"
                                     >
-                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
+                                        <Tooltip title="Click here to Generate password"  classes={{ popper: 'my-tooltip' }} placement="bottom">
                                             <SyncLockIcon />
-                                        </ArrowTooltip>
+                                        </Tooltip>
 
                                     </IconButton>
 
@@ -741,18 +724,20 @@ export default function AddUser() {
                                 <InputAdornment position="end">
 
 
+                                    <Tooltip title="Generate Password" arrow>
+
                                     <IconButton
                                         aria-label="toggle password generator"
                                         onClick={handleGeneratePassword}
                                         edge="end"
                                         size="medium"
+                                        style={{ zIndex: 9999 }}
+
                                     >
-                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
                                             <SyncLockIcon />
-                                        </ArrowTooltip>
 
                                     </IconButton>
-
+                                    </Tooltip>
                                     <IconButton
                                         aria-label="toggle password visibility"
                                         onClick={handleClickShowPassword}

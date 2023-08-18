@@ -20,8 +20,9 @@ import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
-import Tooltip, {tooltipClasses} from "@mui/material/Tooltip";
+import Tooltip from "@mui/material/Tooltip";
 import SyncLockIcon from "@mui/icons-material/SyncLock";
+import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 
 
 export default function AddClient() {
@@ -43,6 +44,10 @@ export default function AddClient() {
     const toast = useRef(null);
     const dt = useRef(null);
     const [passwordVisibility, setPasswordVisibility] = useState({});
+    const [userEditDialog, setUserEditDialog] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+
+
 
 
 
@@ -62,18 +67,21 @@ export default function AddClient() {
     /*************************************************** Generate pwd *************************************************/
 
     const generateRandomPassword = () => {
-
-        const passwordLength = 12;
-        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()_+';
+        const passwordLength = 16;
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()[}]{|_+';
         let password = '';
+        const crypto = window.crypto || window.msCrypto;
+        const randomValues = new Uint32Array(passwordLength);
+        crypto.getRandomValues(randomValues);
 
         for (let i = 0; i < passwordLength; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
+            const randomIndex = randomValues[i] % characters.length;
             password += characters.charAt(randomIndex);
         }
-
         return password;
     };
+
+
     const handleGeneratePassword = () => {
         const generatedPassword = generateRandomPassword();
         setpassword(generatedPassword);
@@ -92,50 +100,52 @@ export default function AddClient() {
     /*************************************************** Save *************************************************/
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '' ) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Warning',
-                detail: 'one of the fields is empty',
-                life: 3000
-            })
-        } else if (!isValidPhoneNumber(tel)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Invalid Phone Number',
-                detail: 'Please enter a valid phone number (8 to 15 digits)',
-                life: 3000
-            });
-        }else if (!isValidEmail(email)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Invalid Email',
-                detail: 'Please enter a valid email address',
-                life: 3000
-            });
-        }else if (!isValidPassword(password)) {
-            toast.current.show({
-                severity: 'error',
-                summary: 'Password Not Strong Enough',
-                detail: 'Please generate a stronger password.',
-                life: 3000
-            });
-        }else{
+        try {
 
-        axios.post("/api/auth/register", {
-            username,
-            firstname,
-            lastname,
-            email,
-            tel,
-            password,
-            role:"CLIENT",
+            if (username.trim() === '' || firstname.trim() === '' || lastname.trim() === '' || email.trim() === '') {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Warning',
+                    detail: 'one of the fields is empty',
+                    life: 3000
+                })
+            } else if (!isValidPhoneNumber(tel)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Invalid Phone Number',
+                    detail: 'Please enter a valid phone number (8 to 15 digits)',
+                    life: 3000
+                });
+            } else if (!isValidEmail(email)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Invalid Email',
+                    detail: 'Please enter a valid email address',
+                    life: 3000
+                });
+            } else if (!isValidPassword(password)) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Password Not Strong Enough',
+                    detail: 'Please generate a stronger password.',
+                    life: 3000
+                });
+            } else {
 
-        })
-            .then((response) => {
+                const response = await axios.post("/api/auth/register", {
+                    username,
+                    firstname,
+                    lastname,
+                    email,
+                    tel,
+                    password,
+                    role:"CLIENT",
+
+                });
+
                 console.log("API Response:", response.data);
                 setEmail("");
                 setFirstName("");
@@ -147,35 +157,53 @@ export default function AddClient() {
                 loadClients();
                 showusave();
 
-            })
-            .catch((error) => {
-                console.error("Error while saving project:", error);
+            }
+
+        } catch (error) {
+            console.error("Error while saving project:", error);
+            toast.current.show({
+                severity: 'error',
+                summary: 'Email Already Used',
+                detail: 'The email address is already registered.',
+                life: 3000
             });
         }
     };
 
 
-    /*************************************************** Tooltip *************************************************/
 
 
-    const ArrowTooltip = styled(({ className, ...props }) => (
-        <Tooltip {...props} arrow classes={{ popper: className }} />
-    ))(({ theme }) => ({
-        [`& .${tooltipClasses.arrow}`]: {
-            color: theme.palette.common.black,
-        },
-        [`& .${tooltipClasses.tooltip}`]: {
-            backgroundColor: theme.palette.common.black,
-        },
-    }));
 
-    const leftToolbarTemplate = () => {
-        return (
-            <div className="flex flex-wrap gap-2">
-                <Button label="Add" icon="pi pi-plus" severity="success" onClick={openDialog}/>
-            </div>
-        );
+    /************************************************** Delete ******************************************************/
+
+
+    const deleteUser = (id) => {
+        const confirmDelete = async () => {
+            try {
+                const response = await axios.delete(`/api/users/${id}`);
+                console.log("API Response:", response.data);
+                loadUsers();
+                showudelete();
+            } catch (error) {
+                console.error("Error while deleting user:", error);
+                toast.current.show({severity:'error', summary: 'Error', detail:'user has a project', life: 3000});
+
+            }
+        };
+
+        confirmDialog({
+            message: 'Are you sure you want to delete this User?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            acceptClassName: 'p-button-danger',
+            accept: confirmDelete
+        });
     };
+
+
+
 
     /************************************ Dialog open/close *****************************/
 
@@ -189,6 +217,18 @@ export default function AddClient() {
     };
     const hideDialog = () => {
         setUserDialog(false);
+        setUserEditDialog(false);
+
+    };
+
+    const handleupdate = (rowData) => {
+        setSelectedUser(rowData);
+        setFirstName(rowData.firstName);
+        setLastName(rowData.lastName);
+        setEmail(rowData.email);
+        setUserName(rowData.username);
+        settel(rowData.tel);
+        setUserEditDialog(true);
     };
 
     /************************************ password check  *****************************/
@@ -211,11 +251,19 @@ export default function AddClient() {
         changePassword('123456');
     }, []);
 
-    /************************************ Toolbar table component *****************************/
+    /************************************ Datatable  components *****************************/
 
 
     const exportCSV = () => {
         dt.current.exportCSV();
+    };
+
+    const leftToolbarTemplate = () => {
+        return (
+            <div className="flex flex-wrap gap-2">
+                <Button label="Add" icon="pi pi-plus" severity="success" onClick={openDialog}/>
+            </div>
+        );
     };
 
     const rightToolbarTemplate = () => {
@@ -239,8 +287,8 @@ export default function AddClient() {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined style={{marginRight: "4px"}}/>
-                <Button icon="pi pi-trash" rounded outlined severity="danger"/>
+                <Button icon="pi pi-pencil" rounded outlined style={{marginRight: "4px"}} onClick={() => handleupdate(rowData)}/>
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => deleteUser(rowData.id)}/>
             </React.Fragment>
         );
     };
@@ -253,6 +301,7 @@ export default function AddClient() {
             </span>
         </div>
     );
+
 
     const passwordBodyTemplate = (rowData) => {
         const isPasswordVisible = passwordVisibility[rowData.id];
@@ -271,6 +320,39 @@ export default function AddClient() {
             </div>
         );
     };
+
+
+    /**************************************************** Update *******************************************/
+
+
+    const handleEdit = async () => {
+        try {
+            const updatedUser = {
+                id: selectedUser.id,
+                username,
+                firstName:firstname,
+                lastName:lastname,
+                tel,
+                password,
+                role:"CLIENT",
+            };
+            const response = await axios.put(`/api/users/${selectedUser.id}`, updatedUser);
+
+            const updatedUsers = users.map((user) =>
+                user.id === response.data.id ? response.data : user
+            );
+
+            setUsers(updatedUsers);
+            setUserEditDialog(false);
+            loadClients();
+            showupdate();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+
 
 
     /********************************************** Regex ***********************************************/
@@ -302,14 +384,33 @@ export default function AddClient() {
     };
 
 
+    const userEditDialogFooter = (
+        <React.Fragment>
+            <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
+            <Button label="Update"
+                    severity="info"
+                    raised onClick={() => handleEdit(selectedUser)}/>
+        </React.Fragment>
+    );
+
     /********************************************Toasts *************************/
 
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
     }
+    const showudelete = () => {
+        toast.current.show({severity:'error', summary: 'done', detail:'User deleted successfully', life: 3000});
+    }
+    const showupdate = () => {
+        toast.current.show({severity:'info', summary: 'done', detail:'User updated successfully', life: 3000});
+    }
+
+
+
 
     return (
         <>
+            <ConfirmDialog />
             <Toast ref={toast}/>
             <div>
                 <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate}
@@ -427,18 +528,168 @@ export default function AddClient() {
                             endAdornment={
                                 <InputAdornment position="end">
 
-
+                                    <Tooltip title="Click here to Generate password" placement="bottom">
                                     <IconButton
                                         aria-label="toggle password generator"
                                         onClick={handleGeneratePassword}
                                         edge="end"
                                         size="medium"
+                                        style={{ zIndex: 9999 }}
                                     >
-                                        <ArrowTooltip title="Click here to Generate password" placement="bottom">
                                             <SyncLockIcon />
-                                        </ArrowTooltip>
-
                                     </IconButton>
+                                    </Tooltip>
+
+
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                        size="large"
+
+                                    >
+                                        {showPassword ? <Visibility/> : <VisibilityOff/>}
+                                    </IconButton>
+
+
+                                </InputAdornment>
+                            }
+                        />
+
+                    </FormControl>
+
+
+                    {strength !== 0 && (
+                        <FormControl fullWidth>
+                            <Box sx={{mb: 2}}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item>
+                                        <Box style={{backgroundColor: level?.color}}
+                                             sx={{width: 85, height: 8, borderRadius: '7px'}}/>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" fontSize="0.75rem">
+                                            {level?.label}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </FormControl>
+                    )}
+
+                </form>
+            </Dialog>
+
+
+            <Dialog visible={userEditDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
+                    header="Add Client" modal className="p-fluid" footer={userEditDialogFooter} onHide={hideDialog}>
+                <form noValidate>
+                    <Grid container  spacing={matchDownSM ? 0 : 1}>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput,mt:1}}>
+                                <InputLabel >
+                                    FirstName
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding:"5px"}}
+                                    type="text"
+
+                                    value={firstname} onChange={(e) => setFirstName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput,mt:1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register" >LastName
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding:"5px"}}
+                                    margin="none"
+                                    type="text"
+
+                                    value={lastname} onChange={(e) => setLastName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput,mt:-1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register" >Username
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding:"5px"}}
+                                    margin="none"
+                                    type="text"
+
+                                    value={username} onChange={(e) => setUserName(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth sx={{...theme.typography.customInput,mt:-1}}>
+                                <InputLabel htmlFor="outlined-adornment-email-register" >Phone
+                                </InputLabel>
+                                <OutlinedInput
+                                    style={{padding:"5px"}}
+                                    margin="none"
+                                    type="text"
+
+                                    value={tel} onChange={(e) => settel(e.target.value)}
+                                    sx={{...theme.typography.customInput}}
+                                />
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+
+                    <FormControl fullWidth sx={{...theme.typography.customInput,mt:1}}>
+                        <InputLabel htmlFor="outlined-adornment-email-register" >Email Address
+                        </InputLabel>
+                        <OutlinedInput
+                            style={{padding:"10px"}}
+                            id="outlined-adornment-email-register"
+                            type="email"
+                            disabled={true}
+                            value={email} onChange={(e) => {
+                            setEmail(e.target.value);
+                        }}
+                            name="email"
+
+                        />
+
+                    </FormControl>
+
+
+                    <FormControl fullWidth sx={{...theme.typography.customInput}}>
+                        <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+                        <OutlinedInput
+                            id="outlined-adornment-password-register"
+                            type={showPassword ? 'text' : 'password'}
+                            style={{padding:"10px"}}
+                            value={password} onChange={(e) => {
+                            setpassword(e.target.value);
+                            changePassword(e.target.value);
+                        }}
+                            name="password"
+                            label="Password"
+                            endAdornment={
+                                <InputAdornment position="end">
+
+                                    <Tooltip title="Click here to Generate password" placement="bottom">
+                                    <IconButton
+                                        aria-label="toggle password generator"
+                                        onClick={handleGeneratePassword}
+                                        edge="end"
+                                        size="medium"
+                                        style={{ zIndex: 9999 }}
+
+                                    >
+                                            <SyncLockIcon />
+                                    </IconButton>
+                                    </Tooltip>
+
 
                                     <IconButton
                                         aria-label="toggle password visibility"
@@ -475,15 +726,12 @@ export default function AddClient() {
                             </Box>
                         </FormControl>
                     )}
-
-
-
-
-
-
                 </form>
 
             </Dialog>
+
+
+
 
         </>
 

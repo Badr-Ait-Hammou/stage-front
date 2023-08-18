@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import axios from "utils/axios"
-// material-ui
 import {styled, useTheme} from '@mui/material/styles';
 import {
   Avatar,
@@ -23,20 +22,12 @@ import {
 
   List, ListItemSecondaryAction,
 } from '@mui/material';
-
-
-// third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-
-// assets
 import { IconBell } from '@tabler/icons';
-import User1 from "../../../../assets/images/users/user-round.svg";
 
-// styles
+
 const ListItemWrapper = styled('div')(({ theme }) => ({
   cursor: 'pointer',
   padding: 16,
@@ -64,31 +55,32 @@ const status = [
 
 const NotificationSection = () => {
   const theme = useTheme();
-
   const chipSX = {
     height: 24,
     padding: '0 6px'
   };
-
 
   const chipWarningSX = {
     ...chipSX,
     color: theme.palette.warning.dark,
     backgroundColor: theme.palette.warning.light
   };
+
   const chipSuccessSX = {
     ...chipSX,
     color: theme.palette.success.dark,
     backgroundColor: theme.palette.success.light,
     height: 20
   };
-  const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
+  const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(false);
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
   const anchorRef = useRef(null);
+  const [selectedStatus, setSelectedStatus] = useState('unread');
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [readNotifications, setReadNotifications] = useState([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -102,12 +94,12 @@ const NotificationSection = () => {
   };
 
   const prevOpen = useRef(open);
+
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
-
-
     }
+
       fetchReadNotifications();
       fetchUnreadNotifications();
     fetchUnreadNotificationCount();
@@ -119,10 +111,6 @@ const NotificationSection = () => {
 
 
 
-  const [selectedStatus, setSelectedStatus] = useState('unread');
-  const [unreadNotifications, setUnreadNotifications] = useState([]);
-  const [readNotifications, setReadNotifications] = useState([]);
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
 
   const fetchUnreadNotifications = async () => {
@@ -147,11 +135,15 @@ const NotificationSection = () => {
     try {
       const response = await axios.get('/api/comment/status/read');
       setReadNotifications(response.data);
+      //console.log(response.data);
     } catch (error) {
       console.error('Error fetching read notifications:', error);
     }
   };
 
+  const getAvatarInitial = (username) => {
+    return username ? username[0].toUpperCase() : '';
+  };
 
   return (
     <>
@@ -225,7 +217,7 @@ const NotificationSection = () => {
 
                       </Grid>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} >
                       <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 205px)', overflowX: 'hidden' }}>
                         <Grid container direction="column" spacing={2}>
                           <Grid item xs={12}>
@@ -256,7 +248,16 @@ const NotificationSection = () => {
 
                         {selectedStatus === 'read' ? (
                             readNotifications.map(notification => (
-                                <List
+                                <Link
+                                    key={`link-${notification.id}`}
+                                    to={notification.projet.result && notification.projet.result.type==="doc" ?
+                                        `project_detailsDoc/${notification.projet.id}` : notification.projet.result && notification.projet.result.type==="excel"
+                                            ? `project_detailsExcel/${notification.projet.id}`
+                                            : `project_details/${notification.projet.id}`}
+                                    onClick={handleClose}
+                                >
+
+                                <List key={`list-${notification.id}`}
                                     sx={{
                                       width: '100%',
                                       maxWidth: 330,
@@ -276,26 +277,32 @@ const NotificationSection = () => {
                                       }
                                     }}
                                 >
-                                <ListItemWrapper key={notification.id}>
 
-                                  <ListItem alignItems="center">
+                                  <ListItemWrapper key={notification.id}>
+
+
+
+                                    <ListItem alignItems="center">
                                     <ListItemAvatar>
-                                      <Avatar alt={notification.author} src={User1} />
+                                      <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                     </ListItemAvatar>
 
-                                    <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
+                                    <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.username}</Typography>} />
                                     <ListItemSecondaryAction>
                                       <Grid container justifyContent="flex-end">
                                         <Grid item xs={12}>
                                           <Typography variant="caption" display="block">
                                             {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
                                           </Typography>
+                                          <Typography variant="caption" display="block">
+                                          </Typography>
                                         </Grid>
                                       </Grid>
                                     </ListItemSecondaryAction>
                                   </ListItem>
 
-                                  <Grid container direction="column" className="list-container">
+
+                                    <Grid container direction="column" className="list-container">
                                     <Grid item xs={12} sx={{ pb: 2 }}>
                                       <Typography variant="subtitle2" className="font-bold">{notification.note}</Typography>
                                     </Grid>
@@ -311,11 +318,24 @@ const NotificationSection = () => {
                                 </ListItemWrapper>
                                     <Divider />
                                 </List>
+                                </Link>
+
                             ))
                         ) : (
                             unreadNotifications.map(notification => (
-                                <List
-                                    sx={{
+                                <Link    key={`link-${notification.id}`}
+                                         to={notification.projet.result && notification.projet.result.type==="doc"
+                                             ? `project_detailsDoc/${notification.projet.id}`
+                                             : notification.projet.result && notification.projet.result.type==="excel"
+                                                 ? `project_detailsExcel/${notification.projet.id}`
+                                                 : `project_details/${notification.projet.id}`}
+                                         onClick={handleClose}
+
+
+                                >
+
+                                <List key={`list-${notification.id}`}
+                                      sx={{
                                       width: '100%',
                                       maxWidth: 330,
                                       py: 0,
@@ -335,9 +355,10 @@ const NotificationSection = () => {
                                     }}
                                 >
                                   <ListItemWrapper key={notification.id}>
+
                                     <ListItem alignItems="center">
                                       <ListItemAvatar>
-                                        <Avatar alt={notification.author} src={User1} />
+                                        <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                       </ListItemAvatar>
 
                                       <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
@@ -371,6 +392,8 @@ const NotificationSection = () => {
                                   <Divider />
 
                                 </List>
+                                </Link>
+
                             ))
                         )}
 

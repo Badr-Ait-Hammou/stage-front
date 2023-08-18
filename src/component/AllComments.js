@@ -203,7 +203,7 @@ export default function AllComments() {
                     <Column field="projet" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '15rem' }}  body={(rowData) => (
                         <Link
                             className="font-bold"
-                            to={rowData.projet.result ? `project_detailsDoc/${rowData.projet.id}` : `project_details/${rowData.projet.id}`}
+                            to={rowData.projet.result && rowData.projet.result.type==="doc" ? `project_detailsDoc/${rowData.projet.id}` : rowData.projet.result && rowData.projet.result.type==="excel" ? `project_detailsExcel/${rowData.projet.id}` : `project_details/${rowData.projet.id}`}
                         >
                             {rowData.projet.name}
                         </Link>)}>
