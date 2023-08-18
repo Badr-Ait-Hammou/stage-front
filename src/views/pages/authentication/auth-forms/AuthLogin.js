@@ -12,6 +12,7 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material';
+import { Toast } from 'primereact/toast';
 
 // third party
 import * as Yup from 'yup';
@@ -42,18 +43,31 @@ const FirebaseLogin = ({ ...others }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!email || !password) {
+      console.error("Email and password are required.");
+      fieldrequired();
+      return;
+    }
+
     try {
       const user = await AuthService.login(email, password);
       console.log(user);
-      navigate('/');
 
+      navigate('/app');
     } catch (error) {
-      console.error(error);
+      console.error("An error occurred:", error);
+      showerror();
     }
   };
 
+
   const showerror = () => {
-    toast.current.show({severity:'info', summary: 'Warning!', detail:'username or password doesnt match', life: 3000});
+    toast.current.show({severity:'error', summary: 'Warning!', detail:'Email or Password are uncorrect', life: 3000});
+  }
+
+  const fieldrequired = () => {
+    toast.current.show({severity:'error', summary: 'Warning!', detail:'Email and password are required.', life: 3000});
   }
 
   const [showPassword, setShowPassword] = useState(false);
@@ -68,6 +82,7 @@ const FirebaseLogin = ({ ...others }) => {
 
   return (
     <>
+      <Toast ref={toast} />
       <Formik
         initialValues={{
           email: 'info@codedthemes.com',
@@ -94,6 +109,7 @@ const FirebaseLogin = ({ ...others }) => {
           }
         }}
       >
+
         {({ errors, handleBlur, handleChange, isSubmitting, touched, values }) => (
           <form noValidate  {...others}>
             <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>

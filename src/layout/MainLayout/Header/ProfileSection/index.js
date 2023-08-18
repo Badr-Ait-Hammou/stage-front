@@ -35,6 +35,8 @@ import Transitions from 'ui-component/extended/Transitions';
 
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
+//=======LOGOUT IMPORT===============//
+import {logout} from "../../../../routes/auth";
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -52,8 +54,8 @@ const ProfileSection = () => {
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
   const anchorRef = useRef(null);
-  const handleLogout = async () => {
-    console.log('Logout');
+  const handleLogout = () => {
+    logout();
   };
 
   const handleClose = (event) => {
