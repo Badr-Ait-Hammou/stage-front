@@ -183,16 +183,17 @@ export default function AddUser() {
 
 
     const deleteUser = (id) => {
-        const confirmDelete = () => {
-            axios.delete(`/api/users/${id}`)
-                .then((response) => {
-                    console.log("API Response:", response.data);
-                    loadUsers();
-                    showudelete();
-                })
-                .catch((error) => {
-                    console.error("Error while deleting user:", error);
-                });
+        const confirmDelete = async () => {
+            try {
+                const response = await axios.delete(`/api/users/${id}`);
+                console.log("API Response:", response.data);
+                loadUsers();
+                showudelete();
+            } catch (error) {
+                console.error("Error while deleting user:", error);
+                toast.current.show({severity:'error', summary: 'Error', detail:'user has a project', life: 3000});
+
+            }
         };
 
         confirmDialog({

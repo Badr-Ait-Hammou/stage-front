@@ -64,31 +64,32 @@ const status = [
 
 const NotificationSection = () => {
   const theme = useTheme();
-
   const chipSX = {
     height: 24,
     padding: '0 6px'
   };
-
 
   const chipWarningSX = {
     ...chipSX,
     color: theme.palette.warning.dark,
     backgroundColor: theme.palette.warning.light
   };
+
   const chipSuccessSX = {
     ...chipSX,
     color: theme.palette.success.dark,
     backgroundColor: theme.palette.success.light,
     height: 20
   };
-  const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
+  const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(false);
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
   const anchorRef = useRef(null);
+  const [selectedStatus, setSelectedStatus] = useState('unread');
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [readNotifications, setReadNotifications] = useState([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -105,9 +106,8 @@ const NotificationSection = () => {
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
-
-
     }
+
       fetchReadNotifications();
       fetchUnreadNotifications();
     fetchUnreadNotificationCount();
@@ -119,10 +119,6 @@ const NotificationSection = () => {
 
 
 
-  const [selectedStatus, setSelectedStatus] = useState('unread');
-  const [unreadNotifications, setUnreadNotifications] = useState([]);
-  const [readNotifications, setReadNotifications] = useState([]);
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
 
   const fetchUnreadNotifications = async () => {
@@ -256,7 +252,7 @@ const NotificationSection = () => {
 
                         {selectedStatus === 'read' ? (
                             readNotifications.map(notification => (
-                                <List
+                                <List key={notification.id}
                                     sx={{
                                       width: '100%',
                                       maxWidth: 330,
@@ -314,7 +310,7 @@ const NotificationSection = () => {
                             ))
                         ) : (
                             unreadNotifications.map(notification => (
-                                <List
+                                <List key={notification.id}
                                     sx={{
                                       width: '100%',
                                       maxWidth: 330,
