@@ -31,6 +31,7 @@ import {Paginator} from "primereact/paginator";
 
 
 
+
 export default function Projects() {
 
     const [selectedProject, setSelectedProject] = useState(null);
@@ -551,6 +552,7 @@ export default function Projects() {
 
 
 
+
     return (
         <>
         <div>
@@ -914,9 +916,20 @@ export default function Projects() {
             <Dialog
                 visible={showDialog}
                 onHide={() => setShowDialog(false)}
-                footer={<Button onClick={() => setShowDialog(false)} label="Close" />}
+                style={{ width: '20rem' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }}
             >
-                This is a pop-up message!
+                <Card
+                    style={{
+                        backgroundColor: 'rgb(236,230,245)',
+                        padding: '20px',
+                        borderRadius: '10px',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        position: 'relative',
+                    }}
+                >
+                    <h5>this project is empty!</h5>
+                </Card>
             </Dialog>
 
 
