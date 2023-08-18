@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import axios from "utils/axios"
+
 // material-ui
 import {styled, useTheme} from '@mui/material/styles';
 import {
@@ -143,11 +144,15 @@ const NotificationSection = () => {
     try {
       const response = await axios.get('/api/comment/status/read');
       setReadNotifications(response.data);
+      //console.log(response.data);
     } catch (error) {
       console.error('Error fetching read notifications:', error);
     }
   };
 
+  const getAvatarInitial = (username) => {
+    return username ? username[0].toUpperCase() : '';
+  };
 
   return (
     <>
@@ -252,7 +257,15 @@ const NotificationSection = () => {
 
                         {selectedStatus === 'read' ? (
                             readNotifications.map(notification => (
-                                <List key={notification.id}
+                                <Link
+                                    key={`link-${notification.id}`}
+                                    to={notification.projet.result && notification.projet.result.type==="doc" ?
+                                        `project_detailsDoc/${notification.projet.id}` : notification.projet.result && notification.projet.result.type==="excel"
+                                            ? `project_detailsExcel/${notification.projet.id}`
+                                            : `project_details/${notification.projet.id}`}
+                                >
+
+                                <List key={`list-${notification.id}`}
                                     sx={{
                                       width: '100%',
                                       maxWidth: 330,
@@ -272,26 +285,32 @@ const NotificationSection = () => {
                                       }
                                     }}
                                 >
-                                <ListItemWrapper key={notification.id}>
 
-                                  <ListItem alignItems="center">
+                                  <ListItemWrapper key={notification.id}>
+
+
+
+                                    <ListItem alignItems="center">
                                     <ListItemAvatar>
-                                      <Avatar alt={notification.author} src={User1} />
+                                      <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                     </ListItemAvatar>
 
-                                    <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
+                                    <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.username}</Typography>} />
                                     <ListItemSecondaryAction>
                                       <Grid container justifyContent="flex-end">
                                         <Grid item xs={12}>
                                           <Typography variant="caption" display="block">
                                             {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
                                           </Typography>
+                                          <Typography variant="caption" display="block">
+                                          </Typography>
                                         </Grid>
                                       </Grid>
                                     </ListItemSecondaryAction>
                                   </ListItem>
 
-                                  <Grid container direction="column" className="list-container">
+
+                                    <Grid container direction="column" className="list-container">
                                     <Grid item xs={12} sx={{ pb: 2 }}>
                                       <Typography variant="subtitle2" className="font-bold">{notification.note}</Typography>
                                     </Grid>
@@ -307,11 +326,21 @@ const NotificationSection = () => {
                                 </ListItemWrapper>
                                     <Divider />
                                 </List>
+                                </Link>
+
                             ))
                         ) : (
                             unreadNotifications.map(notification => (
-                                <List key={notification.id}
-                                    sx={{
+                                <Link    key={`link-${notification.id}`}
+                                         to={notification.projet.result && notification.projet.result.type==="doc"
+                                             ? `project_detailsDoc/${notification.projet.id}`
+                                             : notification.projet.result && notification.projet.result.type==="excel"
+                                                 ? `project_detailsExcel/${notification.projet.id}`
+                                                 : `project_details/${notification.projet.id}`}
+                                >
+
+                                <List key={`list-${notification.id}`}
+                                      sx={{
                                       width: '100%',
                                       maxWidth: 330,
                                       py: 0,
@@ -331,9 +360,10 @@ const NotificationSection = () => {
                                     }}
                                 >
                                   <ListItemWrapper key={notification.id}>
+
                                     <ListItem alignItems="center">
                                       <ListItemAvatar>
-                                        <Avatar alt={notification.author} src={User1} />
+                                        <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
                                       </ListItemAvatar>
 
                                       <ListItemText primary={<Typography variant="subtitle1"   >{notification.user.firstName}</Typography>} />
@@ -367,6 +397,8 @@ const NotificationSection = () => {
                                   <Divider />
 
                                 </List>
+                                </Link>
+
                             ))
                         )}
 

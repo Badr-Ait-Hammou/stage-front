@@ -77,18 +77,23 @@ export default function AddUser() {
     /*************************************************** Auto Generate pwd *************************************************/
 
     const generateRandomPassword = () => {
-
-        const passwordLength = 12;
-        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()_+';
+        const passwordLength = 16;
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£-§/;,?°é"².@#$%^&*()[}]{|_+';
         let password = '';
 
+
+        const crypto = window.crypto || window.msCrypto;
+        const randomValues = new Uint32Array(passwordLength);
+        crypto.getRandomValues(randomValues);
+
         for (let i = 0; i < passwordLength; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
+            const randomIndex = randomValues[i] % characters.length;
             password += characters.charAt(randomIndex);
         }
 
         return password;
     };
+
     const handleGeneratePassword = () => {
         const generatedPassword = generateRandomPassword();
         setpassword(generatedPassword);
@@ -147,8 +152,6 @@ export default function AddUser() {
                     life: 3000
                 })
             } else {
-
-
                 const response = await axios.post("/api/auth/register", {
                     username,
                     firstname,
@@ -157,9 +160,7 @@ export default function AddUser() {
                     tel,
                     password,
                     role,
-
                 });
-
                 console.log("API Response:", response.data);
                 setEmail("");
                 setFirstName("");
@@ -171,7 +172,6 @@ export default function AddUser() {
                 setUserDialog(false);
                 loadUsers();
                 showusave();
-
             }
 
         } catch (error) {
@@ -181,12 +181,7 @@ export default function AddUser() {
     };
 
 
-
-
-
-
-
-    /************************************ Delete ***************************************/
+    /****************************************************** Delete ***************************************/
 
 
     const deleteUser = (id) => {
@@ -213,29 +208,6 @@ export default function AddUser() {
             accept: confirmDelete
         });
     };
-
-
-
-    /*************************************************** Tooltip *************************************************/
-
-
-    const ArrowTooltip = styled(({ className, ...props }) => (
-        <Tooltip {...props} arrow classes={{ popper: className }} />
-    ))(({ theme }) => ({
-        [`& .${tooltipClasses.arrow}`]: {
-            color: theme.palette.common.black,
-            zIndex: 1500,
-
-        },
-        [`& .${tooltipClasses.tooltip}`]: {
-            backgroundColor: theme.palette.common.black,
-            zIndex: 1500,
-
-        },
-    }));
-
-
-
 
     /************************************ Dialog open/close ***************************************/
 
@@ -265,6 +237,8 @@ export default function AddUser() {
         setUserEditDialog(true);
     };
 
+    /******************************************** update ****************************************************/
+
 
 
     const handleEdit = async () => {
@@ -278,9 +252,6 @@ export default function AddUser() {
                 password,
                 role,
             };
-
-
-
             const response = await axios.put(`/api/users/${selectedUser.id}`, updatedUser);
 
             const updatedUsers = users.map((user) =>
@@ -435,7 +406,7 @@ export default function AddUser() {
 
 
 
-    /********************************************Toasts *************************/
+    /******************************************** Toasts ****************************************************/
 
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'done', detail:'User added successfully', life: 3000});
@@ -575,9 +546,9 @@ export default function AddUser() {
                                         edge="end"
                                         size="medium"
                                     >
-                                        <ArrowTooltip title="Click here to Generate password"  classes={{ popper: 'my-tooltip' }} placement="bottom">
+                                        <Tooltip title="Click here to Generate password"  classes={{ popper: 'my-tooltip' }} placement="bottom">
                                             <SyncLockIcon />
-                                        </ArrowTooltip>
+                                        </Tooltip>
 
                                     </IconButton>
 
@@ -753,18 +724,20 @@ export default function AddUser() {
                                 <InputAdornment position="end">
 
 
+                                    <Tooltip title="Generate Password" arrow>
+
                                     <IconButton
                                         aria-label="toggle password generator"
                                         onClick={handleGeneratePassword}
                                         edge="end"
                                         size="medium"
+                                        style={{ zIndex: 9999 }}
+
                                     >
-                                        <ArrowTooltip title="Click here to Generate password" classes={{ popper: 'my-tooltip' }} placement="bottom">
                                             <SyncLockIcon />
-                                        </ArrowTooltip>
 
                                     </IconButton>
-
+                                    </Tooltip>
                                     <IconButton
                                         aria-label="toggle password visibility"
                                         onClick={handleClickShowPassword}
