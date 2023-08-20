@@ -63,7 +63,10 @@ export default function ProjectDetailsCsv() {
 
 
 
+
+
     const showImageSelectionDialog = () => {
+        preloadImages();
         setDisplayDialog(true);
     };
 
@@ -103,6 +106,12 @@ export default function ProjectDetailsCsv() {
     /******************************************** Load  *******************************************/
 
 
+    const preloadImages = () => {
+        images.forEach((image) => {
+            const img = new Image();
+            img.src = image.src;
+        });
+    };
 
     const loadFields = async (projectId) => {
         try {
@@ -374,7 +383,7 @@ export default function ProjectDetailsCsv() {
             setSavedFieldValues([...savedFieldValues, newSavedValue]);
         }
 
-        const updatedRowData = { ...rowData, [fieldId]: value }; // Create a new object with the updated value
+        const updatedRowData = { ...rowData, [fieldId]: value };
         const updatedData = data.map((row, index) => (index === data.indexOf(rowData) ? updatedRowData : row)); // Update the corresponding row in the data array
         setData(updatedData);
     };
