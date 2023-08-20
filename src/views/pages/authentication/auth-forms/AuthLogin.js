@@ -26,7 +26,9 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import AuthService from '../../../../routes/AuthService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useRoutes } from 'react-router-dom';
+import AdminRoute from '../../../../routes/AdminRoute';
+import ClientRoute from '../../../../routes/ClientRoute';
 
 
 // ============================|| FIREBASE - LOGIN ||============================ //
@@ -38,6 +40,8 @@ const FirebaseLogin = ({ ...others }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const toast = useRef(null);
+
+
 
   const navigate = useNavigate();
 
@@ -52,13 +56,11 @@ const FirebaseLogin = ({ ...others }) => {
 
     try {
       const user = await AuthService.login(email, password);
-      console.log(user);
-      if (user.role === 'CLIENT') {
-        console.log('Navigating to /app/client_projects');
-        navigate('/app/client_projects');
+
+      if (user == "CLIENT") {
+        navigate('/client/client_projects');
       } else {
-        console.log('Navigating to /app');
-        navigate('/app');
+        navigate('/manager/projects');
       }
     } catch (error) {
       console.error("An error occurred:", error);

@@ -19,10 +19,7 @@ const AuthenticationRoutes = {
       path: '/',
       element: <AuthLogin3 />
     },
-    {
-      path: '/app',
-      element: <MainLayout />
-    }
+
   ]
 };
 

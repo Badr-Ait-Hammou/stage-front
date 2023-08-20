@@ -32,189 +32,362 @@ import TempDetails from "../component/TemplateDetails"
 import TempDetailsExcel from "../component/TemplateDetailsExcel"
 import ProjectDetailsDoc from "../component/ProjectDetailDoc"
 import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
+import AdminRoute from './AdminRoute';
+import ManagerRoute from './ManagerRoute';
+import ClientRoute from './ClientRoute';
+import AuthGuard from './AuthGuard';
 
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
-  path: '/app',
-  element: <MainLayout />,
+  path: '',
+  element: (
+
+      <MainLayout />
+
+  ),
   children: [
     {
-      path: '',
-      element: <Projects />
-      // element: <DashboardDefault />
-    },
-    {
-      path: 'dashboard',
+      path: 'admin',
       children: [
         {
-          path: 'default',
-          element: <DashboardDefault />
+          path: 'projects',
+          element: <Projects />
+          // element: <DashboardDefault />
         },
-      ]
-    },
-    {
-      path: 'annotation',
-      element: <Annotation />
-    },
-    {
-      path: 'template',
-      element: <Template />
-    },
-    {
-      path: 'client_projects',
-      element: <ProjectClient />
-    },
-    {
-      path: 'addUser',
-      element: <Adduser />
-    },
-    {
-      path: 'addClient',
-      element: <AddClient />
-    },
-    {
-      path: 'profile',
-      element: <Profile />
-    },
-    {
-      path: 'all_comments',
-      element: <AllComments />
-    },
-    {
-      path: 'annotation/Imagedetail/:id',
-      element: <ImageDetail />
-    },
-    {
-      path: 'template/template_details/:id',
-      element: <TempDetails />
-    },
-    {
-      path: 'template/template_detailsExcel/:id',
-      element: <TempDetailsExcel />
-    },
+        {
+          path: 'dashboard',
+          children: [
+            {
+              path: 'default',
+              element: <DashboardDefault />
+            },
+          ]
+        },
+        {
+          path: 'annotation',
+          element: <Annotation />
+        },
+        {
+          path: 'template',
+          element: <Template />
+        },
+        {
+          path: 'client_projects',
+          element: <ProjectClient />
+        },
+        {
+          path: 'addUser',
+          element: <Adduser />
+        },
+        {
+          path: 'addClient',
+          element: <AddClient />
+        },
+        {
+          path: 'profile',
+          element: <Profile />
+        },
+        {
+          path: 'all_comments',
+          element: <AllComments />
+        },
+        {
+          path: 'annotation/Imagedetail/:id',
+          element: <ImageDetail />
+        },
+        {
+          path: 'template/template_details/:id',
+          element: <TempDetails />
+        },
+        {
+          path: 'template/template_detailsExcel/:id',
+          element: <TempDetailsExcel />
+        },
 
-    {
-      path: 'client_projects/Imagedetail/:id',
-      element: <ImageDetail />
-    },
-    {
-      path: 'client_projects/project_comment/:id',
-      element: <ProjectComment />
-    },
-    {
-      path: 'projects/Imagedetail/:id',
-      element: <ImageDetail />
-    },
-    {
-      path: 'chart',
-      element: <Chart />
-    },
-    {
-      path: 'projects/project_details/:id',
-      element: <ProjectDetails />
-    },
-    {
-      path: 'project_details/:id',
-      element: <ProjectDetails />
-    },
-    {
-      path: 'all_comments/project_detailsDoc/:id',
-      element: <ProjectDetailsDoc />
-    },
-    {
-      path: 'project_detailsDoc/:id',
-      element: <ProjectDetailsDoc />
-    },
-    {
-      path: 'all_comments/project_detailsExcel/:id',
-      element: <ProjectDetailsCsv />
-    },
-    {
-      path: 'project_detailsExcel/:id',
-      element: <ProjectDetailsCsv />
-    },
-    {
-      path: 'all_comments/project_details/:id',
-      element: <ProjectDetails />
-    },
-    {
-      path: 'projects/project_detailsDoc/:id',
-      element: <ProjectDetailsDoc />
-    },
-    {
-      path: 'projects/project_detailsExcel/:id',
-      element: <ProjectDetailsCsv />
-    },
-    {
-      path: 'projects',
-      element: <Projects />
-    },
-    {
-      path: 'information',
-      element: <Information />
-    }, {
-      path: 'projects',
-      element: <Projects />
-    }, {
-      path: 'storage',
-      element: <Storage />
-    },
-    {
-      path: 'utils',
-      children: [
         {
-          path: 'util-typography',
-          element: <UtilsTypography />
-        }
-      ]
-    },
-    {
-      path: 'utils',
-      children: [
+          path: 'client_projects/Imagedetail/:id',
+          element: <ImageDetail />
+        },
         {
-          path: 'util-color',
-          element: <UtilsColor />
-        }
-      ]
-    },
+          path: 'client_projects/project_comment/:id',
+          element: <ProjectComment />
+        },
+        {
+          path: 'projects/Imagedetail/:id',
+          element: <ImageDetail />
+        },
+        {
+          path: 'chart',
+          element: <Chart />
+        },
+        {
+          path: 'projects/project_details/:id',
+          element: <ProjectDetails />
+        },
+        {
+          path: 'all_comments/project_detailsDoc/:id',
+          element: <ProjectDetailsDoc />
+        },
+        {
+          path: 'all_comments/project_details/:id',
+          element: <ProjectDetails />
+        },
+        {
+          path: 'projects/project_detailsDoc/:id',
+          element: <ProjectDetailsDoc />
+        },
+        {
+          path: 'projects/project_detailsExcel/:id',
+          element: <ProjectDetailsCsv />
+        },
+        {
+          path: 'projects',
+          element: <Projects />
+        },
+        {
+          path: 'information',
+          element: <Information />
+        }, {
+          path: 'projects',
+          element: <Projects />
+        }, {
+          path: 'storage',
+          element: <Storage />
+        },
+        {
+          path: 'utils',
+          children: [
+            {
+              path: 'util-typography',
+              element: <UtilsTypography />
+            }
+          ]
+        },
+        {
+          path: 'utils',
+          children: [
+            {
+              path: 'util-color',
+              element: <UtilsColor />
+            }
+          ]
+        },
 
-    {
-      path: 'utils',
-      children: [
         {
-          path: 'util-shadow',
-          element: <UtilsShadow />
-        }
-      ]
-    },
-    {
-      path: 'image',
-      element: <Image />
-    },
+          path: 'utils',
+          children: [
+            {
+              path: 'util-shadow',
+              element: <UtilsShadow />
+            }
+          ]
+        },
+        {
+          path: 'image',
+          element: <Image />
+        },
 
-    {
-      path: 'icons',
-      children: [
         {
-          path: 'tabler-icons',
-          element: <UtilsTablerIcons />
-        }
-      ]
-    },
-    {
-      path: 'icons',
-      children: [
+          path: 'icons',
+          children: [
+            {
+              path: 'tabler-icons',
+              element: <UtilsTablerIcons />
+            }
+          ]
+        },
         {
-          path: 'material-icons',
-          element: <UtilsMaterialIcons />
-        }
-      ]
-    },
+          path: 'icons',
+          children: [
+            {
+              path: 'material-icons',
+              element: <UtilsMaterialIcons />
+            }
+          ]
+        },
 
+        {
+          path: 'sample-page',
+          element: <SamplePage />
+        }
+      ]
+
+    },
     {
-      path: 'sample-page',
-      element: <SamplePage />
+      path: 'manager',
+      children: [
+        {
+          path: 'projects',
+          element: <Projects />
+          // element: <DashboardDefault />
+        },
+        {
+          path: 'dashboard',
+          children: [
+            {
+              path: 'default',
+              element: <DashboardDefault />
+            },
+          ]
+        },
+        {
+          path: 'annotation',
+          element: <Annotation />
+        },
+        {
+          path: 'template',
+          element: <Template />
+        },
+        {
+          path: 'client_projects',
+          element: <ProjectClient />
+        },
+        {
+          path: 'addClient',
+          element: <AddClient />
+        },
+        {
+          path: 'profile',
+          element: <Profile />
+        },
+        {
+          path: 'all_comments',
+          element: <AllComments />
+        },
+        {
+          path: 'annotation/Imagedetail/:id',
+          element: <ImageDetail />
+        },
+        {
+          path: 'template/template_details/:id',
+          element: <TempDetails />
+        },
+        {
+          path: 'template/template_detailsExcel/:id',
+          element: <TempDetailsExcel />
+        },
+
+        {
+          path: 'client_projects/Imagedetail/:id',
+          element: <ImageDetail />
+        },
+        {
+          path: 'client_projects/project_comment/:id',
+          element: <ProjectComment />
+        },
+        {
+          path: 'projects/Imagedetail/:id',
+          element: <ImageDetail />
+        },
+        {
+          path: 'chart',
+          element: <Chart />
+        },
+        {
+          path: 'projects/project_details/:id',
+          element: <ProjectDetails />
+        },
+        {
+          path: 'all_comments/project_detailsDoc/:id',
+          element: <ProjectDetailsDoc />
+        },
+        {
+          path: 'all_comments/project_details/:id',
+          element: <ProjectDetails />
+        },
+        {
+          path: 'projects/project_detailsDoc/:id',
+          element: <ProjectDetailsDoc />
+        },
+        {
+          path: 'projects/project_detailsExcel/:id',
+          element: <ProjectDetailsCsv />
+        },
+        {
+          path: 'projects',
+          element: <Projects />
+        },
+        {
+          path: 'information',
+          element: <Information />
+        },
+        {
+          path: 'projects',
+          element: <Projects />
+        },
+        {
+          path: 'storage',
+          element: <Storage />
+        },
+        {
+          path: 'utils',
+          children: [
+            {
+              path: 'util-typography',
+              element: <UtilsTypography />
+            }
+          ]
+        },
+        {
+          path: 'utils',
+          children: [
+            {
+              path: 'util-color',
+              element: <UtilsColor />
+            }
+          ]
+        },
+
+        {
+          path: 'utils',
+          children: [
+            {
+              path: 'util-shadow',
+              element: <UtilsShadow />
+            }
+          ]
+        },
+        {
+          path: 'image',
+          element: <Image />
+        },
+
+        {
+          path: 'icons',
+          children: [
+            {
+              path: 'tabler-icons',
+              element: <UtilsTablerIcons />
+            }
+          ]
+        },
+        {
+          path: 'icons',
+          children: [
+            {
+              path: 'material-icons',
+              element: <UtilsMaterialIcons />
+            }
+          ]
+        },
+
+        {
+          path: 'sample-page',
+          element: <SamplePage />
+        }
+      ]
+
+    },
+    {
+      path: 'client',
+      children: [
+        {
+          path: 'client_projects',
+          element: <ProjectClient />
+        }
+      ]
+
     }
   ]
 };

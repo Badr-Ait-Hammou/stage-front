@@ -13,7 +13,7 @@ const information = {
             id: 'information',
             title: 'Information',
             type: 'item',
-            url: '/app/information',
+            url: '/manager/information',
             icon: icons.IconInfoSquare,
             breadcrumbs: false}]
 };

@@ -9,12 +9,13 @@ const AuthService = {
     try {
       const response = await axios.post(`${API_URL}/authenticate`, {email, password});
       const token = response.data.access_token;
-      const user = response.data.user;
+      const user = response.data.role;
 
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user)); // Store user as a string
       setAuthToken(token);
-
+      console.log(user);
+// console.log("return motherfucker", response.data.user.role);
       return user; // Return user without JSON.parse
     } catch (e) {
       console.error(e);

@@ -14,7 +14,7 @@ const project = {
             id: 'projects',
             title: 'Projects',
             type: 'item',
-            url: '/app/projects',
+            url: '/manager/projects',
             icon: icons.IconBrandMiniprogram,
             breadcrumbs: false
         }

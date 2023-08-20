@@ -14,7 +14,7 @@ const annotation = {
             id: 'annotation',
             title: 'Annotation',
             type: 'item',
-            url: '/app/annotation',
+            url: '/manager/annotation',
             icon: icons.IconPencil,
             breadcrumbs: false
         }

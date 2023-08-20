@@ -22,14 +22,14 @@ const utilities = {
       id: 'storage',
       title: 'Storage',
       type: 'item',
-      url: '/app/storage',
+      url: '/manager/storage',
       icon: icons.IconDownload,
       breadcrumbs: false
     },{
       id: 'chart',
       title: 'Chart',
       type: 'item',
-      url: '/app/chart',
+      url: '/manager/chart',
       icon: icons.IconTypography,
       breadcrumbs: false
     },
@@ -37,7 +37,7 @@ const utilities = {
       id: 'addUser',
       title: 'Add_User',
       type: 'item',
-      url: '/app/addUser',
+      url: '/admin/addUser',
       icon: icons.IconUserPlus,
       breadcrumbs: false
     },
@@ -45,7 +45,7 @@ const utilities = {
       id: 'addClient',
       title: 'Add_Client',
       type: 'item',
-      url: '/app/addClient',
+      url: '/manager/addClient',
       icon: icons.IconUserPlus,
       breadcrumbs: false
     },

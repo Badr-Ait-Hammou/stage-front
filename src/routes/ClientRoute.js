@@ -1,11 +1,12 @@
 import ProjectClient from '../ac_client/ProjectsPage';
 import React from 'react';
+import MainLayout from '../layout/MainLayout';
 
 const ClientRoute = {
   path: "client",
   element: (
     <React.Fragment>
-      <ProjectClient />
+       <MainLayout />,
     </React.Fragment>
   ),
   children: [

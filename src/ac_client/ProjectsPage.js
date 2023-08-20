@@ -18,10 +18,11 @@ export default function ProjectPage() {
     const [client, setClient] = useState([]);
     const [globalFilter, setGlobalFilter] = useState(null);
     const dt = useRef(null);
-
+    const id = useState(1)
 
     useEffect(() => {
-        axios.get("/api/users/1").then((response) => {
+        console.log(id);
+        axios.get(`/api/users/${id}`).then((response) => {
             setClient(response.data);
         });
     }, []);

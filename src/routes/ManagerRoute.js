@@ -35,11 +35,12 @@ import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const ManagerRoute = {
-  path: "admin",
+  path: 'manager',
   element: <MainLayout />,
+
   children: [
     {
-      path: '/',
+      path: 'projects',
       element: <Projects />
       // element: <DashboardDefault />
     },
