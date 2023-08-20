@@ -126,29 +126,33 @@ export default function Template() {
 
 const handleEdit = async () => {
     try {
-        const updatedProject = {
-            id: selectedResult.id,
-            name,
-            file,
-            description,
-            type,
+        if (name.trim() === '' || description.trim() === '' || type.trim() === '' || !file) {
+            showempty();
+        }else {
+            const updatedProject = {
+                id: selectedResult.id,
+                name,
+                file,
+                description,
+                type,
 
-        };
-        const response = await axios.put(`/api/result/${selectedResult.id}`, updatedProject);
+            };
+            const response = await axios.put(`/api/result/${selectedResult.id}`, updatedProject);
 
-        const updatedProjects = result.map((result) =>
-            result.id === response.data.id ? response.data : result
-        );
+            const updatedProjects = result.map((result) =>
+                result.id === response.data.id ? response.data : result
+            );
 
-        setResult(updatedProjects);
-        hideeditDialog();
-        loadResult();
-        fetchData();
-        showuedit();
+            setResult(updatedProjects);
+            hideeditDialog();
+            loadResult();
+            fetchData();
+            showuedit();
+        }
     } catch (error) {
         console.error(error);
     }
-};
+  };
 
 
 const handlefileChange = (event) => {
@@ -167,7 +171,7 @@ const handlefileChange = (event) => {
 
     }
 
-};
+    };
 
 
 const saveAllFieldsWithResult = async () => {
@@ -601,8 +605,7 @@ return (
                         ref={fileUploadRef}
                         accept={type === 'excel' ? '.csv,.xlsx' : ''}
                         cancelLabel="Cancel"
-                        disabled={!type} // Disable file upload until a type is selected
-
+                        disabled={!type}
 
                         onSelect={(e) => {
 
@@ -626,7 +629,6 @@ return (
 
                                 }
                             } else if (type === 'doc') {
-                                // Handle docx file validation here
                                 const selectedFileType = e.files[0].type;
                                 const allowedFileTypes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
@@ -743,28 +745,12 @@ return (
                             </div>
                         }
 
-
                         onSelect={(e) => {
 
 
                             if (type === 'excel') {
-                                const selectedFileType = e.files[0].type;
-                                const allowedFileTypes = ['application/vnd.ms-excel', 'text/csv'];
-
-                                if (!allowedFileTypes.includes(selectedFileType)) {
-                                    toast.current.show({
-                                        severity: 'error',
-                                        summary: 'Info',
-                                        detail: 'Selected file is not compatible with the chosen type.',
-                                        life: 3000
-                                    });
-                                    setFile('');
-                                    fileUploadRef.current.clear(); // Clear the selected file
-
-                                }else{
                                     handlefileChange2(e);
 
-                                }
                             } else if (type === 'doc') {
                                 const selectedFileType = e.files[0].type;
                                 const allowedFileTypes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
