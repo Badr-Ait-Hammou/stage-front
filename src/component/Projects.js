@@ -28,6 +28,11 @@ import {Grid} from "@mui/material";
 import Card from "@mui/material/Card";
 import {Tag} from "primereact/tag";
 import {Paginator} from "primereact/paginator";
+import Alert from '@mui/material/Alert';
+
+
+
+
 
 
 
@@ -919,17 +924,9 @@ export default function Projects() {
                 style={{ width: '20rem' }}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
             >
-                <Card
-                    style={{
-                        backgroundColor: 'rgb(236,230,245)',
-                        padding: '20px',
-                        borderRadius: '10px',
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                        position: 'relative',
-                    }}
-                >
-                    <h5>this project is empty!</h5>
-                </Card>
+                <Alert variant="filled" severity="error">
+                    This project is empty !</Alert>
+
             </Dialog>
 
 

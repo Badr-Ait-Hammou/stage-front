@@ -18,10 +18,13 @@ export default function TemplateDetails() {
     const [result, setResult] = useState(null);
     const [name, setName] = useState('');
     const [file, setFile] = useState('');
+    const [updfile, setupdFile] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState('');
     const toast = useRef(null);
     const [fields, setFields] = useState([]);
+    const fileUploadRef = useRef(null);
+
 
 
 
@@ -40,12 +43,12 @@ export default function TemplateDetails() {
                 setType(response.data.type);
                 setDescription(response.data.description);
                 setFile(response.data.file);
-
             })
             .catch((error) => {
                 console.error("Error fetching image details:", error);
             });
     }, [id]);
+
 
     const loadResult = async () => {
         const res = await axios.get(`/api/result/${id}`);
@@ -59,10 +62,6 @@ export default function TemplateDetails() {
 
 
 
-
-
-
-
     const handleDeleteField = (fieldId) => {
         axios.delete(`/api/field/${fieldId}`)
             .then(() => {
@@ -73,24 +72,26 @@ export default function TemplateDetails() {
             });
     };
 
-
     const handleEdit = async () => {
         try {
-            const updatedProject = {
-                id:id,
-                name,
-                file,
-                description,
-                type,
+            if (name.trim() === '' || description.trim() === '' || type.trim() === '' || !file) {
+                showempty();
+            }else {
+                const updatedProject = {
+                    id: id,
+                    name,
+                    description,
+                    type,
+                    file:updfile,
+                };
 
-            };
-            const response = await axios.put(`/api/result/${id}`, updatedProject);
-
-            setResult(response.data);
-
-
-            showuedit();
-            loadResult();
+                const response = await axios.put(`/api/result/${id}`, updatedProject);
+                setResult(response.data);
+                console.log("upfile",updfile);
+                showuedit();
+                setupdFile("");
+                loadResult();
+            }
         } catch (error) {
             console.error(error);
         }
@@ -136,6 +137,9 @@ export default function TemplateDetails() {
     const showuedit = () => {
         toast.current.show({severity: 'info', summary: 'Done', detail: 'item updated successfully', life: 3000});
     }
+    const showempty = () => {
+        toast.current.show({severity: 'error', summary: 'Heads Up', detail: 'one of the input fields is empty', life: 3000});
+    }
 
     const showNewFileU = () => {
         toast.current.show({severity: 'success', summary: 'Done', detail: 'New Csv File Uploaded ', life: 3000});
@@ -146,13 +150,14 @@ export default function TemplateDetails() {
 
     const handlefileChange = async (event) => {
         const files = event.files;
-
         if (files && files.length > 0) {
             const file = files[0];
-
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const fileContent = e.target.result;
+                setFile(fileContent);
+                setupdFile(`data:text/csv;charset=utf-8,${encodeURIComponent(fileContent)}`);
+
                 console.log("FileReader Output:", fileContent);
 
                 const lines = fileContent.split("\n");
@@ -257,7 +262,6 @@ export default function TemplateDetails() {
                                                 style={{marginTop: "5px"}}
                                                 id="type"
                                                 value={type}
-
                                             />
                                         </Box>
                                     </Grid>
@@ -275,6 +279,7 @@ export default function TemplateDetails() {
                                             className="mt-2"
                                             name="file"
                                             url={'/api/upload'}
+                                            accept={type === 'excel' ? '.csv,.xlsx' : ''}
                                             maxFileSize={100000000}
                                             emptyTemplate={
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -289,8 +294,27 @@ export default function TemplateDetails() {
                                             chooseLabel="Select File"
                                             uploadLabel="Upload"
                                             cancelLabel="Cancel"
-                                            onSelect={(e) => handlefileChange(e)}
-                                            //disabled={true}
+                                            ref={fileUploadRef}
+                                            onSelect={(e) => {
+                                                    const selectedFileType = e.files[0].type;
+                                                    const allowedFileTypes = ['application/vnd.ms-excel', 'text/csv'];
+
+                                                    if (!allowedFileTypes.includes(selectedFileType)) {
+                                                        toast.current.show({
+                                                            severity: 'error',
+                                                            summary: 'Info',
+                                                            detail: 'Selected file is not compatible with the chosen type.',
+                                                            life: 3000
+                                                        });
+                                                        setFile('');
+                                                        fileUploadRef.current.clear();
+
+                                                    }else{
+                                                        handlefileChange(e);
+
+                                                    }
+
+                                            }}
                                         />
 
                                     </Box>

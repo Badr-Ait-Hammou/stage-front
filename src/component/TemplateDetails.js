@@ -24,6 +24,8 @@ export default function TemplateDetails() {
     const [type, setType] = useState('');
     const toast = useRef(null);
     const [fields, setFields] = useState([]);
+    const fileUploadRef = useRef(null);
+
 
 
 
@@ -142,21 +144,25 @@ export default function TemplateDetails() {
 
     const handleEdit = async () => {
         try {
-            const updatedProject = {
-                id:id,
-                name,
-                file,
-                description,
-                type,
+            if (name.trim() === '' || description.trim() === '' || type.trim() === '' || !file) {
+                showempty();
+            }else {
+                const updatedProject = {
+                    id: id,
+                    name,
+                    file,
+                    description,
+                    type,
 
-            };
-            const response = await axios.put(`/api/result/${id}`, updatedProject);
+                };
+                const response = await axios.put(`/api/result/${id}`, updatedProject);
 
-            setResult(response.data);
+                setResult(response.data);
 
 
-            showuedit();
-            loadResult();
+                showuedit();
+                loadResult();
+            }
         } catch (error) {
             console.error(error);
         }
@@ -265,6 +271,8 @@ export default function TemplateDetails() {
                                             className="mt-2"
                                             name="file"
                                             url={'/api/upload'}
+                                            accept={type === 'doc' ? '.docx' : ''}
+                                            ref={fileUploadRef}
                                             maxFileSize={100000000}
                                             emptyTemplate={
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -279,7 +287,24 @@ export default function TemplateDetails() {
                                             chooseLabel="Select File"
                                             uploadLabel="Upload"
                                             cancelLabel="Cancel"
-                                            onSelect={(e) => handlefileChange(e)}
+                                            onSelect={(e) => {
+                                                const selectedFileType = e.files[0].type;
+                                                const allowedFileTypes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+                                                if (!allowedFileTypes.includes(selectedFileType)) {
+                                                    toast.current.show({
+                                                        severity: 'error',
+                                                        summary: 'Info',
+                                                        detail: '00000Selected file is not compatible with the chosen type.',
+                                                        life: 3000
+                                                    });
+                                                    setFile('');
+                                                    fileUploadRef.current.clear();
+                                                } else {
+                                                    handlefileChange(e);
+                                                }
+
+                                            }}
                                         />
 
                                     </Box>
