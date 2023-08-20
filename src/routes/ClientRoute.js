@@ -1,6 +1,8 @@
 import ProjectClient from '../ac_client/ProjectsPage';
 import React from 'react';
 import MainLayout from '../layout/MainLayout';
+import ImageDetail from '../component/ImageDetail';
+import ProjectComment from '../ac_client/ProjectComment';
 
 const ClientRoute = {
   path: "client",
@@ -13,6 +15,14 @@ const ClientRoute = {
     {
       path: 'client_projects',
       element: <ProjectClient />
+    },
+    {
+      path: 'client_projects/Imagedetail/:id',
+      element: <ImageDetail />
+    },
+    {
+      path: 'client_projects/project_comment/:id',
+      element: <ProjectComment />
     }
   ]
 };

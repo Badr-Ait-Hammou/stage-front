@@ -14,7 +14,7 @@ const pdf = {
       id: 'pdf',
       title: 'Pdf File',
       type: 'item',
-      url: '/manager/pdf',
+      url: '/visumine/pdf',
       icon: icons.IconFileDescription,
       breadcrumbs: false
     }

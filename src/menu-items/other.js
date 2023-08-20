@@ -15,7 +15,7 @@ const other = {
       id: 'sample-page',
       title: 'Sample Page',
       type: 'item',
-      url: '/manager/sample-page',
+      url: '/visumine/sample-page',
       icon: icons.IconBrandChrome,
       breadcrumbs: false
     },

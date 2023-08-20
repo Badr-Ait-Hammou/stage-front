@@ -14,7 +14,7 @@ const image = {
             id: 'image',
             title: 'Images',
             type: 'item',
-            url: '/manager/image',
+            url: '/visumine/image',
             icon: icons.IconPhoto,
             breadcrumbs: false
         }

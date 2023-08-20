@@ -14,7 +14,7 @@ const excel = {
       id: 'excel',
       title: 'Excel File',
       type: 'item',
-      url: '/manager/excel',
+      url: '/visumine/excel',
       icon: icons.IconFileSpreadsheet,
       breadcrumbs: false
     }

@@ -13,7 +13,7 @@ const information = {
             id: 'information',
             title: 'Information',
             type: 'item',
-            url: '/manager/information',
+            url: '/visumine/information',
             icon: icons.IconInfoSquare,
             breadcrumbs: false}]
 };

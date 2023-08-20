@@ -60,7 +60,7 @@ const FirebaseLogin = ({ ...others }) => {
       if (user == "CLIENT") {
         navigate('/client/client_projects');
       } else {
-        navigate('/manager/projects');
+        navigate('/visumine/projects');
       }
     } catch (error) {
       console.error("An error occurred:", error);

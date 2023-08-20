@@ -14,7 +14,7 @@ const annotation = {
             id: 'template',
             title: 'Template',
             type: 'item',
-            url: '/manager/template',
+            url: '/visumine/template',
             icon: icons.IconTemplate,
             breadcrumbs: false
         }

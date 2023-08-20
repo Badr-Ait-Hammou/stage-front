@@ -14,7 +14,7 @@ const project = {
             id: 'projects',
             title: 'Projects',
             type: 'item',
-            url: '/manager/projects',
+            url: '/visumine/projects',
             icon: icons.IconBrandMiniprogram,
             breadcrumbs: false
         }

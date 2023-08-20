@@ -22,14 +22,14 @@ const utilities = {
       id: 'storage',
       title: 'Storage',
       type: 'item',
-      url: '/manager/storage',
+      url: '/visumine/storage',
       icon: icons.IconDownload,
       breadcrumbs: false
     },{
       id: 'chart',
       title: 'Chart',
       type: 'item',
-      url: '/manager/chart',
+      url: '/visumine/chart',
       icon: icons.IconTypography,
       breadcrumbs: false
     },
@@ -45,7 +45,7 @@ const utilities = {
       id: 'addClient',
       title: 'Add_Client',
       type: 'item',
-      url: '/manager/addClient',
+      url: '/visumine/addClient',
       icon: icons.IconUserPlus,
       breadcrumbs: false
     },

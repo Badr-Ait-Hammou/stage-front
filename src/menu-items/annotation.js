@@ -14,7 +14,7 @@ const annotation = {
             id: 'annotation',
             title: 'Annotation',
             type: 'item',
-            url: '/manager/annotation',
+            url: '/visumine/annotation',
             icon: icons.IconPencil,
             breadcrumbs: false
         }

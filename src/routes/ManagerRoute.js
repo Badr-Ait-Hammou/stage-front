@@ -35,7 +35,7 @@ import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
 // ==============================|| MAIN ROUTING ||============================== //
 
 const ManagerRoute = {
-  path: 'manager',
+  path: 'visumine',
   element: <MainLayout />,
 
   children: [
