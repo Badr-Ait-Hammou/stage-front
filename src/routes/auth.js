@@ -11,6 +11,15 @@ export const setAuthToken = token => {
   }
 }
 
+let getToken = () => {
+  return localStorage.getItem('token')
+}
+
+
+let getTokenInfo = () => {
+  return jwtDecode(getToken())
+}
+
 const getTokenExpirationDate = encodedToken => {
   const token = jwtDecode(encodedToken);
   if (!token.exp) {
@@ -64,5 +73,6 @@ export const auth = {
   isAuthenticated,
   getUserFromLocalCache,
   isLogged,
+  getTokenInfo,
 
 };

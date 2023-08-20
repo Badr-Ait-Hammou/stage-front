@@ -11,6 +11,8 @@ import "../style/Image.css"
 import {Button} from "primereact/button";
 import {InputText} from "primereact/inputtext";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { auth } from '../routes/auth';
+
 
 
 export default function ProjectPage() {
@@ -18,14 +20,13 @@ export default function ProjectPage() {
     const [client, setClient] = useState([]);
     const [globalFilter, setGlobalFilter] = useState(null);
     const dt = useRef(null);
-    const id = useState(1)
-
+    const [id, setId] = useState(parseInt(auth.getTokenInfo().sub));
     useEffect(() => {
         console.log(id);
         axios.get(`/api/users/${id}`).then((response) => {
             setClient(response.data);
         });
-    }, []);
+    }, [id]);
 
 
     const exportCSV = () => {
