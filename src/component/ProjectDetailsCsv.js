@@ -11,7 +11,10 @@ import {Button} from "primereact/button";
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import {Toast} from "primereact/toast";
 import {Tag} from "primereact/tag";
-import { ProgressBar } from 'primereact/progressbar';
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
+
+
 
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
@@ -47,6 +50,16 @@ export default function ProjectDetailsCsv() {
     const [displayDialog, setDisplayDialog] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [displayProgressBar, setDisplayProgressBar] = useState(false);
+    const [progress, setProgress] = React.useState(10);
+
+    React.useEffect(() => {
+        const timer = setInterval(() => {
+            setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 20));
+        }, 500);
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
 
 
 
@@ -66,7 +79,9 @@ export default function ProjectDetailsCsv() {
         hideImageSelectionDialog();
         if (selectedImage) {
             setDisplayProgressBar(true);
+            setProgress(0);
             await handleExportPDF(selectedImage);
+            setProgress(100);
             setDisplayProgressBar(false);
         }
     };
@@ -158,7 +173,7 @@ export default function ProjectDetailsCsv() {
         });
         const newData = [...data, newRow];
         setData(newData);
-        setShowSaveAllButton(true); // Show the "Save All" button for the newly added row
+        setShowSaveAllButton(true);
 
     };
 
@@ -777,7 +792,6 @@ export default function ProjectDetailsCsv() {
                             <Column
 
                                 key={`input-${field.id}`}
-
                                 header={field.namef}
                                 field={field.namef.toLowerCase()}
                                 style={{ minWidth: '7rem' }}
@@ -855,7 +869,7 @@ export default function ProjectDetailsCsv() {
                             key={image.id}
                             src={image.src}
                             alt={`Image ${image.id}`}
-                            style={{ width: '90%',height:"auto" }} // Adjust image sizing
+                            style={{ width: '90%',height:"auto" }}
                             className={`image-item-small ${selectedImage === image.src ? "selected" : ""}`}
                             onClick={() => handleImageClick(image.src)}
                         />
@@ -864,10 +878,10 @@ export default function ProjectDetailsCsv() {
                 <Button  label="Confirm" className="p-button-success mt-5" onClick={confirmImageSelection} />
             </Dialog>
 
-            <Dialog visible={displayProgressBar} onHide={() => {}} closable={false} showHeader={false} style={{ width: '30rem',borderRadius:"10px" }} modal>
+            <Dialog visible={displayProgressBar} onHide={() => {}} closable={false} showHeader={false} style={{ width: '30rem', borderRadius: '10px' }} modal>
                 <div style={{ textAlign: 'center', padding: '20px' }}>
-                    <ProgressBar mode="indeterminate"  />
-                    <p>Working on it ...</p>
+                    <CircularProgress variant="determinate" value={progress} />
+                    <Typography variant="body1">{`${Math.round(progress)}%`}</Typography>
                 </div>
             </Dialog>
 
