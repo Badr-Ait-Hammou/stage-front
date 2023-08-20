@@ -158,7 +158,7 @@ const ProfileSection = () => {
                       <Stack direction="row" spacing={0.5} alignItems="center">
                         <Typography variant="h4">Good Morning,</Typography>
                         <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Johne Doe
+                          User
                         </Typography>
                       </Stack>
                       <Typography variant="subtitle2">Project Admin</Typography>
@@ -201,20 +201,11 @@ const ProfileSection = () => {
                           }
                         }}
                       >
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 0}
-                          onClick={(event) => handleListItemClick(event, 0, '/information')}
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                                <ListItemText  primary={<Typography variant="body2">Account Settings</Typography>} />
-                        </ListItemButton>
+
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 1}
-                          onClick={(event) => handleListItemClick(event, 1, '/profile')}
+                          onClick={(event) => handleListItemClick(event, 0, '/app/profile')}
                         >
                           <ListItemIcon>
                             <IconUser stroke={1.5} size="1.3rem" />
@@ -223,11 +214,11 @@ const ProfileSection = () => {
                             primary={
                               <Grid container spacing={1} justifyContent="space-between">
                                 <Grid item>
-                                  <Typography variant="body2">Social Profile</Typography>
+                                  <Typography variant="body2">Profile</Typography>
                                 </Grid>
                                 <Grid item>
                                   <Chip
-                                    label="02"
+                                    label="01"
                                     size="small"
                                     sx={{
                                       bgcolor: theme.palette.warning.dark,
