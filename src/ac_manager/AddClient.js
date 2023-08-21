@@ -1,6 +1,6 @@
 
 import React, {useState, useEffect, useRef} from "react"
-import {styled, useTheme} from "@mui/material/styles";
+import { useTheme} from "@mui/material/styles";
 import {
     Box,
     FormControl,
@@ -422,12 +422,12 @@ export default function AddClient() {
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Clients"
                            globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{minWidth: '7rem'}}></Column>
+                    <Column field="email" className="font-bold" header="Email" sortable style={{minWidth: '10em'}}></Column>
                     <Column field="firstName" header="FirstName" filter filterPlaceholder="Search FirstName ..." sortable style={{minWidth: '10rem'}}></Column>
                     <Column field="lastName" header="LastName" filter filterPlaceholder="Search LastName ..." sortable style={{minWidth: '10rem'}}></Column>
-                    <Column field="email" header="Email" sortable style={{minWidth: '10em'}}></Column>
                     <Column field="username" header="UserName" sortable style={{minWidth: '10em'}}></Column>
                     <Column field="tel" header="Phone" sortable sortField="dateCreation" style={{minWidth: "10rem"}}></Column>
-                    <Column field="password" header="Password" filter filterPlaceholder="Search password ..." style={{minWidth: '10rem'}} sortable  body={passwordBodyTemplate}></Column>
+                    <Column field="password" header="Password" filter filterPlaceholder="Search password ..." style={{minWidth: '15rem'}} sortable  body={passwordBodyTemplate}></Column>
 
                     <Column header="Action" body={actionBodyTemplate} exportable={false} style={{minWidth: '12rem'}}></Column>
                 </DataTable>

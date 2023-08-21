@@ -171,7 +171,7 @@ export default function Information() {
     };
 
     return (
-            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company && company.name ? ` ${company.name.toUpperCase()} COMPANY PROFILE` : 'SARL'} </div>} >
+            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company && company.name ? ` ${company.name.toUpperCase()} COMPANY PROFILE` : 'VISUMINE'} </div>} >
 
             <Toast ref={toast} />
 
@@ -193,7 +193,16 @@ export default function Information() {
                                         <Avatar alt="AH" src={company.logo} style={{ width: '150px',height:'145px', cursor: 'pointer',padding:"30px",alignItems:"center",justifyContent:"center" }}  />
                                     </Badge>
                                 ) : (
-                                    <div>No logo available</div>
+                                    <Badge
+
+                                        overlap="circular"
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                        badgeContent={
+                                            <SmallAvatar  alt="Remy Sharp" src={Addphoto}  />
+                                        }
+                                    >
+                                        <Avatar alt="AH"  style={{ width: '150px',height:'145px', cursor: 'pointer',padding:"30px",alignItems:"center",justifyContent:"center" }}  />
+                                    </Badge>
                                 )}
                             </Box>
                         </label>

@@ -209,8 +209,11 @@ export default function ProjectDetails() {
                 <div style={{ borderRadius: '10px', overflow: 'hidden' }}>
                     <DataTable value={project.images} footer={footer} tableStyle={{ minWidth: '30rem' }}>
                         <Column field="id" sortable  header="ID"></Column>
-                        <Column header="Images" body={imageBodyTemplate}></Column>
                         <Column field="name" sortable filter header="Name" ></Column>
+                        <Column header="Images" body={imageBodyTemplate}></Column>
+                        <Column field="description" sortable filter header="Description" ></Column>
+                        <Column field="format" sortable filter header="Format" ></Column>
+
                     </DataTable>
                 </div>
                 </div>

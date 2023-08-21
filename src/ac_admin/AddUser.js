@@ -24,8 +24,7 @@ import {Toolbar} from 'primereact/toolbar';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { styled } from '@mui/material/styles';
+import Tooltip  from '@mui/material/Tooltip';
 
 
 
@@ -433,13 +432,13 @@ export default function AddUser() {
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Users"
                            globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{minWidth: '7rem'}}></Column>
+                    <Column field="email" className="font-bold" header="Email" sortable style={{minWidth: '10em'}}></Column>
                     <Column field="firstName" header="FirstName" filter filterPlaceholder="Search firstName ..." sortable style={{minWidth: '10rem'}}></Column>
                     <Column field="lastName" header="LastName" filter filterPlaceholder="Search lastName ..." sortable style={{minWidth: '10rem'}}></Column>
-                    <Column field="email" header="Email" sortable style={{minWidth: '10em'}}></Column>
                     <Column field="username" header="UserName" sortable sortField="username" style={{minWidth: "10rem"}}></Column>
                     <Column field="tel" header="Phone" sortable sortField="tel" style={{minWidth: "10rem"}}></Column>
                     <Column field="role" header="Role" filter filterPlaceholder="Search role ..." sortable style={{minWidth: '10rem'}}></Column>
-                    <Column field="password" header="Password" filter filterPlaceholder="Search password ..." style={{minWidth: '10rem'}} sortable  body={passwordBodyTemplate}></Column>
+                    <Column field="password" header="Password" filter filterPlaceholder="Search password ..." style={{minWidth: '15rem'}} sortable  body={passwordBodyTemplate}></Column>
                     <Column header="Action" body={actionBodyTemplate} exportable={false} style={{minWidth: '12rem'}}></Column>
                 </DataTable>
             </div>

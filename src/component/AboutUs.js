@@ -82,7 +82,16 @@ export default function AboutUs() {
                                         <Avatar alt="AH" src={company.logo} style={{ width: '150px',height:'145px', cursor: 'pointer',padding:"30px",alignItems:"center",justifyContent:"center" }}  />
                                     </Badge>
                                 ) : (
-                                    <div>No logo available</div>
+                                    <Badge
+
+                                        overlap="circular"
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                        badgeContent={
+                                            <SmallAvatar  alt="Remy Sharp" src={Addphoto}  />
+                                        }
+                                    >
+                                        <Avatar alt="AH"  style={{ width: '150px',height:'145px', cursor: 'pointer',padding:"30px",alignItems:"center",justifyContent:"center" }}  />
+                                    </Badge>
                                 )}
                             </Box>
                         </label>

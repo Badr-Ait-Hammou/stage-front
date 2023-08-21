@@ -142,9 +142,7 @@ const NotificationSection = () => {
     }
   };
 
-  const getAvatarInitial = (username) => {
-    return username ? username[0].toUpperCase() : '';
-  };
+
 
   return (
     <>
@@ -284,7 +282,9 @@ const NotificationSection = () => {
                                   <ListItemWrapper key={notification.id}>
                                     <ListItem>
                                     <ListItemAvatar>
-                                      <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
+                                      <Avatar>
+                                        {`${notification.user.firstName.charAt(0).toUpperCase()}${notification.user.lastName.charAt(0).toUpperCase()}`}
+                                      </Avatar>
                                     </ListItemAvatar>
                                       <ListItemText primary={<Typography variant="subtitle1">{notification.user.username.charAt(0).toUpperCase() + notification.user.username.slice(1)}</Typography>} />
                                       <ListItemSecondaryAction>
@@ -348,7 +348,9 @@ const NotificationSection = () => {
 
                                     <ListItem alignItems="center">
                                       <ListItemAvatar>
-                                        <Avatar>{getAvatarInitial(notification.user.username)}</Avatar>
+                                        <Avatar>
+                                          {`${notification.user.firstName.charAt(0).toUpperCase()}${notification.user.lastName.charAt(0).toUpperCase()}`}
+                                        </Avatar>
                                       </ListItemAvatar>
 
                                       <ListItemText primary={<Typography variant="subtitle1">{notification.user.username.charAt(0).toUpperCase() + notification.user.username.slice(1)}</Typography>} />

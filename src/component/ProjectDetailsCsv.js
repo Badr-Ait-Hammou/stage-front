@@ -363,6 +363,9 @@ export default function ProjectDetailsCsv() {
     const showEmpty = () => {
         toast.current.show({severity:'warn', summary: 'heads up', detail:'the values are empty', life: 3000});
     }
+    const showUndefined  = () => {
+        toast.current.show({severity:'error', summary: 'Undefined', detail:'There is no infos about the company', life: 3000});
+    }
 
 
     /****************************************************** InputChange ****************************************/
@@ -389,11 +392,6 @@ export default function ProjectDetailsCsv() {
         const updatedData = data.map((row, index) => (index === data.indexOf(rowData) ? updatedRowData : row)); // Update the corresponding row in the data array
         setData(updatedData);
     };
-
-
-
-
-
 
     /************************************************* Comment Paginator *****************************************/
 
@@ -560,6 +558,8 @@ export default function ProjectDetailsCsv() {
 
 
     const handleExportPDF = async (backgroundImage) => {
+        try {
+            console.log('Starting PDF generation...');
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         const doc = new jsPDF();
@@ -771,6 +771,10 @@ export default function ProjectDetailsCsv() {
 
         // Save the PDF with the given name
         doc.save('datatable-export.pdf');
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            showUndefined();
+        }
     };
 
 

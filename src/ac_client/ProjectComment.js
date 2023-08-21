@@ -13,7 +13,8 @@ import {Button} from "primereact/button";
 import Card from '@mui/material/Card';
 import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 import { Tag } from 'primereact/tag';
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import Doc from "../assets/images/doc.png";
+import Csv from "../assets/images/csv.png";
 
 export default function ProjectComment() {
     const [project, setProject] = useState([]);
@@ -243,14 +244,23 @@ export default function ProjectComment() {
 
 
     const resultFileBodyTemplate = () => {
-        if (project.result && project.result.file) {
+        if (project.result && project.result.file && project.result.type ==="doc") {
             return (
                 <a href={project.result.file} download>
-                    <FileDownloadIcon /> Download
+
+                    <img  src={Doc} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
                 </a>
-            );
+            )
+
+        }else{
+            return(
+                <a href={project.result.file} download>
+
+                    <img  src={Csv} alt="Download Icon" style={{ width: '30px', height: 'auto' }}/>
+                </a>
+            )
         }
-        return null;
+
     };
     const footer2 = (
         <div >
@@ -276,8 +286,10 @@ export default function ProjectComment() {
                         <div style={{borderRadius: '10px', overflow: 'hidden'}}>
                             <DataTable value={[project.result]} footer={footer2} tableStyle={{minWidth: '30rem'}}>
                                 <Column field="id" sortable header="ID"></Column>
+                                <Column field="name" sortable  header="Name"></Column>
                                 <Column header="Result File" body={resultFileBodyTemplate}></Column>
-                                <Column field="name" sortable filter header="Name"></Column>
+                                <Column field="type" sortable  header="Type"></Column>
+                                <Column field="description" sortable  header="Description"></Column>
                             </DataTable>
                         </div>
                     </div>
@@ -289,8 +301,10 @@ export default function ProjectComment() {
                         <div style={{borderRadius: '10px', overflow: 'hidden'}}>
                             <DataTable value={project.images} footer={footer} tableStyle={{minWidth: '30rem'}}>
                                 <Column field="id" sortable header="ID"></Column>
-                                <Column header="Images" body={imageBodyTemplate}></Column>
                                 <Column field="name" sortable filter header="Name"></Column>
+                                <Column header="Images" body={imageBodyTemplate}></Column>
+                                <Column field="format" sortable filter header="Format"></Column>
+                                <Column field="description" sortable filter header="Description"></Column>
                             </DataTable>
                         </div>
                     </div>
