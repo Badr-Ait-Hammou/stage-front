@@ -8,26 +8,31 @@ import {auth} from "../../../../routes/auth";
 let userType = auth.getUserFromLocalCache();
 console.log("User from local cache:", userType);
 
-
 const MenuList = () => {
   const navItems = menuItem.items.map((item) => {
-    if (userType === "CLIENT" && item.id !== 'myProfile') {
-      return null;
+    if (userType === "CLIENT") {
+      if (item.id === 'myProfile' || item.id === 'clientprojects'|| item.id === 'aboutus') {
+        return <NavGroup key={item.id} item={item} />;
+      } else {
+        return null;
+      }
+    } else if (userType === "MANAGER" || userType === "ADMIN") {
+      if (item.id !== 'clientprojects' && item.id !== 'aboutus') {
+        return <NavGroup key={item.id} item={item} />;
+      } else {
+        return null;
+      }
     }
 
-    switch (item.type) {
-      case 'group':
-        return <NavGroup key={item.id} item={item} />;
-      default:
-        return (
-            <Typography key={item.id} variant="h6" color="error" align="center">
-              Menu Items Error
-            </Typography>
-        );
-    }
+    return (
+        <Typography key={item.id} variant="h6" color="error" align="center">
+          Menu Items Error
+        </Typography>
+    );
   });
 
   return <>{navItems}</>;
 };
+
 
 export default MenuList;

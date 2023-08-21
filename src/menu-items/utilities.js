@@ -1,39 +1,13 @@
-import { IconTypography, IconPalette, IconShadow, IconWindmill, IconBrandMiniprogram, IconDownload, IconUserPlus } from '@tabler/icons';
+import { IconUserPlus } from '@tabler/icons';
 import { auth } from "../routes/auth";
-/*
-// Constant
-const icons = {
-  IconTypography,
-  IconPalette,
-  IconShadow,
-  IconWindmill,
-  IconBrandMiniprogram,
-  IconDownload,
-  IconUserPlus
-};
-*/
+
 const filterMenuItems = (user) => {
   const utilities = {
     id: 'utilities',
-    title: 'Utilities',
+    title: 'Management',
     type: 'group',
     children: [
-      {
-        id: 'storage',
-        title: 'Storage',
-        type: 'item',
-        url: '/visumine/storage',
-        icon: IconDownload,
-        breadcrumbs: false,
-      },
-      {
-        id: 'chart',
-        title: 'Chart',
-        type: 'item',
-        url: '/visumine/chart',
-        icon: IconTypography,
-        breadcrumbs: false,
-      },
+
       {
         id: 'addUser',
         title: 'Add_User',
@@ -62,9 +36,27 @@ const filterMenuItems = (user) => {
   return utilities;
 };
 
-// Initialize user and utilities
 let user = auth.getUserFromLocalCache();
 console.log("User from local cache:", user);
 let utilities = filterMenuItems(user);
 
 export default utilities;
+
+
+/* {
+        id: 'storage',
+        title: 'Storage',
+        type: 'item',
+        url: '/visumine/storage',
+        icon: IconDownload,
+        breadcrumbs: false,
+      },
+       {
+        id: 'chart',
+        title: 'Chart',
+        type: 'item',
+        url: '/visumine/chart',
+        icon: IconTypography,
+        breadcrumbs: false,
+      },
+      */

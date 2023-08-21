@@ -4,6 +4,7 @@ import MainLayout from '../layout/MainLayout';
 import ImageDetail from '../component/ImageDetail';
 import ProjectComment from '../ac_client/ProjectComment';
 import MyProfile from "../component/Profile"
+import AboutUs from "../component/AboutUs"
 const ClientRoute = {
   path: "visumine",
   element: (
@@ -15,6 +16,9 @@ const ClientRoute = {
     {
       path: 'client_projects',
       element: <ProjectClient />
+    }, {
+      path: 'aboutUs',
+      element: <AboutUs />
     },
     {
       path: 'client_projects/Imagedetail/:id',

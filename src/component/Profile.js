@@ -158,7 +158,7 @@ export default function Profile() {
                 </Box>
             </Box>
 
-            <Box className="card flex flex-column md:flex-row gap-3">
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
                 <div className="p-inputgroup flex-1">
                     <TextField
                         label="UserName"
@@ -185,7 +185,7 @@ export default function Profile() {
 
 
 
-            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
                 <div className="p-inputgroup flex-1">
                     <TextField
                         fullWidth
