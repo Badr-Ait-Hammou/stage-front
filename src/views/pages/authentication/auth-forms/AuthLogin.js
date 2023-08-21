@@ -35,14 +35,11 @@ import { useNavigate } from 'react-router-dom';
 const FirebaseLogin = ({ ...others }) => {
   const theme = useTheme();
   const scriptedRef = useScriptRef();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const toast = useRef(null);
-
-
-
   const navigate = useNavigate();
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -55,15 +52,12 @@ const FirebaseLogin = ({ ...others }) => {
 
     try {
       const user = await AuthService.login(email, password);
-
       if (user === "CLIENT") {
         navigate('/client/client_projects');
         window.location.reload();
-
       } else {
         navigate('/visumine/projects');
         window.location.reload();
-
       }
     } catch (error) {
       console.error("An error occurred:", error);
@@ -120,7 +114,7 @@ const FirebaseLogin = ({ ...others }) => {
         }}
       >
 
-        {({ errors, handleBlur, handleChange, isSubmitting, touched, values }) => (
+        {({ errors, handleBlur, isSubmitting, touched }) => (
           <form noValidate  {...others}>
             <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
               <InputLabel htmlFor="outlined-adornment-email-login">Email Address </InputLabel>
