@@ -24,11 +24,12 @@ import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
 import NoImg from "../assets/images/nopic.png";
 import NoFile from "../assets/images/nofile.png";
 import MainCard from "../ui-component/cards/MainCard";
-import {Grid} from "@mui/material";
+import {Avatar, Grid} from "@mui/material";
 import Card from "@mui/material/Card";
 import {Tag} from "primereact/tag";
 import {Paginator} from "primereact/paginator";
 import Alert from '@mui/material/Alert';
+import Typography from "@mui/material/Typography";
 
 
 
@@ -657,7 +658,20 @@ export default function Projects() {
                                                     <Tag value="confirm reading comment" severity="warning"></Tag>
                                                 )}
                                                 {/*<Rating value={comment.rate} readOnly cancel={false} style={{ fontSize: '18px', marginTop: '10px' }} />*/}
-                                                <p style={{ fontSize: '25px', marginTop: '10px' }}>{comment.note}</p>
+                                                <div style={{ display: 'flex', alignItems: 'center',marginTop: '10px' }}>
+                                                    <Avatar>
+                                                        <Typography
+                                                            variant="h4"
+                                                            style={{
+                                                                fontWeight: 'bold',
+                                                                color: 'white'
+                                                            }}
+                                                        >
+                                                            {`${project.user.firstName.charAt(0).toUpperCase()}${project.user.lastName.charAt(0).toUpperCase()}`}
+                                                        </Typography>
+                                                    </Avatar>
+                                                    <p style={{ fontSize: '25px',marginLeft:"5px" }}>{comment.note}</p>
+                                                </div>
                                                 <p style={{ fontSize: '15px', marginTop: '10px' }}>
                                                     {formatDateTime(comment.commentDate)}
                                                 </p>
