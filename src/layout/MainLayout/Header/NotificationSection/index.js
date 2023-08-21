@@ -26,6 +26,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import { IconBell } from '@tabler/icons';
+import {auth} from "../../../../routes/auth";
 
 
 const ListItemWrapper = styled('div')(({ theme }) => ({
@@ -80,6 +81,7 @@ const NotificationSection = () => {
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [readNotifications, setReadNotifications] = useState([]);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  let userType = auth.getUserFromLocalCache();
 
 
   const handleToggle = () => {
@@ -146,6 +148,7 @@ const NotificationSection = () => {
 
   return (
     <>
+      {userType !== "CLIENT" && (
       <Box
         sx={{
           ml: 2,
@@ -181,6 +184,7 @@ const NotificationSection = () => {
           </Badge>
         </ButtonBase>
       </Box>
+          )}
       <Popper
         placement={matchesXs ? 'bottom' : 'bottom-end'}
         open={open}

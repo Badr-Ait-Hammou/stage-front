@@ -53,7 +53,7 @@ const FirebaseLogin = ({ ...others }) => {
     try {
       const user = await AuthService.login(email, password);
       if (user === "CLIENT") {
-        navigate('/client/client_projects');
+        navigate('/visumine/client_projects');
         window.location.reload();
       } else {
         navigate('/visumine/projects');

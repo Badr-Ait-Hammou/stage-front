@@ -32,13 +32,12 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-//import UpgradePlanCard from './UpgradePlanCard';
-//import User1 from 'assets/images/users/user-round.svg';
 
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
 //=======LOGOUT IMPORT===============//
-import {logout} from "../../../../routes/auth";
+import {auth, logout} from "../../../../routes/auth";
+import axios from "../../../../utils/axios";
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -46,12 +45,18 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const navigate = useNavigate();
-
-    //const [sdm, setSdm] = useState(true);
     const [value, setValue] = useState('');
-    //const [notification, setNotification] = useState(false);
+    const [user, setUser] = useState([]);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
+    const [id, setId] = useState(parseInt(auth.getTokenInfo().sub));
+
+    useEffect(() => {
+        console.log(id);
+        axios.get(`/api/users/${id}`).then((response) => {
+            setUser(response.data);
+        });
+    }, [id]);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
@@ -160,10 +165,9 @@ const ProfileSection = () => {
                                             <Stack direction="row" spacing={0.5} alignItems="center">
                                                 <Typography variant="h4">Good Morning,</Typography>
                                                 <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                    User
-                                                </Typography>
+                                                    {user && user.username}                                                </Typography>
                                             </Stack>
-                                            <Typography variant="subtitle2">Project Admin</Typography>
+                                            <Typography variant="subtitle2">Project {user && user.role}</Typography>
                                         </Stack>
                                         <OutlinedInput
                                             sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}

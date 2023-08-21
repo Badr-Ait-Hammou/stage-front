@@ -53,6 +53,7 @@ const ManagerRoute = {
         },
       ]
     },
+
     {
       path: 'annotation',
       element: <Annotation />

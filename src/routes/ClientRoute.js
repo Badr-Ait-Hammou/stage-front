@@ -3,9 +3,9 @@ import React from 'react';
 import MainLayout from '../layout/MainLayout';
 import ImageDetail from '../component/ImageDetail';
 import ProjectComment from '../ac_client/ProjectComment';
-
+import MyProfile from "../component/Profile"
 const ClientRoute = {
-  path: "client",
+  path: "visumine",
   element: (
     <React.Fragment>
        <MainLayout />,
@@ -23,6 +23,10 @@ const ClientRoute = {
     {
       path: 'client_projects/project_comment/:id',
       element: <ProjectComment />
+    },
+    {
+      path: 'profile',
+      element: <MyProfile />
     }
   ]
 };
