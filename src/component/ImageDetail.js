@@ -6,6 +6,7 @@ import MainCard from "../ui-component/cards/MainCard";
 import {IoAddOutline, IoRefreshOutline, IoRemoveOutline} from "react-icons/io5";
 import { Grid } from "@mui/material";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import BubbleChartIcon from "@mui/icons-material/BubbleChart";
 
 export default function ImageDetail() {
     const { id } = useParams();
@@ -28,7 +29,8 @@ export default function ImageDetail() {
 
 
     return (
-        <MainCard title="Detail">
+            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {image && image.name ? ` ${image.name.toUpperCase()} EDITOR` : 'img'} </div>} >
+
             <div style={{ position: "relative" }}>
                 <div
                     style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}

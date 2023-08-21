@@ -50,11 +50,11 @@ export default function Projects() {
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
-    const dt = useRef(null);
     const [clientId, setClientId] = useState("");
     const [resultId, setResultId] = useState("");
     const [clients, setClient] = useState([]);
     const [results, setResults] = useState([]);
+    const dt = useRef(null);
     const [dataTableLoaded, setDataTableLoaded] = useState(false);
     const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
     //const projectsWithPhotos = project.filter(rowData => rowData.images && rowData.images.length);

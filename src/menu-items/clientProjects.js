@@ -12,7 +12,7 @@ const clientProjects = {
     children: [
         {
             id: 'clientprojects',
-            title: 'Projects',
+            title: 'My Projects',
             type: 'item',
             url: '/visumine/client_projects',
             icon: icons.IconBrandMiniprogram,

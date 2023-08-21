@@ -101,7 +101,6 @@ export default function Information() {
 
     const handleUpdate = (event) => {
         event.preventDefault();
-
         const requestData = {
             id:company.id,
             name :name,
@@ -121,7 +120,6 @@ export default function Information() {
         axios.post("/api/company/", requestData)
             .then((response) => {
                 console.log("API Response:", response.data);
-
                 loadCompany();
                 showupdate();
             })
@@ -145,7 +143,6 @@ export default function Information() {
         axios.get(`/api/company/getfirst`).then((response) => {
             const companyData = response.data;
             setCompany(companyData);
-
 
             if (!name && companyData) setName(companyData.name);
             if (!address && companyData) setAddress(companyData.address);
@@ -174,7 +171,7 @@ export default function Information() {
     };
 
     return (
-            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company.name} COMPANY PROFILE </div>} >
+            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company && company.name ? ` ${company.name.toUpperCase()} COMPANY PROFILE` : 'SARL'} </div>} >
 
             <Toast ref={toast} />
 

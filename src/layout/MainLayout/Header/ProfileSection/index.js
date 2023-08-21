@@ -165,9 +165,10 @@ const ProfileSection = () => {
                                             <Stack direction="row" spacing={0.5} alignItems="center">
                                                 <Typography variant="h4">Good Morning,</Typography>
                                                 <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                    {user && user.username}                                                </Typography>
+                                                    {user && user.username}
+                                                </Typography>
                                             </Stack>
-                                            <Typography variant="subtitle2">Project {user && user.role}</Typography>
+                                            <Typography variant="subtitle2">{user && user.role} Space</Typography>
                                         </Stack>
                                         <OutlinedInput
                                             sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
