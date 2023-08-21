@@ -10,7 +10,9 @@ import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import Addphoto from "../assets/images/add photo.png";
 import {auth} from "../routes/auth";
-import {Typography} from "@mui/material";
+import {TextField, Typography} from "@mui/material";
+import PersonPinIcon from '@mui/icons-material/PersonPin';
+
 
 
 const SmallAvatar = styled(Avatar)(({ theme }) => ({
@@ -77,6 +79,7 @@ export default function Profile() {
             });
     };
 
+
     /***********************Toasts **************/
 
     const showupdate = () => {
@@ -98,7 +101,7 @@ export default function Profile() {
 
 
     return (
-        <MainCard >
+        <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}><PersonPinIcon /> {user.username}'s Profile </div>} >
             <Toast ref={toast} />
 
 
@@ -133,7 +136,7 @@ export default function Profile() {
                             </Box>
                         </label>
                         <strong
-                            className="my-3 font-serif mt-5"><i className="mx-2 pi pi-building "></i>
+                            className="my-3 font-serif mt-5"><i className="mx-2 pi pi-user "></i>
                             { user ? user.username || 'username' : 'username'}
                         </strong>
 
@@ -158,22 +161,27 @@ export default function Profile() {
 
             <Box className="card flex flex-column md:flex-row gap-3">
                 <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon" >
-                    <i style={{fontSize:"12px"}}>userName</i>
-                </span>
-                    <InputText placeholder={user ? user.username ||'username' : 'UserName'}
-                               value={username}
-                               onChange={(e) => setUserName(e.target.value)}
+                    <TextField
+                        fullWidth
+                        value={username}
+                        onChange={(e) => setUserName(e.target.value)}
+                        label={
+                            user && user.username
+                                ? `UserName : ${user.username}`
+                                : 'UserName'
+                        }
                     />
                 </div>
-
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i>FirstName</i>
-                    </span>
-                    <InputText placeholder={ user ? user.firstName ||'firstName' : 'firstName'}
-                               value={firstName}
-                               onChange={(e) => setFirstName(e.target.value)}
+                    <TextField
+                        fullWidth
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        label={
+                            user && user.firstName
+                                ? `FirstName : ${user.firstName}`
+                                : 'FirstName'
+                        }
                     />
                 </div>
 
@@ -185,23 +193,28 @@ export default function Profile() {
 
             <Box className="card flex flex-column md:flex-row gap-3 mt-2">
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i style={{fontSize:"12px"}}>LastName</i>
-                    </span>
-                    <InputText placeholder={ user ? user.lastName || 'lastName' : 'lastName'}
-                               value={lastName}
-                               onChange={(e) => setLastName(e.target.value)}
+                    <TextField
+                        fullWidth
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        label={
+                            user && user.lastName
+                                ? `LastName : ${user.lastName}`
+                                : 'LastName'
+                        }
                     />
                 </div>
 
                 <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i style={{fontSize:"12px"}} >Phone</i>
-                </span>
-                    <InputText placeholder={ user ? user.tel || 'phone' : 'PHONE'}
-                               value={tel}
-                               onChange={(e) => settel(e.target.value)}
-                    />
+                    <TextField
+                        fullWidth
+                        value={tel}
+                        onChange={(e) => settel(e.target.value)}
+                        label={
+                            user && user.tel
+                                ? `Phone : ${user.tel}`
+                                : 'Phone'
+                        }                    />
                 </div>
 
             </Box>

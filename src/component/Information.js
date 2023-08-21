@@ -9,6 +9,7 @@ import {styled} from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import Addphoto from "../assets/images/add photo.png";
+import BubbleChartIcon from '@mui/icons-material/BubbleChart';
 
 
 const SmallAvatar = styled(Avatar)(({ theme }) => ({
@@ -173,7 +174,8 @@ export default function Information() {
     };
 
     return (
-        <MainCard >
+            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company.name.toUpperCase()} COMPANY PROFILE </div>} >
+
             <Toast ref={toast} />
 
 

@@ -146,6 +146,11 @@ export default function Projects() {
                 setSelectedPageComments(res.data.slice(0, cardsPerPage));
                 setSelectedProjectId(projectId);
                 setCurrentPage(0);
+                // Scroll to the comments section
+                const commentsSection = document.getElementById('comments-section');
+                if (commentsSection) {
+                    commentsSection.scrollIntoView({ behavior: 'smooth' });
+                }
             }
         } catch (error) {
             console.error("Failed to load comments for the project with ID: ", projectId);
@@ -594,8 +599,10 @@ export default function Projects() {
                             >   {rowData.name}
                             </Link>)}></Column>
 
-                        <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
-                        <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
+                        <Column header="Client" field="user.username"
+                                filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '18rem' }} body={(rowData) => rowData.user ? `${rowData.user.username} -- ${rowData.user.email}` : ''
+                        }></Column>
+                        <Column field="description" header="Description" sortable style={{ minWidth: '15em' }}></Column>
                         <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '18rem' }} ></Column>
                         <Column field="result.file" header="file" filter body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>
                         <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
@@ -618,7 +625,7 @@ export default function Projects() {
                     <PopularCart/>
                 )}
 
-                <Grid item  xs={12} className="mt-5" >
+                <Grid item xs={12} id="comments-section" className="mt-5">
 
                     <strong>Comments:</strong>
                     {project.map((project) => (
@@ -764,7 +771,10 @@ export default function Projects() {
                     <Dropdown
                         style={{marginTop:"5px"}}
                         value={clientId}
-                        options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
+                        options={clients.map((client) => ({
+                            label: `${client.username} -- ${client.email}`
+                            , value: client.id
+                        }))}
                         onChange={(e) => setClientId(e.value)}
                         placeholder="Select a client"
                     />
@@ -816,8 +826,10 @@ export default function Projects() {
                     <Dropdown
                         style={{marginTop:"5px"}}
                         value={clientId}
-                        options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
-                        onChange={(e) => setClientId(e.value)}
+                        options={clients.map((client) => ({
+                            label: `${client.username} -- ${client.email}`
+                            , value: client.id
+                        }))}                        onChange={(e) => setClientId(e.value)}
                         placeholder="Select a client"
                     />  </div>
 
@@ -861,8 +873,10 @@ export default function Projects() {
                     <Dropdown
                         style={{marginTop:"5px"}}
                         value={clientId}
-                        options={clients.map((client) => ({ label: client.firstName, value: client.id }))}
-                        onChange={(e) => setClientId(e.value)}
+                        options={clients.map((client) => ({
+                            label: `${client.username} -- ${client.email}`
+                            , value: client.id
+                        }))}                        onChange={(e) => setClientId(e.value)}
                         placeholder="Select a client"
                     />  </div>
 
@@ -884,53 +898,6 @@ export default function Projects() {
 
 
         </div>
-            {/*
-            <div className="card">
-
-                <Toolbar className="mb-4" start={leftToolbarTemplate} center={centerToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
-                {dataTableLoaded ? (
-                <DataTable ref={dt} value={projectsWithPhotos}
-                           dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
-                           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} image projects" globalFilter={globalFilter} header={header}>
-                    <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                        <Link className="font-bold" to={`project_details/${rowData.id}`}>{rowData.name}</Link>
-                    )}></Column>
-                    <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
-                    <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '18rem' }} ></Column>
-                    <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
-                    <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
-                    <Column  header="Action" body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
-                </DataTable>
-                ) : (
-                    <PopularCart/>
-                )}
-            </div>
-
-
-            <div className="card mt-5">
-                {dataTableLoaded ? (
-                    <DataTable ref={dt} value={projectsWithFiles}
-                               dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
-                               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} template projects" globalFilter={globalFilter} header={header}>
-                        <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                        <Column field="name" header="Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
-                            <Link className="font-bold" to={`project_detailsDoc/${rowData.id}`}>{rowData.name}</Link>
-                        )}></Column>
-                        <Column header="Result File" body={resultFileBodyTemplate} style={{ minWidth: '12rem' }} />
-                        <Column field="result.name" header="Template Name" sortable style={{ minWidth: '10rem' }} />
-                        <Column field="description" header="Description" sortable style={{ minWidth: '10em' }}></Column>
-                        <Column  field="user.firstName" header="Client" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
-                        <Column field="dateCreation" header="Creation_Date" sortable sortField="dateCreation" style={{ minWidth: "10rem" }}></Column>
-                        <Column  header="Action" body={actionPhotoBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
-                    </DataTable>
-                ) : (
-                    <PopularCart/>
-                )}
-            </div>
-            */}
 
             <Dialog
                 visible={showDialog}
