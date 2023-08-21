@@ -1,6 +1,7 @@
-// assets
-import { IconTypography, IconPalette, IconShadow, IconWindmill,IconBrandMiniprogram,IconDownload,IconUserPlus } from '@tabler/icons';
-// constant
+import { IconTypography, IconPalette, IconShadow, IconWindmill, IconBrandMiniprogram, IconDownload, IconUserPlus } from '@tabler/icons';
+import { auth } from "../routes/auth";
+/*
+// Constant
 const icons = {
   IconTypography,
   IconPalette,
@@ -10,95 +11,60 @@ const icons = {
   IconDownload,
   IconUserPlus
 };
+*/
+const filterMenuItems = (user) => {
+  const utilities = {
+    id: 'utilities',
+    title: 'Utilities',
+    type: 'group',
+    children: [
+      {
+        id: 'storage',
+        title: 'Storage',
+        type: 'item',
+        url: '/visumine/storage',
+        icon: IconDownload,
+        breadcrumbs: false,
+      },
+      {
+        id: 'chart',
+        title: 'Chart',
+        type: 'item',
+        url: '/visumine/chart',
+        icon: IconTypography,
+        breadcrumbs: false,
+      },
+      {
+        id: 'addUser',
+        title: 'Add_User',
+        type: 'item',
+        url: '/admin/addUser',
+        icon: IconUserPlus,
+        breadcrumbs: false,
+      },
+      {
+        id: 'addClient',
+        title: 'Add_Client',
+        type: 'item',
+        url: '/visumine/addClient',
+        icon: IconUserPlus,
+        breadcrumbs: false,
+      },
+    ],
+  };
 
-// ==============================|| UTILITIES MENU ITEMS ||============================== //
+  if (user === "MANAGER") {
+    utilities.children = utilities.children.filter(item => item.id !== 'addUser');
+  } else if (user === "ADMIN") {
+    utilities.children = utilities.children.filter(item => item.id !== 'addClient');
+  }
 
-const utilities = {
-  id: 'utilities',
-  title: 'Utilities',
-  type: 'group',
-  children: [
-    {
-      id: 'storage',
-      title: 'Storage',
-      type: 'item',
-      url: '/visumine/storage',
-      icon: icons.IconDownload,
-      breadcrumbs: false
-    },{
-      id: 'chart',
-      title: 'Chart',
-      type: 'item',
-      url: '/visumine/chart',
-      icon: icons.IconTypography,
-      breadcrumbs: false
-    },
-    {
-      id: 'addUser',
-      title: 'Add_User',
-      type: 'item',
-      url: '/admin/addUser',
-      icon: icons.IconUserPlus,
-      breadcrumbs: false
-    },
-    {
-      id: 'addClient',
-      title: 'Add_Client',
-      type: 'item',
-      url: '/visumine/addClient',
-      icon: icons.IconUserPlus,
-      breadcrumbs: false
-    },
-
-    /*{
-      id: 'util-typography',
-      title: 'Typography',
-      type: 'item',
-      url: '/utils/util-typography',
-      icon: icons.IconTypography,
-      breadcrumbs: false
-    },
-    {
-      id: 'util-color',
-      title: 'Color',
-      type: 'item',
-      url: '/utils/util-color',
-      icon: icons.IconPalette,
-      breadcrumbs: false
-    },
-    {
-      id: 'util-shadow',
-      title: 'Shadow',
-      type: 'item',
-      url: '/utils/util-shadow',
-      icon: icons.IconShadow,
-      breadcrumbs: false
-    },
-    {
-      id: 'icons',
-      title: 'Icons',
-      type: 'collapse',
-      icon: icons.IconWindmill,
-      children: [
-        {
-          id: 'tabler-icons',
-          title: 'Tabler Icons',
-          type: 'item',
-          url: '/icons/tabler-icons',
-          breadcrumbs: false
-        },
-        {
-          id: 'material-icons',
-          title: 'Material Icons',
-          type: 'item',
-          external: true,
-          target: '_blank',
-          url: 'https://mui.com/material-ui/material-icons/',
-          breadcrumbs: false
-        }
-      ]
-    }*/
-  ]
+  return utilities;
 };
+
+// Initialize user and utilities
+let user = auth.getUserFromLocalCache();
+console.log("User from local cache:", user);
+let utilities = filterMenuItems(user);
 
 export default utilities;

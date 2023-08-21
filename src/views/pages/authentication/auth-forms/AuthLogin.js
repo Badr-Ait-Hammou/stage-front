@@ -26,9 +26,8 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import AuthService from '../../../../routes/AuthService';
-import { useNavigate, useRoutes } from 'react-router-dom';
-import AdminRoute from '../../../../routes/AdminRoute';
-import ClientRoute from '../../../../routes/ClientRoute';
+import { useNavigate } from 'react-router-dom';
+
 
 
 // ============================|| FIREBASE - LOGIN ||============================ //
@@ -57,10 +56,14 @@ const FirebaseLogin = ({ ...others }) => {
     try {
       const user = await AuthService.login(email, password);
 
-      if (user == "CLIENT") {
+      if (user === "CLIENT") {
         navigate('/client/client_projects');
+        window.location.reload();
+
       } else {
         navigate('/visumine/projects');
+        window.location.reload();
+
       }
     } catch (error) {
       console.error("An error occurred:", error);
@@ -120,7 +123,7 @@ const FirebaseLogin = ({ ...others }) => {
         {({ errors, handleBlur, handleChange, isSubmitting, touched, values }) => (
           <form noValidate  {...others}>
             <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-email-login">Email Address </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 type="email"

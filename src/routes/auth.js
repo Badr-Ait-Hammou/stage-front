@@ -45,7 +45,6 @@ const register = async (name, email, password) => {
 export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href="/";
   setAuthToken(null);
 }
 

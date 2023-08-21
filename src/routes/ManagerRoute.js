@@ -86,6 +86,18 @@ const ManagerRoute = {
       element: <TempDetails />
     },
     {
+      path: 'project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'project_detailsExcel/:id',
+      element: <ProjectDetailsCsv />
+    },
+    {
+      path: 'project_details/:id',
+      element: <ProjectDetails />
+    },
+    {
       path: 'template/template_detailsExcel/:id',
       element: <TempDetailsExcel />
     },

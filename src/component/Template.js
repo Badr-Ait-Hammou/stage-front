@@ -112,9 +112,9 @@ export default function Template() {
             console.log("Navigation will be executed");
 
             if (response.data.type === "doc") {
-                navigate(`/app/template/template_details/${response.data.id}`);
+                navigate(`/visumine/template/template_details/${response.data.id}`);
             } else {
-                navigate(`/app/template/template_detailsExcel/${response.data.id}`);
+                navigate(`/visumine/template/template_detailsExcel/${response.data.id}`);
             }
         }).catch((error) => {
             console.error("Error while saving file:", error);
@@ -210,7 +210,7 @@ const saveAllFieldsWithResult = async () => {
         }
         showusave();
 
-        navigate(`/app/template/template_detailsExcel/${resultResponse.data.id}`);
+        navigate(`/visumine/template/template_detailsExcel/${resultResponse.data.id}`);
 
         console.log("Fields and result saved successfully!");
 
@@ -436,82 +436,6 @@ const rightToolbarTemplate = () => {
 
 /************************************************  Upload new file / delete all  the old fields "using Promise" and create the new files fields**********************************/
 
-
-
-const handlefileChange3 = async (event) => {
-    const files = event.files;
-
-    if (files && files.length > 0) {
-        const file = files[0];
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const fileContent = e.target.result;
-            console.log('FileReader Output:', fileContent);
-
-            const lines = fileContent.split('\n');
-            const firstRow = lines[0].split(',');
-            console.log('First Row Attributes:', firstRow);
-
-            const nonEmptyAttributes = firstRow.filter(
-                (attribute) => attribute.trim() !== '' && attribute.trim() !== '""'
-            );
-            console.log('Non-Empty Attributes:', nonEmptyAttributes);
-
-            try {
-
-                const deletePromises = fields.map((field) =>
-                    axios.delete(`/api/field/${field.id}`)
-                );
-
-                await Promise.all(deletePromises);
-
-                console.log("Old fields deleted successfully.");
-
-                const resultId = selectedResult?.id || id;
-                const csvDataUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(fileContent)}`;
-
-                if (selectedResult) {
-                    const updatedResult = {
-                        ...selectedResult,
-                        file: csvDataUrl,
-                    };
-
-                    await axios.put(`/api/result/${selectedResult.id}`, updatedResult);
-                    setResult(updatedResult);
-                } else {
-                    const newResult = {
-                        name: name,
-                        file: csvDataUrl,
-                        description: description,
-                        type: 'excel',
-                    };
-                    const resultResponse = await axios.post('/api/result/save', newResult);
-                    setResult(resultResponse.data);
-                }
-
-                for (const attribute of nonEmptyAttributes) {
-                    const trimmedAttribute = attribute.trim();
-                    const fieldToSave = {
-                        namef: trimmedAttribute.replace(/"/g, ''),
-                        fieldid: trimmedAttribute.replace(/"/g, '').toUpperCase(),
-                        type: 'text',
-                        result: {id: resultId},
-                    };
-                    await axios.post('/api/field/save', fieldToSave);
-                }
-
-                loadResult();
-                loadFields();
-
-                console.log('New fields and result saved successfully!');
-            } catch (error) {
-                console.error('Error while updating result and saving new fields:', error);
-            }
-        };
-        reader.readAsText(file);
-    }
-};
 
 
 return (

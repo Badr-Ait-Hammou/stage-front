@@ -22,8 +22,6 @@ import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
 import Template from "../component/Template"
-import ExcelFile from '../component/ExcelFile';
-import PdfFile from '../component/PdfFile';
 import Profile from '../component/Profile';
 import Adduser from "../ac_admin/AddUser"
 import AddClient from "../ac_manager/AddClient"
@@ -119,6 +117,18 @@ const AdminRoute = {
     {
       path: 'all_comments/project_detailsDoc/:id',
       element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'project_detailsDoc/:id',
+      element: <ProjectDetailsDoc />
+    },
+    {
+      path: 'project_detailsExcel/:id',
+      element: <ProjectDetailsCsv />
+    },
+    {
+      path: 'project_details/:id',
+      element: <ProjectDetails />
     },
     {
       path: 'all_comments/project_details/:id',
