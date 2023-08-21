@@ -2,7 +2,6 @@ import React, {useState,useEffect,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import { Button } from 'primereact/button';
 import {Box} from "@mui/system";
-import { InputText } from "primereact/inputtext";
 import axios from "../utils/axios";
 import {Toast} from "primereact/toast";
 import {styled} from "@mui/material/styles";
@@ -27,7 +26,6 @@ export default function Profile() {
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
     const [username, setUserName] = useState('');
     const [tel, settel] = useState('');
     const [user,setUser]=useState([]);
@@ -41,8 +39,9 @@ export default function Profile() {
         console.log(id);
         axios.get(`/api/users/${id}`).then((response) => {
             setUser(response.data);
-            console.log(getInitials());
+            loadUser();
         });
+
     }, [id]);
 
 
@@ -61,7 +60,7 @@ export default function Profile() {
             firstName  :firstName || user.firstName,
             lastName : lastName || user.lastName,
             username : username || user.username,
-            email:email,
+            email:user.email,
             tel :tel || user.tel,
             role:user.role,
             password:user.password,
@@ -89,13 +88,13 @@ export default function Profile() {
 
     const loadUser = async () => {
         axios.get(`/api/users/${id}`).then((response) => {
-            setUser(response.data);
+            const userData= response.data;
+            setUser(userData);
 
-            if (!firstName && user) setFirstName(user.firstName);
-            if (!lastName && user) setLastName(user.lastName);
-            if (!username && user) setUserName(user.username);
-            if (!tel && user) settel(user.tel);
-            if (!email && user) setEmail(user.email);
+            if (!firstName && userData) setFirstName(userData.firstName);
+            if (!lastName && userData) setLastName(userData.lastName);
+            if (!username && userData) setUserName(userData.username);
+            if (!tel && userData) settel(userData.tel);
         });
     };
 
@@ -110,19 +109,19 @@ export default function Profile() {
                     <Box className=" text-center">
                         <label htmlFor="uploadImage">
                             <Box style={{ alignItems: "center", justifyContent: 'center', display: "flex",marginBottom:"8px" }}>
-                                    <Badge
+                                <Badge
 
-                                        overlap="circular"
-                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                        badgeContent={
-                                            <SmallAvatar  alt="Remy Sharp" src={Addphoto}  />
-                                        }
+                                    overlap="circular"
+                                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                    badgeContent={
+                                        <SmallAvatar  alt="Remy Sharp" src={Addphoto}  />
+                                    }
+                                >
+
+                                    <Avatar
+                                        style={{ width: '150px', height: '145px', cursor: 'pointer', alignItems: "center", justifyContent: "center" }}
                                     >
-
-                                        <Avatar
-                                            style={{ width: '150px', height: '145px', cursor: 'pointer', alignItems: "center", justifyContent: "center" }}
-                                        >
-                                            <Typography
+                                        <Typography
                                             variant="h1"
                                             style={{
                                                 fontWeight: 'bold',
@@ -131,8 +130,8 @@ export default function Profile() {
                                         >
                                             {getInitials()}
                                         </Typography>
-                                        </Avatar>
-                                    </Badge>
+                                    </Avatar>
+                                </Badge>
                             </Box>
                         </label>
                         <strong
@@ -151,7 +150,7 @@ export default function Profile() {
                         <Box className="card">
                             <div className="d-flex justify-content-center mb-2">
 
-                                        <Button label="Update" severity="info" raised onClick={handleUpdate} />
+                                <Button label="Update" severity="info" raised onClick={handleUpdate} />
 
                             </div>
                         </Box>
@@ -162,26 +161,21 @@ export default function Profile() {
             <Box className="card flex flex-column md:flex-row gap-3">
                 <div className="p-inputgroup flex-1">
                     <TextField
-                        fullWidth
+                        label="UserName"
                         value={username}
+                        placeholder={user ? user.username ||'username' : 'UserName'}
                         onChange={(e) => setUserName(e.target.value)}
-                        label={
-                            user && user.username
-                                ? `UserName : ${user.username}`
-                                : 'UserName'
-                        }
+                        fullWidth
+
                     />
                 </div>
                 <div className="p-inputgroup flex-1">
                     <TextField
                         fullWidth
+                        label="firstName"
                         value={firstName}
+                        placeholder={ user ? user.firstName ||'firstName' : 'firstName'}
                         onChange={(e) => setFirstName(e.target.value)}
-                        label={
-                            user && user.firstName
-                                ? `FirstName : ${user.firstName}`
-                                : 'FirstName'
-                        }
                     />
                 </div>
 
@@ -195,26 +189,21 @@ export default function Profile() {
                 <div className="p-inputgroup flex-1">
                     <TextField
                         fullWidth
+                        label="lastName"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        label={
-                            user && user.lastName
-                                ? `LastName : ${user.lastName}`
-                                : 'LastName'
-                        }
+                        placeholder={ user ? user.lastName || 'lastName' : 'lastName'}
                     />
                 </div>
 
                 <div className="p-inputgroup flex-1">
                     <TextField
                         fullWidth
+                        label="PHONE"
                         value={tel}
                         onChange={(e) => settel(e.target.value)}
-                        label={
-                            user && user.tel
-                                ? `Phone : ${user.tel}`
-                                : 'Phone'
-                        }                    />
+                        placeholder={ user ? user.tel || 'phone' : 'PHONE'}
+                    />
                 </div>
 
             </Box>

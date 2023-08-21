@@ -2,7 +2,6 @@ import React, {useState,useEffect,useRef} from "react";
 import MainCard from "../ui-component/cards/MainCard";
 import { Button } from 'primereact/button';
 import {Box} from "@mui/system";
-import { InputText } from "primereact/inputtext";
 import axios from "../utils/axios";
 import {Toast} from "primereact/toast";
 import {styled} from "@mui/material/styles";
@@ -10,6 +9,7 @@ import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import Addphoto from "../assets/images/add photo.png";
 import BubbleChartIcon from '@mui/icons-material/BubbleChart';
+import {TextField} from "@mui/material";
 
 
 const SmallAvatar = styled(Avatar)(({ theme }) => ({
@@ -174,7 +174,7 @@ export default function Information() {
     };
 
     return (
-            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company.name.toUpperCase()} COMPANY PROFILE </div>} >
+            <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company.name} COMPANY PROFILE </div>} >
 
             <Toast ref={toast} />
 
@@ -229,51 +229,24 @@ export default function Information() {
                 </Box>
             </Box>
 
-            <Box className="card flex flex-column md:flex-row gap-3">
+            <Box className="card flex flex-column md:flex-row gap-3 mt-7">
                 <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon" >
-                    <i style={{fontSize:"12px"}}>Name</i>
-                </span>
-                    <InputText placeholder={company ? company.name ||'name' : 'NAME'}
-                               value={name}
-                               onChange={(e) => setName(e.target.value)}
+                    <TextField
+                        label="Name"
+                        placeholder={company ? company.name ||'name' : 'NAME'}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        fullWidth
                     />
                 </div>
 
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i>Address</i>
-                    </span>
-                    <InputText placeholder={ company ? company.address ||'address' : 'ADDRESS'}
-                               value={address}
-                               onChange={(e) => setAddress(e.target.value)}
-                    />
-                </div>
-
-            </Box>
-
-
-
-
-
-            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i style={{fontSize:"12px"}}>WebSite</i>
-                    </span>
-                    <InputText placeholder={ company ? company.webSite || 'website' : 'WEBSITE'}
-                               value={webSite}
-                               onChange={(e) => setWebSite(e.target.value)}
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i style={{fontSize:"12px"}} >Phone</i>
-                </span>
-                    <InputText placeholder={ company ? company.phone || 'phone' : 'PHONE'}
-                               value={phone}
-                               onChange={(e) => setPhone(e.target.value)}
+                    <TextField
+                        label="ADDRESS"
+                        placeholder={ company ? company.address ||'address' : 'ADDRESS'}
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        fullWidth
                     />
                 </div>
 
@@ -283,84 +256,111 @@ export default function Information() {
 
 
 
-            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i >Fax</i>
-                    </span>
-                    <InputText placeholder={ company ? company.fax || 'fax' : 'FAX'}
-                               value={fax}
-                               onChange={(e) => setFax(e.target.value)}
+
+                    <TextField
+                        label="WEBSITE"
+                        placeholder={ company ? company.webSite || 'website' : 'WEBSITE'}
+                        value={webSite}
+                        onChange={(e) => setWebSite(e.target.value)}
+                        fullWidth
                     />
                 </div>
 
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i >Email</i>
-
-                    </span>
-                    <InputText placeholder={ company ? company.email || 'email' : 'Email'}
-                               value={email}
-                               onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-
-
-            </Box>
-
-
-            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
-                <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i >I.F</i>
-                </span>
-                    <InputText placeholder={ company ? company.valIf || 'if' : 'I.F'}
-                               value={valIf }
-                               onChange={(e) => setvalIf(e.target.value)}
-                    />
-                </div>
-
-                <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i >Cnss</i>
-                    </span>
-                    <InputText placeholder={company ? company.valCnss || 'val cnss': 'CNSS'}
-                               value={valCnss}
-                               onChange={(e) => setValcnss(e.target.value)}
+                    <TextField
+                        label="PHONE"
+                        placeholder={ company ? company.phone || 'phone' : 'PHONE'}
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        fullWidth
                     />
                 </div>
 
             </Box>
 
 
-            <Box className="card flex flex-column md:flex-row gap-3 mt-2">
+
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
                 <div className="p-inputgroup flex-1">
-                <span className="p-inputgroup-addon">
-                    <i >R.C</i>
-                </span>
-                    <InputText placeholder={company ? company.valRc || 'valRc': 'R.C'}
-                               value={valRc}
-                               onChange={(e) => setValRc(e.target.value)}
+                    <TextField
+                        label="FAX"
+                        placeholder={ company ? company.fax || 'fax' : 'FAX'}
+                        value={fax}
+                        onChange={(e) => setFax(e.target.value)}
+                        fullWidth
                     />
                 </div>
 
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i style={{fontSize:"16px"}}>I.C.E</i>
-                    </span>
-                    <InputText placeholder={company ? company.valIce || 'valIce' : 'I.C.E'}
-                               value={valIce}
-                               onChange={(e) => setValIce(e.target.value)}
+                    <TextField
+                        label="Email"
+                        placeholder={ company ? company.email || 'email' : 'Email'}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        fullWidth
+                    />
+                </div>
+
+            </Box>
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
+                <div className="p-inputgroup flex-1">
+                    <TextField
+                        label="I.F"
+                        placeholder={ company ? company.valIf || 'if' : 'I.F'}
+                        value={valIf }
+                        onChange={(e) => setvalIf(e.target.value)}
+                        fullWidth
                     />
                 </div>
 
                 <div className="p-inputgroup flex-1">
-                    <span className="p-inputgroup-addon">
-                        <i >Patente</i>
-                    </span>
-                    <InputText placeholder={ company ? company.valPatente || 'patente' : 'PATENTE'}
-                               value={valPatente}
-                               onChange={(e) => setValPatente(e.target.value)}
+                    <TextField
+                        label="CNSS"
+                        placeholder={company ? company.valCnss || 'val cnss': 'CNSS'}
+                        value={valCnss}
+                        onChange={(e) => setValcnss(e.target.value)}
+                        fullWidth
+                    />
+                </div>
+
+            </Box>
+
+
+            <Box className="card flex flex-column md:flex-row gap-3 mt-5">
+                <div className="p-inputgroup flex-1">
+                    <TextField
+                        label="R.C"
+                        placeholder={company ? company.valRc || 'valRc': 'R.C'}
+                        value={valRc}
+                        onChange={(e) => setValRc(e.target.value)}
+                        fullWidth
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+                    <TextField
+                        label="I.C.E"
+                        placeholder={company ? company.valIce || 'valIce' : 'I.C.E'}
+                        value={valIce}
+                        onChange={(e) => setValIce(e.target.value)}
+                        fullWidth
+                    />
+                </div>
+
+                <div className="p-inputgroup flex-1">
+
+                    <TextField
+                        label="PATENTE"
+                        placeholder={ company ? company.valPatente || 'patente' : 'PATENTE'}
+                        value={valPatente}
+                        onChange={(e) => setValPatente(e.target.value)}
+                        fullWidth
                     />
                 </div>
             </Box>
