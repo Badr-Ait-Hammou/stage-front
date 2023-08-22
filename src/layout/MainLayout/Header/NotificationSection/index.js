@@ -289,7 +289,7 @@ const NotificationSection = () => {
                                       <ListItemText primary={<Typography variant="subtitle1">{notification.user.username.charAt(0).toUpperCase() + notification.user.username.slice(1)}</Typography>} />
                                       <ListItemSecondaryAction>
                                         <Grid item xs={12}  >
-                                          <Typography variant="subtitle2" >
+                                          <Typography variant="subtitle2" style={{fontSize:"10px"}}>
                                             {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
                                           </Typography>
                                         </Grid>
@@ -357,7 +357,7 @@ const NotificationSection = () => {
                                       <ListItemSecondaryAction>
                                         <Grid container justifyContent="flex-end">
                                           <Grid item xs={12}>
-                                            <Typography variant="caption" display="block">
+                                            <Typography variant="subtitle2" style={{fontSize:"10px"}}>
                                               {formatDistanceToNow(new Date(notification.commentDate), { addSuffix: true })}
                                             </Typography>
                                           </Grid>

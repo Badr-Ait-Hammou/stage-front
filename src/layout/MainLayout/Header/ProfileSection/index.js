@@ -157,12 +157,20 @@ const ProfileSection = () => {
                                     <Box sx={{ p: 2 }}>
                                         <Stack>
                                             <Stack direction="row" spacing={0.5} alignItems="center">
-                                                <Typography variant="h4">Good Morning,</Typography>
-                                                <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
+                                                <Typography variant="h4">Greetings,</Typography>
+                                                <Typography  variant="h4" sx={{ fontWeight: 400 }}>
                                                     {user && user.username}
                                                 </Typography>
                                             </Stack>
-                                            <Typography variant="subtitle2">{user && user.role} Space</Typography>
+
+                                            <Typography variant="h6"><Chip
+                                                label={`${user && user.role} Space`}
+                                                size="small"
+                                                sx={{
+                                                    bgcolor: theme.palette.info.light,
+                                                    color: theme.palette.background.default
+                                                }}
+                                            /></Typography>
                                         </Stack>
                                         <OutlinedInput
                                             sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
@@ -184,7 +192,7 @@ const ProfileSection = () => {
                                     </Box>
                                     <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
 
-                                        <Box sx={{ p: 2 }}>
+                                        <Box sx={{ p: 1 }}>
 
                                             <List
                                                 component="nav"
@@ -222,7 +230,7 @@ const ProfileSection = () => {
                                                                         label="01"
                                                                         size="small"
                                                                         sx={{
-                                                                            bgcolor: theme.palette.warning.dark,
+                                                                            bgcolor: theme.palette.error.main,
                                                                             color: theme.palette.background.default
                                                                         }}
                                                                     />
