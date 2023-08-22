@@ -605,8 +605,9 @@ export default function Projects() {
                             </Link>)}></Column>
 
                         <Column header="Client" field="user.username"
-                                filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '18rem' }} body={(rowData) => rowData.user ? `${rowData.user.username} -- ${rowData.user.email}` : ''
-                        }></Column>
+                                filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '18rem' }} body={(rowData) => rowData.user ? `${rowData.user.username} -- ${rowData.user.email}` : ''}>
+
+                        </Column>
                         <Column field="description" header="Description" sortable style={{ minWidth: '15em' }}></Column>
                         <Column field="photo" header="Photo" body={photoBodyTemplate} sortable style={{ minWidth: '18rem' }} ></Column>
                         <Column field="result.file" header="file" filter body={resultFileBodyTemplate} sortable style={{ minWidth: '10rem' }} ></Column>

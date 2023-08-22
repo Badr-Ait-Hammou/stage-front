@@ -135,6 +135,10 @@ const AdminRoute = {
       element: <ProjectDetails />
     },
     {
+      path: 'all_comments/project_detailsExcel/:id',
+      element: <ProjectDetailsCsv />
+    },
+    {
       path: 'projects/project_detailsDoc/:id',
       element: <ProjectDetailsDoc />
     },

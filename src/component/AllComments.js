@@ -200,7 +200,7 @@ export default function AllComments() {
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Comments" globalFilter={globalFilter} header={header}>
                     <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                    <Column field="projet" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '15rem' }}  body={(rowData) => (
+                    <Column field="projet.name" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '15rem' }}  body={(rowData) => (
                         <Link
                             className="font-bold"
                             to={rowData.projet.result && rowData.projet.result.type==="doc" ? `project_detailsDoc/${rowData.projet.id}` : rowData.projet.result && rowData.projet.result.type==="excel" ? `project_detailsExcel/${rowData.projet.id}` : `project_details/${rowData.projet.id}`}
@@ -208,7 +208,8 @@ export default function AllComments() {
                             {rowData.projet.name}
                         </Link>)}>
                     </Column>
-                    <Column header="Client" field="user.firstName" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '7rem' }} body={(rowData) => rowData.user?.firstName}></Column>
+                    <Column header="Client" field="user.email" filter filterPlaceholder="Search Client ..." sortable style={{ minWidth: '15rem' }}  body={(rowData) => rowData.user ? `${rowData.user.username} -- ${rowData.user.email}` : ''}
+                    ></Column>
                     <Column field="commentDate" header="Comment_Date" filter sortable sortField="commentDate"      body={(rowData) => formatDateTime(rowData.commentDate)} style={{ minWidth: "12rem" }}></Column>
                     <Column field="note" header="Comment" filter sortable style={{ minWidth: '15rem' }} ></Column>
                     <Column field="status" header="Status" filter sortable  body={statusBodyTemplate} style={{ minWidth: '5rem' }} ></Column>

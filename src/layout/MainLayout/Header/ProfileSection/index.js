@@ -54,9 +54,8 @@ const ProfileSection = () => {
             setUser(response.data);
         });
     }, [id]);
-    /**
-     * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-     * */
+
+
     const anchorRef = useRef(null);
     const handleLogout = () => {
         logout();
@@ -173,11 +172,10 @@ const ProfileSection = () => {
                                         </Stack>
 
                                     </Box>
+
                                     <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
 
-                                        <Box >
-                                            <Divider/>
-
+                                        <Box>
                                             <List
                                                 component="nav"
                                                 sx={{
@@ -194,6 +192,7 @@ const ProfileSection = () => {
                                                     }
                                                 }}
                                             >
+                                                <Divider/>
 
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
@@ -224,7 +223,6 @@ const ProfileSection = () => {
                                                     />
                                                 </ListItemButton>
                                                 <Divider/>
-
                                                 <ListItemButton
                                                     component={Link}
                                                     to="/"
@@ -232,6 +230,7 @@ const ProfileSection = () => {
                                                     selected={selectedIndex === 4}
                                                     onClick={handleLogout}
                                                 >
+
                                                     <ListItemIcon>
                                                         <IconLogout stroke={1.5} size="1.3rem" />
                                                     </ListItemIcon>
