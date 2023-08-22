@@ -116,18 +116,12 @@ const ProfileSection = () => {
                     }
                 }}
                 icon={
-                    <Avatar
+                    <Avatar>
+                        {user && user.firstName && user.lastName ?
+                            `${user.firstName.charAt(0).toUpperCase()}${user.lastName.charAt(0).toUpperCase()}` :
+                            '?'}
+                    </Avatar>
 
-                        sx={{
-                            ...theme.typography.mediumAvatar,
-                            margin: '8px 0 8px 8px !important',
-                            cursor: 'pointer'
-                        }}
-                        ref={anchorRef}
-                        aria-controls={open ? 'menu-list-grow' : undefined}
-                        aria-haspopup="true"
-                        color="inherit"
-                    />
                 }
                 label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
                 variant="outlined"

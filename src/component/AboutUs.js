@@ -64,7 +64,7 @@ export default function AboutUs() {
 
 
     return (
-        <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon /> {company.name} COMPANY PROFILE </div>} >
+        <MainCard title={<div style={{display:"flex",justifyContent:"center", alignItems:"center"}}> <BubbleChartIcon />About { company.name} </div>} >
             <Box className="card   md:flex-row ">
                 <Box className="card mb-4">
                     <Box className=" text-center">

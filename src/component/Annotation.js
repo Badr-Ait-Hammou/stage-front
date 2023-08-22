@@ -191,7 +191,7 @@ export default function Annotation() {
                 <div className="card flex  flex-wrap gap-3 mt-2" >
                     <div className="p-inputgroup flex-1">
                         <span className="p-inputgroup-addon">
-                            <i className="pi pi-user"></i>
+                            <i className="pi pi-search"></i>
                         </span>
                         <Dropdown
                             value={selectedProject}
@@ -238,10 +238,7 @@ export default function Annotation() {
                     <FilteredImagesGrid projects={filteredProjects}/>
                 </MainCard>
             </div>
-            <div className="mt-5">
-                <MainCard title="Download ">
-                </MainCard>
-            </div>
+
         </>
     );
 }

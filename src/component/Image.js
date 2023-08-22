@@ -28,7 +28,6 @@ import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
 
 export default function Image() {
 
-
     const [productDialog, setProductDialog] = useState(false);
     const [editproductDialog, seteditProductDialog] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -85,6 +84,11 @@ export default function Image() {
 
     const handleSubmit = (event) => {
         event?.preventDefault();
+
+        if (name.trim() === '' || description.trim() === '' || format.trim()==='' || !photo ||projetId ==='') {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
+            return;
+        }
         axios.post("/api/image/save", {
             name,
             photo,
@@ -110,7 +114,7 @@ export default function Image() {
     };
 
     const handlePhotoChange = (event) => {
-        const files = event.files; // An array of selected files
+        const files = event.files;
 
         if (files && files.length > 0) {
             const file = files[0];
@@ -135,10 +139,6 @@ export default function Image() {
         const res=await axios.get(`/api/image/all`);
         setImages(res.data);
     }
-
-
-
-
 
     /******************************************** Delete *************************/
 
@@ -177,7 +177,6 @@ export default function Image() {
 
     /******************************************** Dialogues *************************/
 
-
     const openNew = () => {
         setImages(image);
         setSubmitted(false);
@@ -199,7 +198,6 @@ export default function Image() {
         seteditProductDialog(false);
     };
 
-
     /***********************Update **************/
 
     const handleupdate = (rowData) => {
@@ -213,6 +211,10 @@ export default function Image() {
 
     const handleEdit = async (projectToUpdate) => {
         try {
+            if (name.trim() === '' || description.trim() === '' || format.trim()==='' || !photo ||projetId ==='') {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
+                return;
+            }
             const response = await axios.put(`/api/image/${projectToUpdate.id}`, {
                 name:name,
                 photo:photo,

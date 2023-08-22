@@ -325,7 +325,7 @@ export default function Projects() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (name.trim() === '' || description.trim() === '') {
+        if (name.trim() === '' || description.trim() === '' ||clientId ==='') {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
             return;
         }
@@ -433,6 +433,11 @@ export default function Projects() {
 
     const handleEdit = async () => {
         try {
+            if (name.trim() === '' || description.trim() === '' ||clientId ==='') {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Fields cannot be empty', life: 3000 });
+                return;
+            }
+
             const updatedProject = {
                 id: selectedProject.id,
                 name,
