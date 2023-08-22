@@ -12,12 +12,10 @@ import {
     ClickAwayListener,
     Divider,
     Grid,
-    InputAdornment,
     List,
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    OutlinedInput,
     Paper,
     Popper,
     Stack,
@@ -34,7 +32,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 
 // assets
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
+import { IconLogout, IconSettings, IconUser } from '@tabler/icons';
 //=======LOGOUT IMPORT===============//
 import {auth, logout} from "../../../../routes/auth";
 import axios from "../../../../utils/axios";
@@ -45,7 +43,6 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const navigate = useNavigate();
-    const [value, setValue] = useState('');
     const [user, setUser] = useState([]);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
@@ -163,36 +160,23 @@ const ProfileSection = () => {
                                                 </Typography>
                                             </Stack>
 
-                                            <Typography variant="h6"><Chip
+                                            <Typography variant="h6" className="mt-1">
+                                                <Chip
                                                 label={`${user && user.role} Space`}
                                                 size="small"
                                                 sx={{
                                                     bgcolor: theme.palette.info.light,
                                                     color: theme.palette.background.default
                                                 }}
-                                            /></Typography>
+                                            />
+                                            </Typography>
                                         </Stack>
-                                        <OutlinedInput
-                                            sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
-                                            id="input-search-profile"
-                                            value={value}
-                                            onChange={(e) => setValue(e.target.value)}
-                                            placeholder="Search profile options"
-                                            startAdornment={
-                                                <InputAdornment position="start">
-                                                    <IconSearch stroke={1.5} size="1rem" color={theme.palette.grey[500]} />
-                                                </InputAdornment>
-                                            }
-                                            aria-describedby="search-helper-text"
-                                            inputProps={{
-                                                'aria-label': 'weight'
-                                            }}
-                                        />
-                                        <Divider />
+
                                     </Box>
                                     <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
 
-                                        <Box sx={{ p: 1 }}>
+                                        <Box >
+                                            <Divider/>
 
                                             <List
                                                 component="nav"
@@ -239,6 +223,8 @@ const ProfileSection = () => {
                                                         }
                                                     />
                                                 </ListItemButton>
+                                                <Divider/>
+
                                                 <ListItemButton
                                                     component={Link}
                                                     to="/"

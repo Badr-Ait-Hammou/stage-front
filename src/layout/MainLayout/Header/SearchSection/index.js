@@ -74,21 +74,25 @@ const MobileSearch = ({  popupState }) => {
 
     const searchResults = [
         { name: 'Projects', link: '/visumine/projects' },
-        { name: 'Images', link: '/visumine/images' },
+        { name: 'Images', link: '/visumine/image' },
         { name: 'Profile', link: '/visumine/profile' },
         { name: 'Template', link: '/visumine/template' },
         { name: 'Information', link: '/visumine/information' },
-        { name: 'add user', link: '/admin/addUser' }
-        // Add more items as needed
+        { name: 'add user', link: '/admin/addUser' },
+        { name: 'Annotation', link: '/visumine/annotation' },
+        { name: 'Comments', link: '/visumine/all_comments' },
+
+
     ];
     const searchResultsManager = [
         { name: 'Projects', link: '/visumine/projects' },
-        { name: 'Images', link: '/visumine/images' },
+        { name: 'Images', link: '/visumine/image' },
         { name: 'Profile', link: '/visumine/profile' },
         { name: 'Template', link: '/visumine/template' },
         { name: 'Information', link: '/visumine/information' },
-        { name: 'add client', link: '/visumine/addClient' }
-        // Add more items as needed
+        { name: 'Add client', link: '/visumine/addClient' },
+        { name: 'Annotation', link: '/visumine/annotation' },
+        { name: 'Comments', link: '/visumine/all_comments' },
     ];
 
     const searchResultsClient = [
@@ -116,7 +120,6 @@ const MobileSearch = ({  popupState }) => {
     return (
         <Box>
         <OutlineInputStyle
-            id="input-search-header"
             value={filterValue}
             onChange={(e) => setFilterValue(e.target.value)}
             placeholder="Search"
@@ -201,20 +204,23 @@ const SearchSection = () => {
 
     const searchResults = [
         { name: 'Projects', link: '/visumine/projects' },
-        { name: 'Images', link: '/visumine/images' },
+        { name: 'Images', link: '/visumine/image' },
         { name: 'Profile', link: '/visumine/profile' },
         { name: 'Template', link: '/visumine/template' },
         { name: 'Information', link: '/visumine/information' },
-        { name: 'add user', link: '/admin/addUser' }
-        // Add more items as needed
+        { name: 'add user', link: '/admin/addUser' },
+        { name: 'Annotation', link: '/visumine/annotation' },
+        { name: 'Comments', link: '/visumine/all_comments' }
     ];
     const searchResultsManager = [
         { name: 'Projects', link: '/visumine/projects' },
-        { name: 'Images', link: '/visumine/images' },
+        { name: 'Images', link: '/visumine/image' },
         { name: 'Profile', link: '/visumine/profile' },
         { name: 'Template', link: '/visumine/template' },
         { name: 'Information', link: '/visumine/information' },
-        { name: 'add client', link: '/visumine/addClient' }
+        { name: 'add client', link: '/visumine/addClient' },
+        { name: 'Annotation', link: '/visumine/annotation' },
+        { name: 'Comments', link: '/visumine/all_comments' }
     ];
 
     const searchResultsClient = [
@@ -286,7 +292,6 @@ const SearchSection = () => {
             </Box>
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                 <OutlineInputStyle
-                    id="input-search-header"
                     value={filterValue}
                     onChange={(e) => setFilterValue(e.target.value)}
                     placeholder="Search"
