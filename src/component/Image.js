@@ -22,6 +22,7 @@ import html2canvas from 'html2canvas';
 import { IoCameraOutline, IoAddOutline, IoRemoveOutline,IoSquareOutline } from 'react-icons/io5';
 import 'leaflet-draw/dist/leaflet.draw.css'
 import PopularCart from "../ui-component/cards/Skeleton/PopularCard"
+import MainCard from "../ui-component/cards/MainCard";
 
 
 
@@ -397,8 +398,9 @@ export default function Image() {
 
 
     return (
-        <div>
+        <>
 
+            <MainCard>
             <Toast ref={toast} />
             <ConfirmDialog />
 
@@ -421,6 +423,7 @@ export default function Image() {
                         <PopularCart/>
                     )}
             </div>
+            </MainCard>
 
             <Dialog visible={productDialog} style={{ width: '40rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Add Image" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <Grid container spacing={2}>
@@ -656,7 +659,7 @@ export default function Image() {
             </Dialog>
 
 
-        </div>
+        </>
     );
 }
         

@@ -27,6 +27,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 import NoFile from "../assets/images/nofile.png";
+import MainCard from "../ui-component/cards/MainCard";
 
 
 export default function Template() {
@@ -442,6 +443,7 @@ return (
     <>
         <Toast ref={toast}/>
         <ConfirmDialog/>
+        <MainCard>
         <div className="card">
             <Toolbar className="mb-4" start={leftToolbarTemplate} center={<strong>Manage Templates</strong>}
                      end={rightToolbarTemplate}></Toolbar>
@@ -470,9 +472,8 @@ return (
             ) : (
                 <PopularCart/>
             )}
-
-
         </div>
+        </MainCard>
 
 
         <Dialog visible={productDialog} style={{width: '40rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}

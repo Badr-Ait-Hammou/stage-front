@@ -7,6 +7,7 @@ import {IoAddOutline, IoRefreshOutline, IoRemoveOutline} from "react-icons/io5";
 import { Grid } from "@mui/material";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import BubbleChartIcon from "@mui/icons-material/BubbleChart";
+import ImagePlaceholder from "../ui-component/cards/Skeleton/ProductPlaceholder"
 
 export default function ImageDetail() {
     const { id } = useParams();
@@ -24,7 +25,7 @@ export default function ImageDetail() {
     }, [id]);
 
     if (!image) {
-        return <p>Loading...</p>;
+        return <ImagePlaceholder/>;
     }
 
 
