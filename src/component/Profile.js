@@ -144,7 +144,8 @@ export default function Profile() {
                             { user ? user.tel || 'phone' : 'Phone'}
                         </h3>
                         <p
-                            className="text-muted mb-4 mt-2">  <i className="mx-2 pi  pi-globe "></i>
+                            className="text-muted mb-4 mt-2">
+                            <i className="mx-2 pi  pi-inbox "></i>
                             { user ? user.email || 'Email' : 'Email'}
                         </p>
                         <Box className="card">

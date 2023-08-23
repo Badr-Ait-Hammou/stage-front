@@ -31,6 +31,7 @@ const PopperStyle = styled(Popper, { shouldForwardProp })(({ theme }) => ({
     }
 }));
 
+
 const OutlineInputStyle = styled(OutlinedInput, { shouldForwardProp })(({ theme }) => ({
     width: 434,
     marginLeft: 16,
@@ -48,6 +49,27 @@ const OutlineInputStyle = styled(OutlinedInput, { shouldForwardProp })(({ theme 
         marginLeft: 4,
         background: '#fff'
     }
+}));
+
+const CardStyle = styled(Card)(({ theme }) =>({
+    width: 434,
+    marginLeft: 16,
+    paddingLeft: 16,
+    paddingRight: 16,
+    background: '#fff',
+    zIndex: 9999,
+    position: 'absolute',
+    '& input': {
+        background: 'transparent !important',
+        paddingLeft: '4px !important',
+    },
+    [theme.breakpoints.down('lg')]: {
+        width: 250,
+    },
+    [theme.breakpoints.down('md')]: {
+        width: '100%',
+        marginLeft: 4,
+    },
 }));
 
 const HeaderAvatarStyle = styled(Avatar, { shouldForwardProp })(({ theme }) => ({
@@ -314,7 +336,7 @@ const SearchSection = () => {
                 />
                 {/* Display filtered search results */}
                 {filterValue && (
-                    <Card sx={{ background: '#fff', zIndex: 9999, position: 'absolute',width:"27%" }}>
+                    <CardStyle>
                         <Box sx={{ p: 2 }}>
                             {filteredResults.length > 0 ? (
                                 filteredResults.map(result => (
@@ -332,7 +354,7 @@ const SearchSection = () => {
                                 </Alert>
                             )}
                         </Box>
-                    </Card>
+                    </CardStyle>
                 )}
             </Box>
         </>

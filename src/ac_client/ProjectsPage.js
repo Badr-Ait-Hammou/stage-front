@@ -15,6 +15,7 @@ import Doc from "../assets/images/doc.png";
 import Csv from "../assets/images/csv.png";
 import { Tag } from 'primereact/tag';
 import NoImg from "../assets/images/nopic.png";
+import Alert from "@mui/material/Alert";
 
 
 
@@ -146,6 +147,8 @@ export default function ProjectPage() {
     return (
         <>
             <MainCard>
+                <Alert className="mb-2" severity="info">these are two types of projects those that contains images and those that contains templates!</Alert>
+
                 <div className="card mb-2">
                     <Toolbar className="mb-4" start={leftToolbarTemplate}  end={rightToolbarTemplate}></Toolbar>
                     <div style={{ borderRadius: "10px", overflow: "hidden" }}>
