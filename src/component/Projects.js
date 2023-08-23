@@ -583,7 +583,7 @@ export default function Projects() {
                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Image and Template projects" globalFilter={globalFilter} header={header}>
                         <Column field="id" header="ID" sortable style={{ minWidth: '7rem' }}></Column>
-                        <Column field="name" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '10rem' }}  body={(rowData) => (
+                        <Column field="name" header="Project Name" filter filterPlaceholder="Search Name ..." sortable style={{ minWidth: '15rem' }}  body={(rowData) => (
                             <Link
                                 className="font-bold"
                                 onClick={(e) => {
@@ -840,14 +840,6 @@ export default function Projects() {
                     />  </div>
 
             </Dialog>
-
-
-
-
-
-
-
-
 
             <Dialog  visible={editPhotoDialog}
                      style={{ width: '40rem' }}

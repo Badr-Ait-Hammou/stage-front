@@ -490,7 +490,7 @@ export default function Image() {
                                     lineHeight: '1.5',
                                 }}
                             >
-                                <option value="">Select Projet</option>
+                                <option value="">Select Project</option>
                                 {projectsWithoutFiles &&
                                     projectsWithoutFiles.map((projet) => (
                                         <option key={projet.id} value={projet.id}>
@@ -570,7 +570,7 @@ export default function Image() {
                                 lineHeight: '1.5',
                             }}
                         >
-                            <option value="">Select Projet</option>
+                            <option value="">Select Project</option>
                             {projectsWithoutFiles &&
                                 projectsWithoutFiles.map((projet) => (
                                     <option key={projet.id} value={projet.id}>

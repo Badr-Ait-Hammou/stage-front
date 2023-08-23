@@ -226,7 +226,7 @@ export default function ProjectComment() {
     const commentDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-            <Button  label="save"
+            <Button  label="Submit"
                      severity="success"
                      raised onClick={(e) => handleSubmit(e)}/>
         </React.Fragment>

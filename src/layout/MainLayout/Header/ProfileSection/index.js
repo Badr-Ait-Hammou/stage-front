@@ -88,7 +88,6 @@ const ProfileSection = () => {
 
         prevOpen.current = open;
     }, [open]);
-
     return (
         <>
             <Chip
