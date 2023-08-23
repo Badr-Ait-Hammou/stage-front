@@ -1,14 +1,6 @@
-
 import React, {useState, useEffect, useRef} from "react"
 import { useTheme} from "@mui/material/styles";
-import {
-    Box,
-    FormControl,
-    Grid, IconButton, InputAdornment,
-    InputLabel, OutlinedInput,
-    Typography,
-    useMediaQuery
-} from "@mui/material";
+import {Box, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography, useMediaQuery} from "@mui/material";
 import {Dialog} from 'primereact/dialog';
 import {Button} from 'primereact/button';
 import Visibility from "@mui/icons-material/Visibility";
@@ -26,7 +18,6 @@ import {ConfirmDialog, confirmDialog} from "primereact/confirmdialog";
 
 
 export default function AddClient() {
-
     const [firstname, setFirstName] = useState('');
     const [lastname, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -73,7 +64,6 @@ export default function AddClient() {
         const crypto = window.crypto || window.msCrypto;
         const randomValues = new Uint32Array(passwordLength);
         crypto.getRandomValues(randomValues);
-
         for (let i = 0; i < passwordLength; i++) {
             const randomIndex = randomValues[i] % characters.length;
             password += characters.charAt(randomIndex);
@@ -98,7 +88,6 @@ export default function AddClient() {
     };
 
     /*************************************************** Save *************************************************/
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -169,28 +158,20 @@ export default function AddClient() {
             });
         }
     };
-
-
-
-
-
     /************************************************** Delete ******************************************************/
-
 
     const deleteUser = (id) => {
         const confirmDelete = async () => {
             try {
                 const response = await axios.delete(`/api/users/${id}`);
                 console.log("API Response:", response.data);
-                loadUsers();
+                loadClients();
                 showudelete();
             } catch (error) {
                 console.error("Error while deleting user:", error);
                 toast.current.show({severity:'error', summary: 'Error', detail:'user has a project', life: 3000});
-
             }
         };
-
         confirmDialog({
             message: 'Are you sure you want to delete this User?',
             header: 'Confirmation',
@@ -201,9 +182,6 @@ export default function AddClient() {
             accept: confirmDelete
         });
     };
-
-
-
 
     /************************************ Dialog open/close *****************************/
 
@@ -305,7 +283,6 @@ export default function AddClient() {
 
     const passwordBodyTemplate = (rowData) => {
         const isPasswordVisible = passwordVisibility[rowData.id];
-
         return (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ marginRight: "4px" }}>

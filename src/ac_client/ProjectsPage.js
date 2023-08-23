@@ -6,6 +6,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Link } from "react-router-dom";
 import "../style/Image.css"
+import "style/font.css"
 import {Button} from "primereact/button";
 import {InputText} from "primereact/inputtext";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -16,6 +17,9 @@ import Csv from "../assets/images/csv.png";
 import { Tag } from 'primereact/tag';
 import NoImg from "../assets/images/nopic.png";
 import Alert from "@mui/material/Alert";
+import {  IconButton, Tooltip } from '@mui/material';
+import { MdErrorOutline } from 'react-icons/md';
+
 
 
 
@@ -39,6 +43,29 @@ export default function ProjectPage() {
     const sortedProjects = undefinedNameProjects.concat(definedNameProjects);
 
 
+
+    const AlertWithIcon = ({ message }) => {
+        const [showAlert, setShowAlert] = useState(false);
+
+        const handleIconClick = () => {
+            setShowAlert((prevShowAlert) => !prevShowAlert);
+        };
+
+        return (
+            <>
+                <Tooltip title="Show Info">
+                    <IconButton onClick={handleIconClick}>
+                        <MdErrorOutline className="animated-icon" />
+                    </IconButton>
+                </Tooltip>
+                {showAlert && (
+                    <Alert severity="error" className="mb-2">
+                        {message}
+                    </Alert>
+                )}
+            </>
+        );
+    };
 
     useEffect(() => {
         console.log(id);
@@ -99,17 +126,7 @@ export default function ProjectPage() {
             return <img src={NoImg} alt="No" style={{width: '30px', height: 'auto'}}/>;
         }
     };
-    /*const resultFileBodyTemplate = (rowData) => {
-        if (rowData.result && rowData.result.file) {
-            return (
-                <a href={rowData.result.file} download>
-                    <FileDownloadIcon /> Download
-                </a>
-            );
-        }
-        return null;
-    };
-*/
+
 
     const resultFileBodyTemplate = (rowData) => {
         if (rowData.result && rowData.result.file) {
@@ -130,8 +147,7 @@ export default function ProjectPage() {
                 </a>
             );
         } else {
-            return             <Tag value="Not found" severity="warning" />
-                ;
+            return <Tag value="Not found" severity="warning" />;
         }
     };
 
@@ -147,7 +163,7 @@ export default function ProjectPage() {
     return (
         <>
             <MainCard>
-                <Alert className="mb-2" severity="info">these are two types of projects those that contains images and those that contains templates!</Alert>
+                <AlertWithIcon message="There are two types of projects: those that contain images and those that contain templates!" />
 
                 <div className="card mb-2">
                     <Toolbar className="mb-4" start={leftToolbarTemplate}  end={rightToolbarTemplate}></Toolbar>
@@ -176,9 +192,8 @@ export default function ProjectPage() {
                                 style={{ minWidth: '11rem' }} />
 
                         <Column  header="Creation_Date" field="dateCreation"  body={(rowData) => formatDateTime(rowData.dateCreation)}
-                                 sortable sortField="dateCreation" filter style={{ minWidth: "15rem" }}></Column>
-
-
+                                 sortable sortField="dateCreation" filter style={{ minWidth: "15rem" }}>
+                        </Column>
                     </DataTable>
                 ) : (
                     <PopularCart/>
