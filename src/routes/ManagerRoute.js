@@ -17,7 +17,7 @@ import Image from '../component/Image';
 import Information from '../component/Information';
 import Annotation from '../component/Annotation';
 import Projects from '../component/Projects';
-import Storage from '../component/Storage';
+import Storage from '../component/ImportCsv';
 import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
@@ -156,7 +156,7 @@ const ManagerRoute = {
       element: <Projects />
     },
     {
-      path: 'storage',
+      path: 'importCsv',
       element: <Storage />
     },
     {

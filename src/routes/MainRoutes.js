@@ -17,7 +17,7 @@ import Image from '../component/Image';
 import Information from '../component/Information';
 import Annotation from '../component/Annotation';
 import Projects from '../component/Projects';
-import Storage from '../component/Storage';
+import Storage from '../component/ImportCsv';
 import ImageDetail from '../component/ImageDetail';
 import Chart from "../component/Chart"
 import ProjectDetails from "../component/ProjectDetails"
@@ -32,10 +32,6 @@ import TempDetails from "../component/TemplateDetails"
 import TempDetailsExcel from "../component/TemplateDetailsExcel"
 import ProjectDetailsDoc from "../component/ProjectDetailDoc"
 import ProjectDetailsCsv from "../component/ProjectDetailsCsv"
-import AdminRoute from './AdminRoute';
-import ManagerRoute from './ManagerRoute';
-import ClientRoute from './ClientRoute';
-import AuthGuard from './AuthGuard';
 
 // ==============================|| MAIN ROUTING ||============================== //
 

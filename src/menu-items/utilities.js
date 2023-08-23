@@ -1,4 +1,4 @@
-import { IconUserPlus } from '@tabler/icons';
+import { IconUserPlus,IconDownload } from '@tabler/icons';
 import { auth } from "../routes/auth";
 
 const filterMenuItems = (user) => {
@@ -7,6 +7,16 @@ const filterMenuItems = (user) => {
     title: 'Management',
     type: 'group',
     children: [
+      {
+        id: 'storage',
+        title: 'Import Csv',
+        type: 'item',
+        url: '/visumine/importCsv',
+        icon: IconDownload,
+
+
+        breadcrumbs: false,
+      },
 
       {
         id: 'addUser',
