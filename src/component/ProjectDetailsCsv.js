@@ -15,8 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { Avatar } from '@mui/material';
 
-
-
+import * as XLSX from 'xlsx/xlsx.mjs';
 
 import { Paginator } from 'primereact/paginator';
 import Doc from "../assets/images/doc.png";
@@ -35,6 +34,7 @@ import Pdftemplate6 from "../assets/images/pdftemplate13.png"
 import Pdftemplate7 from "../assets/images/pdftemplate19.png"
 import Pdftemplate8 from "../assets/images/pdftemplate15.png"
 import Pdftemplate9 from "../assets/images/pdftemplate16.png"
+import {FileUpload} from "primereact/fileupload";
 
 
 export default function ProjectDetailsCsv() {
@@ -53,6 +53,8 @@ export default function ProjectDetailsCsv() {
     const [selectedImage, setSelectedImage] = useState(null);
     const [displayProgressBar, setDisplayProgressBar] = useState(false);
     const [progress, setProgress] = React.useState(10);
+    const [displayDialog2, setDisplayDialog2] = useState(false);
+
 
     React.useEffect(() => {
         const timer = setInterval(() => {
@@ -188,45 +190,59 @@ export default function ProjectDetailsCsv() {
 
     };
 
+
     /******************************************** Save all row values *******************************************/
 
 
     const handleSaveAll = () => {
-        const lastRowValues = data[data.length - 1];
+        const savePromises = data.map((rowData) => {
+            const savePromisesForRow = project.result.fieldList.map((field) =>
+                axios.post("/api/fieldvalue/save", {
+                    value: rowData[field.namef.toLowerCase()],
+                    field: {
+                        id: field.id,
+                    },
+                })
+            );
+            return Promise.all(savePromisesForRow);
+        });
 
-        const hasEmptyFields = Object.values(lastRowValues).some((value) => value === '');
+        Promise.all(savePromises)
+            .then((responses) => {
+                console.log("Saved all field values for imported data:", responses);
+                const newEmptyRow = {};
+                project.result.fieldList.forEach((field) => {
+                    newEmptyRow[field.namef.toLowerCase()] = '';
+                });
+                setData([...data, newEmptyRow]);
+                setSavedFieldValues([]);
+                showusave();
+            })
+            .catch((error) => {
+                console.error("Error while saving field values:", error);
+            });
+    };
 
-        if (hasEmptyFields) {
-            console.log("Cannot save due to empty fields.");
-            showEmpty();
-            return;
-        }
 
-        const savePromises = project.result.fieldList.map((field) =>
+    const saveSingleRow = (rowData) => {
+        console.log("rowData:", rowData); // Debugging line
+
+        const savePromisesForRow = project.result.fieldList.map((field, index) =>
             axios.post("/api/fieldvalue/save", {
-                value: lastRowValues[field.namef.toLowerCase()],
+                value: rowData[field.namef.toLowerCase()],
                 field: {
                     id: field.id,
                 },
             })
         );
 
-        Promise.all(savePromises)
+        console.log("savePromisesForRow:", savePromisesForRow); // Debugging line
+
+        Promise.all(savePromisesForRow)
             .then((responses) => {
-                console.log("Saved all field values:", responses);
-                const newRow = {};
-                project.result.fieldList.forEach((field) => {
-                    newRow[field.namef.toLowerCase()] = '';
-                });
-                const newData = [...data];
-                newData[newData.length - 1] = newRow;
-                setData(newData);
-                loadFields(project.result.id);
+                console.log("Saved field values for the single row:", responses);
                 setShowSaveAllButton(false);
                 showusave();
-
-
-
             })
             .catch((error) => {
                 console.error("Error while saving field values:", error);
@@ -300,7 +316,7 @@ export default function ProjectDetailsCsv() {
                         rounded
                         outlined
                         style={{ marginRight: '4px' }}
-                        onClick={handleSaveAll}
+                        onClick={() => saveSingleRow(rowData)}
                     />
                 )}
                 <Button
@@ -344,7 +360,9 @@ export default function ProjectDetailsCsv() {
             <div>
         <Button label="Export" icon="pi pi-upload" className="p-button-help" style={{marginRight:"5px"}} onClick={exportCSV} />
         <Button label="Export PDF" icon="pi pi-file-pdf" className="p-button-danger "  onClick={showImageSelectionDialog} />
-        </div>
+        <Button label="Import CSV Data"  icon="pi pi-file-excel" className="p-button-secondary" style={{marginLeft:"5px"}} onClick={() => setDisplayDialog2(true)} />
+
+            </div>
         );
     };
 
@@ -355,6 +373,9 @@ export default function ProjectDetailsCsv() {
 
     const showusave = () => {
         toast.current.show({severity:'success', summary: 'success', detail:'row saved successfully', life: 3000});
+    }
+    const showusaveCsv = () => {
+        toast.current.show({severity:'success', summary: 'success', detail:'Csv Data saved successfully', life: 3000});
     }
 
     const showDelete = () => {
@@ -552,6 +573,191 @@ export default function ProjectDetailsCsv() {
 
     };
 
+    const parseCSVContents = (contents) => {
+        const rows = contents.split('\n');
+        const parsedData = rows.map((row) => {
+            const cells = row.split(',');
+            return cells.map((cell) => (cell.startsWith('"') && cell.endsWith('"') ? cell.slice(1, -1) : cell));
+        });
+        console.log("parsed data", parsedData);
+
+        return parsedData;
+    };
+
+    /*
+    const handleImportCSV = (event) => {
+        const selectedFiles = event.files;
+        if (!selectedFiles || selectedFiles.length === 0) {
+            console.error("No files selected");
+            return;
+        }
+
+        const file = selectedFiles[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const contents = e.target.result;
+            console.log("contents", contents);
+
+            const parsedData = parseCSVContents(contents);
+
+            if (parsedData && parsedData.length > 0) {
+                const newData = [...data]; // Create a copy of the current data array
+                const newSavedFieldValues = [...savedFieldValues]; // Create a copy of the current savedFieldValues array
+
+                parsedData.forEach((rowData) => {
+                    const newRow = {};
+                    project.result.fieldList.forEach((field, index) => {
+                        newRow[field.namef.toLowerCase()] = rowData[index];
+                    });
+                    newData.push(newRow); // Add the new row to the newData array
+
+                    const savedFieldValuesForRow = project.result.fieldList.map((field, index) => ({
+                        field: { id: field.id },
+                        value: rowData[index],
+                    }));
+                    newSavedFieldValues.push(...savedFieldValuesForRow); // Add the savedFieldValues for the new row
+                });
+
+                setData(newData);
+                setSavedFieldValues(newSavedFieldValues);
+            } else {
+                console.error("Parsed data is empty");
+            }
+        };
+
+        reader.readAsText(file);
+    };
+*/
+
+    /*
+    const handleImportCSV = (event) => {
+        const selectedFiles = event.files;
+        if (!selectedFiles || selectedFiles.length === 0) {
+            console.error("No files selected");
+            return;
+        }
+
+        const file = selectedFiles[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const contents = e.target.result;
+            console.log("contents", contents);
+
+            const parsedData = parseCSVContents(contents);
+
+            if (parsedData && parsedData.length > 1) {
+                const newData = [...data];
+
+                for (let i = 1; i < parsedData.length; i++) {
+                    const rowData = parsedData[i];
+                    const newRow = {};
+
+                    project.result.fieldList.forEach((field, index) => {
+                        newRow[field.namef.toLowerCase()] = rowData[index];
+                    });
+
+                    newData.push(newRow); // Add the new row to the newData array
+                }
+
+                setData(newData);
+
+                // Save the parsedData (excluding the first row) to the database
+                const savePromises = parsedData.slice(1).map((rowData) => {
+                    const savePromisesForRow = project.result.fieldList.map((field, index) =>
+                        axios.post("/api/fieldvalue/save", {
+                            value: rowData[index],
+                            field: {
+                                id: field.id,
+                            },
+                        })
+                    );
+                    return Promise.all(savePromisesForRow);
+                });
+
+                Promise.all(savePromises)
+                    .then((responses) => {
+                        console.log("Saved all field values for imported data:", responses);
+                        showusaveCsv();
+                        setDisplayDialog2(false);
+                    })
+                    .catch((error) => {
+                        console.error("Error while saving field values:", error);
+                    });
+            } else {
+                console.error("Parsed data is empty");
+            }
+        };
+
+        reader.readAsText(file);
+    };
+
+*/
+
+    const handleImportCSV = (event) => {
+        const selectedFiles = event.files;
+        if (!selectedFiles || selectedFiles.length === 0) {
+            console.error("No files selected");
+            return;
+        }
+
+        const file = selectedFiles[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const contents = e.target.result;
+            console.log("contents", contents);
+
+            const workbook = XLSX.read(contents, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const parsedData = XLSX.utils.sheet_to_json(worksheet);
+
+            if (parsedData && parsedData.length > 0) {
+                const newData = [...data];
+
+                parsedData.forEach((rowData) => {
+                    const newRow = {};
+
+                    project.result.fieldList.forEach((field, index) => {
+                        newRow[field.namef.toLowerCase()] = rowData[field.namef];
+                    });
+
+                    newData.push(newRow);
+                });
+
+                setData(newData);
+
+
+                const savePromises = parsedData.map((rowData) => {
+                    const savePromisesForRow = project.result.fieldList.map((field, index) =>
+                        axios.post("/api/fieldvalue/save", {
+                            value: rowData[field.namef],
+                            field: {
+                                id: field.id,
+                            },
+                        })
+                    );
+                    return Promise.all(savePromisesForRow);
+                });
+
+                Promise.all(savePromises)
+                    .then((responses) => {
+                        console.log("Saved all field values for imported data:", responses);
+                        showusaveCsv();
+                        setDisplayDialog2(false);
+                    })
+                    .catch((error) => {
+                        console.error("Error while saving field values:", error);
+                    });
+            } else {
+                console.error("Parsed data is empty");
+            }
+        };
+
+        reader.readAsArrayBuffer(file);
+    };
 
     /******************************************** Export pdf *******************************************/
 
@@ -597,7 +803,6 @@ export default function ProjectDetailsCsv() {
                     currentLine = '';
                 }
             }
-
             return lines;
         };
 
@@ -820,10 +1025,9 @@ export default function ProjectDetailsCsv() {
 
                         {project.result.fieldList.map((field) => (
                             <Column
-
                                 key={`input-${field.id}`}
                                 header={field.namef}
-                                field={field.namef.toLowerCase()}
+                                field={field.namef.toLowerCase()} // Use the correct property name
                                 style={{ minWidth: '7rem' }}
                                 body={(rowData) => (
                                     <InputText
@@ -838,14 +1042,12 @@ export default function ProjectDetailsCsv() {
                                             textAlign: 'left',
                                         }}
                                         type="text"
-                                        //key={`input-${field.id}-${rowData.id}`} // Unique key for each input
-                                        value={rowData[field.namef.toLowerCase()]}
+                                        value={rowData[field.namef.toLowerCase()]} // Set the input value based on data property
                                         onChange={(e) =>
                                             handleInputChange(rowData, field.namef.toLowerCase(), e.target.value)
                                         }
                                     />
                                 )}
-
                             />
                         ))}
                         <Column
@@ -914,6 +1116,29 @@ export default function ProjectDetailsCsv() {
                     <Typography variant="body1">{`${Math.round(progress)}%`}</Typography>
                 </div>
             </Dialog>
+
+
+            <Dialog
+                visible={displayDialog2}
+                onHide={() => setDisplayDialog2(false)}
+                header="Upload CSV Data"
+            >
+
+                <FileUpload
+                    className="mt-2"
+                    name="photo"
+                    url={'/api/upload'}
+                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    maxFileSize={1000000}
+                    emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
+                    chooseLabel="Select Csv file"
+                    uploadLabel="Upload"
+                    cancelLabel="Cancel"
+                    onSelect={(e) => handleImportCSV(e)} // Pass the event object here
+                />
+            </Dialog>
+
+
 
         </>
     );
