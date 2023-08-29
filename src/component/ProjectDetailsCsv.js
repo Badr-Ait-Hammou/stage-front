@@ -294,7 +294,6 @@ export default function ProjectDetailsCsv() {
         });
     };
 
-
     /******************************************** Datatable component *******************************************/
 
 
