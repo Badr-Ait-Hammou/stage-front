@@ -193,7 +193,7 @@ export default function AllComments() {
 
             <MainCard>
 
-                <Toolbar className="mb-4"  start={<strong>ALl Comments</strong>} end={rightToolbarTemplate}></Toolbar>
+                <Toolbar className="mb-4"  start={<strong>ALL Comments</strong>} end={rightToolbarTemplate}></Toolbar>
                 {dataTableLoaded ? (
                 <DataTable ref={dt} value={comment}
                            dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
