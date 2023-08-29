@@ -433,7 +433,7 @@ export default function CSV(){
                         accept=".csv"
                         maxFileSize={1000000}
                         emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
-                        chooseLabel="Select Image"
+                        chooseLabel="Select Csv File"
                         uploadLabel="Upload"
                         cancelLabel="Cancel"
                         onSelect={(e) => handleFileUpload(e)}
