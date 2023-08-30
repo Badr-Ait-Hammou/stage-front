@@ -56,7 +56,7 @@ const FirebaseLogin = ({ ...others }) => {
         navigate('/visumine/client_projects');
         window.location.reload();
       } else {
-        navigate('/visumine/projects');
+        navigate('/visumine/dashboard');
         window.location.reload();
       }
     } catch (error) {

@@ -1,9 +1,9 @@
-import axios from "axios"
+import axios from "utils/axios"
 import {setAuthToken} from "./auth";
 
 
 //const API_URL = 'https://garrulous-metal-production.up.railway.app/api/auth';
-const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = '/api/auth';
 
 const AuthService = {
   login: async (email, password) => {
@@ -16,11 +16,10 @@ const AuthService = {
       localStorage.setItem('user', JSON.stringify(user)); // Store user as a string
       setAuthToken(token);
       console.log(user);
-// console.log("return motherfucker", response.data.user.role);
-      return user; // Return user without JSON.parse
+      return user;
     } catch (e) {
       console.error(e);
-      throw e; // Explicitly throw the error to reject the Promise
+      throw e;
     }
   },
 };

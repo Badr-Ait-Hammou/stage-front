@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from 'utils/axios';
 import jwtDecode from 'jwt-decode';
 
-const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = '/api/auth';
 
 export const setAuthToken = token => {
   if (token) {
