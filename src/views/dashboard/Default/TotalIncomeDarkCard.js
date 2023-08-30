@@ -7,9 +7,12 @@ import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography }
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
+import InsertCommentIcon from '@mui/icons-material/InsertComment';
 
 // assets
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import {useEffect, useState} from "react";
+import axios from "../../../utils/axios";
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -39,10 +42,27 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
   }
 }));
 
+
+
 // ==============================|| DASHBOARD - TOTAL INCOME DARK CARD ||============================== //
 
 const TotalIncomeDarkCard = ({ isLoading }) => {
   const theme = useTheme();
+  const [commentCount, setCommentCount] = useState(0); // State to hold the project count
+
+
+
+  useEffect(() => {
+    axios.get('/api/comment/all')
+        .then((response) => {
+          const data = response.data;
+          const count = data.length;
+          setCommentCount(count);
+        })
+        .catch((error) => {
+          console.error('Error fetching client data:', error);
+        });
+  }, []);
 
   return (
     <>
@@ -63,7 +83,7 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                       color: '#fff'
                     }}
                   >
-                    <TableChartOutlinedIcon fontSize="inherit" />
+                    <InsertCommentIcon fontSize="inherit" />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
@@ -74,12 +94,12 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                   }}
                   primary={
                     <Typography variant="h4" sx={{ color: '#fff' }}>
-                      $203k
+                      {commentCount}
                     </Typography>
                   }
                   secondary={
                     <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                      Total Income
+                      Comment
                     </Typography>
                   }
                 />

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+import axios from "utils/axios"
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
@@ -12,6 +13,7 @@ import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 // assets
 import EarningIcon from 'assets/images/icons/earning.svg';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import GroupIcon from '@mui/icons-material/Group';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
 import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
@@ -58,8 +60,9 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const EarningCard = ({ isLoading }) => {
   const theme = useTheme();
-
   const [anchorEl, setAnchorEl] = useState(null);
+  const [clientCount, setClientCount] = useState(0); // State to hold the client count
+
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -68,6 +71,18 @@ const EarningCard = ({ isLoading }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    axios.get('/api/users/role/CLIENT')
+        .then((response) => {
+          const data = response.data;
+          const count = data.length;
+          setClientCount(count);
+        })
+        .catch((error) => {
+          console.error('Error fetching client data:', error);
+        });
+  }, []);
 
   return (
     <>
@@ -86,10 +101,13 @@ const EarningCard = ({ isLoading }) => {
                         ...theme.typography.commonAvatar,
                         ...theme.typography.largeAvatar,
                         backgroundColor: theme.palette.secondary[800],
-                        mt: 1
+                        mt: 1,
+                        color: '#fff',
+
                       }}
                     >
-                      <img src={EarningIcon} alt="Notification" />
+                      <GroupIcon fontSize="inherit" />
+
                     </Avatar>
                   </Grid>
                   <Grid item>
@@ -100,7 +118,8 @@ const EarningCard = ({ isLoading }) => {
                         ...theme.typography.mediumAvatar,
                         backgroundColor: theme.palette.secondary.dark,
                         color: theme.palette.secondary[200],
-                        zIndex: 1
+                        zIndex: 1,
+
                       }}
                       aria-controls="menu-earning-card"
                       aria-haspopup="true"
@@ -143,7 +162,7 @@ const EarningCard = ({ isLoading }) => {
               <Grid item>
                 <Grid container alignItems="center">
                   <Grid item>
-                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$500.00</Typography>
+                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{clientCount} Client </Typography>
                   </Grid>
                   <Grid item>
                     <Avatar
@@ -167,7 +186,7 @@ const EarningCard = ({ isLoading }) => {
                     color: theme.palette.secondary[200]
                   }}
                 >
-                  Total Earning
+                  Total Clients: {clientCount}
                 </Typography>
               </Grid>
             </Grid>

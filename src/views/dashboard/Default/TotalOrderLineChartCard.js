@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+import axios from "utils/axios";
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
@@ -16,7 +17,7 @@ import ChartDataMonth from './chart-data/total-order-month-line-chart';
 import ChartDataYear from './chart-data/total-order-year-line-chart';
 
 // assets
-import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -65,11 +66,28 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalOrderLineChartCard = ({ isLoading }) => {
   const theme = useTheme();
+  const [projectCount, setProjectCount] = useState(0); // State to hold the project count
+
 
   const [timeValue, setTimeValue] = useState(false);
   const handleChangeTime = (event, newValue) => {
     setTimeValue(newValue);
   };
+
+
+  useEffect(() => {
+    // Fetch project data using axios
+    axios.get('/api/projet/role/CLIENT')
+        .then((response) => {
+          const data = response.data;
+          // Calculate the project count from the data
+          const count = data.length;
+          setProjectCount(count);
+        })
+        .catch((error) => {
+          console.error('Error fetching project data:', error);
+        });
+  }, []);
 
   return (
     <>
@@ -92,7 +110,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                         mt: 1
                       }}
                     >
-                      <LocalMallOutlinedIcon fontSize="inherit" />
+                      <AccountTreeIcon fontSize="inherit" />
                     </Avatar>
                   </Grid>
                   <Grid item>
@@ -123,9 +141,13 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                     <Grid container alignItems="center">
                       <Grid item>
                         {timeValue ? (
-                          <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$108</Typography>
+                            <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
+                              {projectCount}
+                            </Typography>
                         ) : (
-                          <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$961</Typography>
+                            <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
+                              {projectCount}
+                            </Typography>
                         )}
                       </Grid>
                       <Grid item>
@@ -148,7 +170,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                             color: theme.palette.primary[200]
                           }}
                         >
-                          Total Order
+                          Total Project
                         </Typography>
                       </Grid>
                     </Grid>

@@ -42,7 +42,10 @@ const AdminRoute = {
     {
       path: 'projects',
       element: <Projects />
-      // element: <DashboardDefault />
+    },
+    {
+      path: 'dashboard',
+      element: <DashboardDefault />
     },
     {
       path: 'dashboard',
