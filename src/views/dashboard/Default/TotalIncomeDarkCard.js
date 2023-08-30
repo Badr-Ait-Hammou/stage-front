@@ -10,7 +10,6 @@ import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 import InsertCommentIcon from '@mui/icons-material/InsertComment';
 
 // assets
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import {useEffect, useState} from "react";
 import axios from "../../../utils/axios";
 

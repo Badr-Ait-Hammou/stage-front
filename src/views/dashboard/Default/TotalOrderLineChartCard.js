@@ -149,6 +149,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                               {projectCount}
                             </Typography>
                         )}
+
                       </Grid>
                       <Grid item>
                         <Avatar
