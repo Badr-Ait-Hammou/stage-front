@@ -103,6 +103,7 @@ const MobileSearch = ({  popupState }) => {
         { name: 'add user', link: '/admin/addUser' },
         { name: 'Annotation', link: '/visumine/annotation' },
         { name: 'Comments', link: '/visumine/all_comments' },
+        { name: 'Dashboard', link: '/visumine/dashboard' },
 
 
     ];
@@ -115,6 +116,8 @@ const MobileSearch = ({  popupState }) => {
         { name: 'Add client', link: '/visumine/addClient' },
         { name: 'Annotation', link: '/visumine/annotation' },
         { name: 'Comments', link: '/visumine/all_comments' },
+        { name: 'Dashboard', link: '/visumine/dashboard' },
+
     ];
 
     const searchResultsClient = [
@@ -182,7 +185,6 @@ const MobileSearch = ({  popupState }) => {
             aria-describedby="search-helper-text"
             inputProps={{ 'aria-label': 'weight' }}
         />
-            {/* Display filtered search results */}
             {filterValue && (
                 <Card sx={{ background: '#fff', zIndex: 9999, position: 'absolute',width:"87%" }}>
                     <Box sx={{ p: 2 }}>
@@ -232,7 +234,9 @@ const SearchSection = () => {
         { name: 'Information', link: '/visumine/information' },
         { name: 'add user', link: '/admin/addUser' },
         { name: 'Annotation', link: '/visumine/annotation' },
-        { name: 'Comments', link: '/visumine/all_comments' }
+        { name: 'Comments', link: '/visumine/all_comments' },
+        { name: 'Dashboard', link: '/visumine/dashboard' },
+
     ];
     const searchResultsManager = [
         { name: 'Projects', link: '/visumine/projects' },
@@ -242,7 +246,9 @@ const SearchSection = () => {
         { name: 'Information', link: '/visumine/information' },
         { name: 'add client', link: '/visumine/addClient' },
         { name: 'Annotation', link: '/visumine/annotation' },
-        { name: 'Comments', link: '/visumine/all_comments' }
+        { name: 'Comments', link: '/visumine/all_comments' },
+        { name: 'Dashboard', link: '/visumine/dashboard' },
+
     ];
 
     const searchResultsClient = [
@@ -334,7 +340,6 @@ const SearchSection = () => {
                     aria-describedby="search-helper-text"
                     inputProps={{ 'aria-label': 'weight' }}
                 />
-                {/* Display filtered search results */}
                 {filterValue && (
                     <CardStyle>
                         <Box sx={{ p: 2 }}>
