@@ -2,10 +2,12 @@ import PropTypes from 'prop-types';
 import {useState, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import axios from "utils/axios";
+import Chip from '@mui/material/Chip';
+
 
 // material-ui
 import {useTheme} from '@mui/material/styles';
-import {Grid, MenuItem, TextField, Typography} from '@mui/material';
+import {Grid, Typography} from '@mui/material';
 
 // third-party
 import ApexCharts from 'apexcharts';
@@ -19,25 +21,11 @@ import {gridSpacing} from 'store/constant';
 // chart data
 import chartData from './chart-data/total-growth-bar-chart';
 
-const status = [
-    {
-        value: 'today',
-        label: 'Today'
-    },
-    {
-        value: 'month',
-        label: 'This Month'
-    },
-    {
-        value: 'year',
-        label: 'This Year'
-    }
-];
+
 
 // ==============================|| DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
 
 const TotalGrowthBarChart = ({isLoading}) => {
-    const [value, setValue] = useState('today');
     const theme = useTheme();
     const [projectCount, setProjectCount] = useState(0); // State to hold the project count
     const customization = useSelector((state) => state.customization);
@@ -112,19 +100,17 @@ const TotalGrowthBarChart = ({isLoading}) => {
                     <Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>
                             <Grid container alignItems="center" justifyContent="space-between">
-                                <Grid item>
-                                    <Grid container direction="column" spacing={1}>
-                                        <Grid item>
-                                            <Typography variant="subtitle2">Total Project</Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography variant="h3">{projectCount}</Typography>
-                                        </Grid>
+                                <Grid item container alignItems="center" spacing={1}>
+                                    <Grid item>
+                                        <Typography variant="subtitle2">Total Project</Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Chip label={projectCount}  color="primary"  />
                                     </Grid>
                                 </Grid>
-
                             </Grid>
                         </Grid>
+
                         <Grid item xs={12}>
                             <Chart {...chartData} />
                         </Grid>

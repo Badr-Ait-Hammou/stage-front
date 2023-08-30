@@ -16,7 +16,7 @@ const dashboard = {
       title: 'Dashboard',
       type: 'item',
       //url: '/dashboard/default',
-      url: '/image',
+      url: '/visumine/dashboard',
       icon: icons.IconDashboard,
       breadcrumbs: false
     }
